@@ -1,11 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Betto.DataAccessLayer;
+using Betto.DataAccessLayer.Repositories;
+using Betto.Helpers;
+using Betto.Services.Services.ImportService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +31,13 @@ namespace Betto.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddMvc().AddNewtonsoftJson();
+
+            services.Configure<RapidApiConfiguration>(Configuration.GetSection("RapidApiConfiguration"));
+
+            ConfigureDatabaseConnection(services);
+            ConfigureRepositories(services);
+            ConfigureBettoServices(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,5 +59,24 @@ namespace Betto.Api
                 endpoints.MapControllers();
             });
         }
+
+        private void ConfigureDatabaseConnection(IServiceCollection services)
+        {
+            var connectionString = Configuration.GetConnectionString("DevelopmentConnectionString");
+            services.AddDbContext<BettoDbContext>(options => options.UseSqlServer(connectionString,
+                o => o.MigrationsAssembly("Betto.DataAccessLayer")));
+        }
+
+        private void ConfigureRepositories(IServiceCollection services)
+        {
+            services.AddScoped<ILeagueRepository, LeagueRepository>();
+            services.AddScoped<ITeamRepository, TeamRepository>();
+        }
+
+        private void ConfigureBettoServices(IServiceCollection services)
+        {
+            services.AddScoped<IImportService, ImportService>();
+        }
+
     }
 }
