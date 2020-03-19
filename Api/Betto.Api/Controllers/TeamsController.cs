@@ -41,7 +41,7 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<TeamDTO>> GetTeamByIdAsync(int leagueId, int id, bool includeVenues = false)
+        public async Task<ActionResult<TeamDTO>> GetTeamByIdAsync(int leagueId, int id, bool includeVenue = false)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Betto.Api.Controllers
                 if (league == null)
                     return NotFound(new { Message = "League not found" });
 
-                var team = await _teamService.GetTeamByIdAsync(id, includeVenues);
+                var team = await _teamService.GetTeamByIdAsync(id, includeVenue);
 
                 if (team == null)
                     return NotFound(new { Message = "Team not found" });
