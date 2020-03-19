@@ -11,7 +11,7 @@ namespace Betto.Model.DTO
         public int Capacity { get; set; }
 
         public static explicit operator VenueDTO(VenueEntity venue)
-            => new VenueDTO
+            => venue == null ? null : new VenueDTO
             {
                 Name = venue.Name,
                 Surface = venue.Surface,

@@ -13,7 +13,7 @@ namespace Betto.Model.DTO
         public VenueDTO Venue { get; set; }
 
         public static explicit operator TeamDTO(TeamEntity team)
-            => new TeamDTO
+            => team == null ? null : new TeamDTO
             {
                 TeamId = team.TeamId,
                 LeagueId = team.LeagueId,

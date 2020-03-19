@@ -17,7 +17,7 @@ namespace Betto.Model.DTO
         public bool Standings { get; set; }
 
         public static explicit operator LeagueDTO(LeagueEntity league)
-            => new LeagueDTO
+            => league == null ? null : new LeagueDTO
             {
                 LeagueId = league.LeagueId,
                 Name = league.Name,

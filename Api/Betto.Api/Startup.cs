@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Betto.DataAccessLayer;
-using Betto.DataAccessLayer.Repositories;
+using Betto.DataAccessLayer.LeagueRepository.Repositories;
+using Betto.DataAccessLayer.Repositories.TeamRepository;
 using Betto.Helpers;
 using Betto.Services.Services.ImportService;
+using Betto.Services.Services.LeagueService;
+using Betto.Services.Services.TeamService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -75,6 +78,8 @@ namespace Betto.Api
         private void ConfigureBettoServices(IServiceCollection services)
         {
             services.AddScoped<IImportService, ImportService>();
+            services.AddScoped<ILeagueService, LeagueService>();
+            services.AddScoped<ITeamService, TeamService>();
         }
 
     }

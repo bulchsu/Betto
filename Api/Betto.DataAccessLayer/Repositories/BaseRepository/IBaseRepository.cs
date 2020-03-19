@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Betto.DataAccessLayer.Repositories
+namespace Betto.DataAccessLayer.Repositories.BaseRepository
 {
     public interface IBaseRepository
     {

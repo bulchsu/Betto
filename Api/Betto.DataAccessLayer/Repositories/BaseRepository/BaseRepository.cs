@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Betto.DataAccessLayer.Repositories
+namespace Betto.DataAccessLayer.Repositories.BaseRepository
 {
     public abstract class BaseRepository : IBaseRepository
     {
@@ -12,7 +12,8 @@ namespace Betto.DataAccessLayer.Repositories
             this.DbContext = dbContext;
         }
 
-        public async Task<int> SaveChangesAsync() => await DbContext.SaveChangesAsync();
+        public async Task<int> SaveChangesAsync() 
+            => await DbContext.SaveChangesAsync();
 
     }
 }

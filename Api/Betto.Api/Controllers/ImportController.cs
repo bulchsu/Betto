@@ -28,7 +28,7 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.InnerException != null ? ex.Message + ex.InnerException.Message : ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.InnerException != null ? $"{ex.Message} {ex.InnerException.Message}" : ex.Message });
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using Betto.DataAccessLayer.Repositories;
+﻿using Betto.DataAccessLayer.LeagueRepository.Repositories;
 using Betto.Helpers;
 using Betto.Helpers.JSONManager;
 using Betto.Model.Entities;
@@ -10,7 +10,6 @@ namespace Betto.Services.Services.ImportService
 {
     public class ImportService : IImportService
     {
-
         private readonly ILeagueRepository _leagueRepository;
         private readonly IOptions<RapidApiConfiguration> _apiConfiguration;
 
