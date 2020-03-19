@@ -11,21 +11,21 @@ namespace Betto.Model.Entities
         [Required]
         [MaxLength(200)]
         [JsonProperty("venue_name", NullValueHandling = NullValueHandling.Ignore)]
-        public string VenueName { get; set; }
+        public string Name { get; set; }
         [Required]
         [MaxLength(100)]
         [JsonProperty("venue_surface", NullValueHandling = NullValueHandling.Ignore)]
-        public string VenueSurface { get; set; }
+        public string Surface { get; set; }
         [MaxLength(200)]
         [JsonProperty("venue_address", NullValueHandling = NullValueHandling.Ignore)]
-        public string VenueAddress { get; set; }
+        public string Address { get; set; }
         [Required]
         [MaxLength(100)]
         [JsonProperty("venue_city", NullValueHandling = NullValueHandling.Ignore)]
-        public string VenueCity { get; set; }
+        public string City { get; set; }
         [Required]
         [JsonProperty("venue_capacity", NullValueHandling = NullValueHandling.Ignore)]
-        public int VenueCapacity { get; set; }
+        public int Capacity { get; set; }
         [Required]
         public TeamEntity Team { get; set; }
         [ForeignKey("Team")]

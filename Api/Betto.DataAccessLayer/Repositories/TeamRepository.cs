@@ -7,12 +7,14 @@ namespace Betto.DataAccessLayer.Repositories
     public class TeamRepository : BaseRepository, ITeamRepository
     {
 
-        public TeamRepository(BettoDbContext dbContext) : base(dbContext)
+        public TeamRepository(BettoDbContext dbContext)
+            : base(dbContext)
         {
 
         }
 
-        public async Task AddLeagueTeamsAsync(IEnumerable<TeamEntity> teams) => await DbContext.AddRangeAsync(teams);
+        public async Task AddLeagueTeamsAsync(IEnumerable<TeamEntity> teams) 
+            => await DbContext.AddRangeAsync(teams);
    
     }
 }
