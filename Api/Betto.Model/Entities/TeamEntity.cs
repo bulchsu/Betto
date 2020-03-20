@@ -24,7 +24,7 @@ namespace Betto.Model.Entities
         [JsonProperty("is_national", NullValueHandling = NullValueHandling.Ignore)]
         public string IsNational { get; set; }
         [Required]
-        public int Founded { get; set; }
+        public int? Founded { get; set; }
         [Required]
         public VenueEntity Venue { get; set; }
         public LeagueEntity League { get; set; }

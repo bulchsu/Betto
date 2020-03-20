@@ -6,6 +6,7 @@ using Betto.DataAccessLayer;
 using Betto.DataAccessLayer.LeagueRepository.Repositories;
 using Betto.DataAccessLayer.Repositories.TeamRepository;
 using Betto.Helpers;
+using Betto.Helpers.LeagueParser;
 using Betto.Services.Services.ImportService;
 using Betto.Services.Services.LeagueService;
 using Betto.Services.Services.TeamService;
@@ -38,6 +39,7 @@ namespace Betto.Api
             services.Configure<RapidApiConfiguration>(Configuration.GetSection("RapidApiConfiguration"));
 
             ConfigureDatabaseConnection(services);
+            ConfigureHelpers(services);
             ConfigureRepositories(services);
             ConfigureBettoServices(services);
         }
@@ -67,6 +69,11 @@ namespace Betto.Api
             var connectionString = Configuration.GetConnectionString("DevelopmentConnectionString");
             services.AddDbContext<BettoDbContext>(options => options.UseSqlServer(connectionString,
                 o => o.MigrationsAssembly("Betto.DataAccessLayer")));
+        }
+
+        private void ConfigureHelpers(IServiceCollection services)
+        {
+            services.AddScoped<ILeagueParser, LeagueParser>();
         }
 
         private void ConfigureRepositories(IServiceCollection services)

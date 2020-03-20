@@ -7,28 +7,31 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Linq;
+using Microsoft.Extensions.Options;
 
-namespace Betto.Helpers.JSONManager
+namespace Betto.Helpers.LeagueParser
 {
-    public class JSONManager
+    public class LeagueParser : ILeagueParser
     {
-        private readonly RapidApiConfiguration _apiConfiguration;
+        private readonly IOptions<RapidApiConfiguration> _apiConfiguration;
 
-        public JSONManager(RapidApiConfiguration configuration)
+        public LeagueParser(IOptions<RapidApiConfiguration> configuration)
         {
             this._apiConfiguration = configuration;
         }
+
+        private RapidApiConfiguration ApiConfiguration { get => _apiConfiguration.Value; }
 
         public async Task<IEnumerable<LeagueEntity>> GetLeaguesAsync()
         {
             var url = GetLeaguesUrl();
             var filePath = GetBackupFilePath();
 
-            var jsonString = await ExecuteUrlAsync(filePath, url);
+            var jsonString = await ExecuteUrlAsync(url);
             Backup(filePath, jsonString);
 
             var results = ParseLeagues(jsonString);
-            var leagues = results.Take(_apiConfiguration.LeaguesAmount);
+            var leagues = results.Take(ApiConfiguration.LeaguesAmount);
             var teams = await GetTeamsAsync();
 
             for (int i = 0; i < leagues.Count(); i++)
@@ -41,7 +44,7 @@ namespace Betto.Helpers.JSONManager
         {
             var tasks = new List<Task<IEnumerable<TeamEntity>>>();
 
-            for (int i = 1; i < _apiConfiguration.LeaguesAmount + 1; i++)
+            for (int i = 1; i < ApiConfiguration.LeaguesAmount + 1; i++)
                 tasks.Add(GetLeagueTeamsAsync(i));
 
             var teams = await Task.WhenAll(tasks);
@@ -54,7 +57,7 @@ namespace Betto.Helpers.JSONManager
             var url = GetTeamsUrl(leagueId);
             var filePath = GetBackupFilePath();
 
-            var jsonString = await ExecuteUrlAsync(filePath, url);
+            var jsonString = await ExecuteUrlAsync(url);
             Backup(filePath, jsonString);
 
             var teams = ParseTeams(jsonString);
@@ -62,13 +65,13 @@ namespace Betto.Helpers.JSONManager
             return teams;
         }
 
-        private async Task<string> ExecuteUrlAsync(string filePath, string url)
+        private async Task<string> ExecuteUrlAsync(string url)
         {
             var client = new RestClient(url);
             var request = new RestRequest(Method.GET);
 
-            request.AddHeader(_apiConfiguration.HostHeaderName, _apiConfiguration.RapidApiHost);
-            request.AddHeader(_apiConfiguration.KeyHeaderName, _apiConfiguration.RapidApiKey);
+            request.AddHeader(ApiConfiguration.HostHeaderName, ApiConfiguration.RapidApiHost);
+            request.AddHeader(ApiConfiguration.KeyHeaderName, ApiConfiguration.RapidApiKey);
 
             var response = await client.ExecuteAsync(request);
 
@@ -77,9 +80,6 @@ namespace Betto.Helpers.JSONManager
 
             return response.Content;
         }
-
-        private void Backup(string filePath, string rawJson) 
-            => File.WriteAllText(filePath, rawJson);
 
         private IEnumerable<LeagueEntity> ParseLeagues(string rawJson)
         {
@@ -118,13 +118,16 @@ namespace Betto.Helpers.JSONManager
             return teams;
         }
 
+        private void Backup(string filePath, string rawJson)
+            => File.WriteAllText(filePath, rawJson);
+
         private string GetLeaguesUrl()
-            => string.Concat(_apiConfiguration.RapidApiUrl, _apiConfiguration.LeaguesRoute);
+            => string.Concat(ApiConfiguration.RapidApiUrl, ApiConfiguration.LeaguesRoute);
 
         private string GetTeamsUrl(int leagueId)
-            => string.Concat(_apiConfiguration.RapidApiUrl, _apiConfiguration.TeamsRoute, leagueId);
+            => string.Concat(ApiConfiguration.RapidApiUrl, ApiConfiguration.TeamsRoute, leagueId);
 
         private string GetBackupFilePath()
-            => string.Concat(_apiConfiguration.JsonBackupDirectory, DateTime.Now.ToString("yyyyMMdd_HHmmssfff"), _apiConfiguration.BackupFileSuffix);
+            => string.Concat(ApiConfiguration.JsonBackupDirectory, DateTime.Now.ToString("yyyyMMdd_HHmmssfff"), ApiConfiguration.BackupFileSuffix);
     }
 }
