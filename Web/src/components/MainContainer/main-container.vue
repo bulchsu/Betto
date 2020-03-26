@@ -1,17 +1,30 @@
 <template>
-  <v-card id="main-container">
-    <LeagueBar />
-  </v-card>
+    <div id="main-container"> 
+      <LeagueBar @tabChanged="changeTab"/>
+      <GeneralInfo v-if="selectedTab == 0"/>
+    </div>
 </template>
 
 <script>
 
 import LeagueBar from '@/components/MainContainer/LeagueBar/league-bar';
+import GeneralInfo from './GeneralInfo/general-info';
 
 export default {
   name: "MainContainer",
+  data(){
+    return {
+      selectedTab: 0
+    }
+  },
+  methods: {
+    changeTab(value) {
+      this.selectedTab = value;
+    }
+  },
   components: {
-    LeagueBar
+    LeagueBar,
+    GeneralInfo
   }
 };
 

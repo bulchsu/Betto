@@ -1,6 +1,5 @@
 <template>
     <v-app-bar 
-        absolute
         color="#7cb378"
         dark
         prominent>
@@ -11,8 +10,8 @@
       </v-btn>
       <template v-slot:extension>
         <v-tabs align-with-title>
-          <v-tab>General</v-tab>
-          <v-tab>Teams</v-tab>
+          <v-tab @click="changeTab(0)">General</v-tab>
+          <v-tab @click="changeTab(1)">Teams</v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
@@ -24,6 +23,11 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: "LeagueBar",
+  methods: {
+    changeTab(value) {
+      this.$emit('tabChanged', value);
+    }
+  },
   computed: {
     ...mapGetters(['getSelectedLeague']),
     selectedLeague() {
