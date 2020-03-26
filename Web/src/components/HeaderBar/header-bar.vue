@@ -22,7 +22,7 @@ export default {
 .main-header {
   background-color: $green-background;
   width: 100%;
-  height: 90px;
+  height: 89px;
 }
 
 </style>

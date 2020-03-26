@@ -1,12 +1,12 @@
 <template>
     <div class="d-flex flex-row align-self-center mr-auto">
-      <img id="logo" src="../../../assets/football.png" />
+      <img id="logo" src="@/assets/football.png" />
       <h2 id="title">Betto</h2>
     </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../../../assets/styles/_colors.scss";
+@import "@/assets/styles/_colors.scss";
 
 #title {
   color: $white;

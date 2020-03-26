@@ -1,0 +1,1 @@
+export const API_URL = process.env.NODE_ENV == 'production' ? process.env.VUE_APP_PRODUCTION_API_URL : process.env.VUE_APP_DEVELOPMENT_API_URL;
