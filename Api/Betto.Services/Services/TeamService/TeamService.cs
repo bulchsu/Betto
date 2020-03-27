@@ -1,10 +1,10 @@
-﻿using Betto.DataAccessLayer.Repositories.TeamRepository;
-using Betto.Model.DTO;
+﻿using Betto.Model.DTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Betto.DataAccessLayer.Repositories;
 
-namespace Betto.Services.Services.TeamService
+namespace Betto.Services.Services
 {
     public class TeamService : ITeamService
     {

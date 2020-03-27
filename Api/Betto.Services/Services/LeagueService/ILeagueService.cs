@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Betto.Services.Services.LeagueService
+namespace Betto.Services.Services
 {
     public interface ILeagueService
     {

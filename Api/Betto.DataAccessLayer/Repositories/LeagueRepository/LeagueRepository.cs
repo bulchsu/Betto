@@ -2,9 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.DataAccessLayer.Repositories.BaseRepository;
 
-namespace Betto.DataAccessLayer.LeagueRepository.Repositories
+namespace Betto.DataAccessLayer.Repositories
 {
     public class LeagueRepository : BaseRepository, ILeagueRepository
     {

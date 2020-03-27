@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace Betto.Helpers
 {
-    public interface ILeagueParser
+    public interface ITeamParser
     {
-        Task<IEnumerable<LeagueEntity>> GetLeaguesAsync();
+        Task<IEnumerable<IEnumerable<TeamEntity>>> GetTeamsAsync();
     }
 }

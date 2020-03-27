@@ -1,9 +1,8 @@
-﻿using Betto.DataAccessLayer.Repositories.BaseRepository;
-using Betto.Model.Entities;
+﻿using Betto.Model.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Betto.DataAccessLayer.LeagueRepository.Repositories
+namespace Betto.DataAccessLayer.Repositories
 {
     public interface ILeagueRepository : IBaseRepository
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Betto.Services.Services.TeamService
+namespace Betto.Services.Services
 {
     public interface ITeamService
     {

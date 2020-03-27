@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Betto.Services.Services.ImportService
+namespace Betto.Services.Services
 {
     public interface IImportService
     {

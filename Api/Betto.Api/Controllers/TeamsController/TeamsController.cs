@@ -1,6 +1,5 @@
 ﻿using Betto.Model.DTO;
-using Betto.Services.Services.LeagueService;
-using Betto.Services.Services.TeamService;
+using Betto.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;

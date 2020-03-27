@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Betto.DataAccessLayer;
-using Betto.DataAccessLayer.LeagueRepository.Repositories;
-using Betto.DataAccessLayer.Repositories.TeamRepository;
+﻿using Betto.DataAccessLayer;
+using Betto.DataAccessLayer.Repositories;
 using Betto.Helpers;
-using Betto.Helpers.LeagueParser;
-using Betto.Services.Services.ImportService;
-using Betto.Services.Services.LeagueService;
-using Betto.Services.Services.TeamService;
+using Betto.Helpers.Configuration;
+using Betto.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,9 +35,8 @@ namespace Betto.Api
             services.AddControllers()
                 .AddNewtonsoftJson(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
-            services.Configure<RapidApiConfiguration>(Configuration.GetSection("RapidApiConfiguration"));
-
             ConfigureDatabaseConnection(services);
+            SetCustomConfiguration(services);
             ConfigureHelpers(services);
             ConfigureRepositories(services);
             ConfigureBettoServices(services);
@@ -81,8 +71,16 @@ namespace Betto.Api
                 o => o.MigrationsAssembly("Betto.DataAccessLayer")));
         }
 
+        private void SetCustomConfiguration(IServiceCollection services)
+        {
+            services.Configure<RapidApiConfiguration>(Configuration.GetSection("RapidApiConfiguration"));
+            services.Configure<LoggingConfiguration>(Configuration.GetSection("LoggingConfiguration"));
+        }
+
         private void ConfigureHelpers(IServiceCollection services)
         {
+            services.AddSingleton<ILogger, Logger>();
+            services.AddScoped<ITeamParser, TeamParser>();
             services.AddScoped<ILeagueParser, LeagueParser>();
         }
 

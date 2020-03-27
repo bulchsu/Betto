@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Betto.DataAccessLayer.Repositories.TeamRepository
+namespace Betto.DataAccessLayer.Repositories
 {
-    public class TeamRepository : BaseRepository.BaseRepository, ITeamRepository
+    public class TeamRepository : BaseRepository, ITeamRepository
     {
         public TeamRepository(BettoDbContext dbContext)
             : base(dbContext)

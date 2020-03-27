@@ -1,10 +1,10 @@
-﻿using Betto.DataAccessLayer.LeagueRepository.Repositories;
+﻿using Betto.DataAccessLayer.Repositories;
 using Betto.Model.DTO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Betto.Services.Services.LeagueService
+namespace Betto.Services.Services
 {
     public class LeagueService : ILeagueService
     {
