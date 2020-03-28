@@ -2,6 +2,7 @@
     <div id="main-container"> 
       <LeagueBar @tabChanged="changeTab"/>
       <GeneralInfo v-if="selectedTab == 0"/>
+      <TeamsTable v-if="selectedTab == 1"/>
     </div>
 </template>
 
@@ -9,10 +10,11 @@
 
 import LeagueBar from '@/components/MainContainer/LeagueBar/league-bar';
 import GeneralInfo from './GeneralInfo/general-info';
+import TeamsTable from './TeamsTable/teams-table';
 
 export default {
   name: "MainContainer",
-  data(){
+  data() {
     return {
       selectedTab: 0
     }
@@ -24,7 +26,8 @@ export default {
   },
   components: {
     LeagueBar,
-    GeneralInfo
+    GeneralInfo,
+    TeamsTable
   }
 };
 
