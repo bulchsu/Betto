@@ -4,14 +4,16 @@ using Betto.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Betto.DataAccessLayer.Migrations
 {
     [DbContext(typeof(BettoDbContext))]
-    partial class BettoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200402115524_AddConstraintsToUserColumns")]
+    partial class AddConstraintsToUserColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,12 +189,13 @@ namespace Betto.DataAccessLayer.Migrations
 
                     b.Property<string>("MailAddress")
                         .IsRequired()
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<byte[]>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(64)")
-                        .HasMaxLength(64);
+                        .HasColumnType("varbinary(256)")
+                        .HasMaxLength(256);
 
                     b.Property<string>("Username")
                         .IsRequired()

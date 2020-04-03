@@ -4,18 +4,19 @@ using Microsoft.EntityFrameworkCore;
 namespace Betto.DataAccessLayer
 {
     public class BettoDbContext : DbContext
-    {
-        public DbSet<LeagueEntity> Leagues { get; set; }
-        public DbSet<CoverageEntity> Coverages { get; set; }
-        public DbSet<FixturesEntity> Fixtures { get; set; }
-        public DbSet<TeamEntity> Teams { get; set; }
-        public DbSet<VenueEntity> Venues { get; set; }
-
+    { 
         public BettoDbContext(DbContextOptions<BettoDbContext> options) 
             : base(options)
         {
 
         }
+
+        public DbSet<LeagueEntity> Leagues { get; set; }
+        public DbSet<CoverageEntity> Coverages { get; set; }
+        public DbSet<FixturesEntity> Fixtures { get; set; }
+        public DbSet<TeamEntity> Teams { get; set; }
+        public DbSet<VenueEntity> Venues { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder builder)
             => base.OnConfiguring(builder);
