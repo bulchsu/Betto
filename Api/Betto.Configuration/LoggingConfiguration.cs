@@ -1,4 +1,4 @@
-﻿namespace Betto.Helpers.Configuration
+﻿namespace Betto.Configuration
 {
     public class LoggingConfiguration
     {

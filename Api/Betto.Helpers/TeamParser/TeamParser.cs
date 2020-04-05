@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RestSharp;
-using Betto.Helpers.Configuration;
+using Betto.Configuration;
 
 namespace Betto.Helpers
 {

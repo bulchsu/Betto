@@ -1,21 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
-using Betto.DataAccessLayer;
-using Betto.DataAccessLayer.Repositories;
-using Betto.Helpers;
-using Betto.Helpers.Configuration;
-using Betto.Services.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Betto.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace Betto.Api
@@ -42,13 +33,7 @@ namespace Betto.Api
             services.AddControllers()
                 .AddNewtonsoftJson(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
-            ConfigureDatabaseConnection(services);
-            SetCustomConfiguration(services);
-            ConfigureHelpers(services);
-            ConfigureRepositories(services);
-            ConfigureBettoServices(services);
-            ConfigureJwtAuthentication(services);
-            ConfigureLocalization(services);
+            services.RegisterDependencies(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,88 +60,6 @@ namespace Betto.Api
                 endpoints.MapControllers();
             });
         }
-
-        private void ConfigureDatabaseConnection(IServiceCollection services)
-        {
-            var connectionString = Configuration.GetConnectionString("DevelopmentConnectionString");
-            services.AddDbContext<BettoDbContext>(options => options.UseSqlServer(connectionString,
-                o => o.MigrationsAssembly("Betto.DataAccessLayer")));
-        }
-
-        private void SetCustomConfiguration(IServiceCollection services)
-        {
-            services.Configure<RapidApiConfiguration>(Configuration.GetSection("RapidApiConfiguration"));
-            services.Configure<LoggingConfiguration>(Configuration.GetSection("LoggingConfiguration"));
-            services.Configure<ApplicationMainConfiguration>(Configuration.GetSection("ApplicationMainConfiguration"));
-        }
-
-        private void ConfigureHelpers(IServiceCollection services)
-        {
-            services.AddSingleton<ILogger, Logger>();
-            services.AddScoped<ITeamParser, TeamParser>();
-            services.AddScoped<ILeagueParser, LeagueParser>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<ITokenGenerator, TokenGenerator>();
-            services.AddScoped<IObjectValidator, ObjectValidator>();
-        }
-
-        private void ConfigureRepositories(IServiceCollection services)
-        {
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILeagueRepository, LeagueRepository>();
-            services.AddScoped<ITeamRepository, TeamRepository>();
-        }
-
-        private void ConfigureBettoServices(IServiceCollection services)
-        {
-            services.AddScoped<IImportService, ImportService>();
-            services.AddScoped<ILeagueService, LeagueService>();
-            services.AddScoped<ITeamService, TeamService>();
-            services.AddScoped<IUserService, UserService>();
-        }
-
-        private void ConfigureJwtAuthentication(IServiceCollection services)
-        {
-            var applicationMainConfiguration = Configuration
-                .GetSection(nameof(ApplicationMainConfiguration))
-                .Get<ApplicationMainConfiguration>();
-
-            var authenticationSecretKey = Encoding.ASCII.GetBytes(applicationMainConfiguration.AuthenticationSecretKey);
-
-            services.AddAuthentication(o =>
-            {
-                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(o =>
-            {
-                o.Events = new JwtBearerEvents { OnTokenValidated = OnTokenValidatedAsync };
-                o.RequireHttpsMetadata = false;
-                o.SaveToken = true;
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(authenticationSecretKey),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
-        }
-
-        private async Task OnTokenValidatedAsync(TokenValidatedContext context)
-        {
-            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-            var username = context.Principal.Identity.Name;
-            var doesUserExist = await userService.CheckIsUsernameAlreadyTakenAsync(username);
-
-            if (!doesUserExist)
-            {
-                context.Fail("Unauthorized");
-            }
-        }
-
-        private void ConfigureLocalization(IServiceCollection services) =>
-            services.AddLocalization(o => o.ResourcesPath = "Resources");
 
         private void SetUpRequestLocalization(IApplicationBuilder app) =>
             app.UseRequestLocalization(new RequestLocalizationOptions

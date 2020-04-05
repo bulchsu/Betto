@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Betto.Configuration\Betto.Configuration.csproj" />
     <ProjectReference Include="..\Betto.Model\Betto.Model.csproj" />
   </ItemGroup>
 

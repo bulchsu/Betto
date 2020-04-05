@@ -14,6 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Betto.Configuration\Betto.Configuration.csproj" />
+    <ProjectReference Include="..\Betto.DependencyInjection\Betto.DependencyInjection.csproj" />
     <ProjectReference Include="..\Betto.Services\Betto.Services.csproj" />
   </ItemGroup>
 

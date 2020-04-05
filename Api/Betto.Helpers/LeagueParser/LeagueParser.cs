@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Betto.Helpers.Configuration;
+using Betto.Configuration;
 
 namespace Betto.Helpers
 {

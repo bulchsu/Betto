@@ -1,4 +1,4 @@
-﻿using Betto.Helpers.Configuration;
+﻿using Betto.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
