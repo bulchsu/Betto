@@ -8,7 +8,7 @@ namespace Betto.Helpers
     public class Logger : ILogger
     {
         private readonly LoggingConfiguration _configuration;
-        private static readonly object _padlock = new object();
+        private static readonly object Padlock = new object();
 
         public Logger(IOptions<LoggingConfiguration> configuration)
         {
@@ -17,7 +17,7 @@ namespace Betto.Helpers
 
         public void LogToFile(string filename, string content)
         {
-            lock (_padlock)
+            lock (Padlock)
             {
                 var filePath = GetBackupFilePath(filename);
                 File.WriteAllText(filePath, content);

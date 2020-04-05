@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using Betto.DataAccessLayer;
 using Betto.DataAccessLayer.Repositories;
@@ -8,6 +10,7 @@ using Betto.Services.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +48,7 @@ namespace Betto.Api
             ConfigureRepositories(services);
             ConfigureBettoServices(services);
             ConfigureJwtAuthentication(services);
+            ConfigureLocalization(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +67,8 @@ namespace Betto.Api
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            SetUpRequestLocalization(app);
 
             app.UseEndpoints(endpoints =>
             {
@@ -117,10 +123,10 @@ namespace Betto.Api
 
             var authenticationSecretKey = Encoding.ASCII.GetBytes(applicationMainConfiguration.AuthenticationSecretKey);
 
-            services.AddAuthentication(x =>
+            services.AddAuthentication(o =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(o =>
             {
@@ -148,5 +154,15 @@ namespace Betto.Api
                 context.Fail("Unauthorized");
             }
         }
+
+        private void ConfigureLocalization(IServiceCollection services) =>
+            services.AddLocalization(o => o.ResourcesPath = "Resources");
+
+        private void SetUpRequestLocalization(IApplicationBuilder app) =>
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                SupportedCultures = new List<CultureInfo> { new CultureInfo("en-US") }
+            });
     }
 }

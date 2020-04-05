@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Betto.Api.Text;
 using Betto.Model.DTO;
 using Betto.Services.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers.UsersController
 {
@@ -12,10 +14,12 @@ namespace Betto.Api.Controllers.UsersController
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> localizer)
         {
-            _userService = userService;
+            this._userService = userService;
+            this._localizer = localizer;
         }
 
         [HttpPost("authenticate")]
@@ -27,14 +31,14 @@ namespace Betto.Api.Controllers.UsersController
 
                 if (!doesUserExist)
                 {
-                    return NotFound($"User {loginData.Username} does not exist");
+                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", loginData.Username].Value });
                 }
 
                 var token = await _userService.AuthenticateUserAsync(loginData);
 
                 if (token == null)
                 {
-                    return Unauthorized("Incorrect password");
+                    return Unauthorized(new { Message = _localizer["IncorrectPasswordErrorMessage"].Value });
                 }
 
                 return Ok(token);
@@ -52,7 +56,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDTO>> SignUpAsync(SignUpDTO signUpData)
+        public async Task<ActionResult<UserDTO>> SignUpAsync([FromBody] SignUpDTO signUpData)
         {
             try
             {
@@ -60,21 +64,21 @@ namespace Betto.Api.Controllers.UsersController
 
                 if (doesUserExist)
                 {
-                    return BadRequest($"Username {signUpData.Username} already taken");
+                    return BadRequest(new { Message = _localizer["UsernameAlreadyTakenErrorMessage", signUpData.Username].Value });
                 }
 
                 doesUserExist = await _userService.CheckIsMailAlreadyTakenAsync(signUpData.MailAddress);
 
                 if (doesUserExist)
                 {
-                    return BadRequest($"Mail {signUpData.MailAddress} already taken");
+                    return BadRequest(new { Message = _localizer["MailAddressAlreadyTakenErrorMessage", signUpData.MailAddress].Value });
                 }
 
                 var user = await _userService.SignUpAsync(signUpData);
 
                 if (user == null)
                 {
-                    return BadRequest("Could not create user");
+                    return BadRequest(new { Message = _localizer["UserCreationErrorMessage"].Value });
                 }
 
                 return Ok(user);

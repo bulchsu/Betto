@@ -36,7 +36,9 @@ namespace Betto.Services.Services
         private IEnumerable<LeagueEntity> CombineLeaguesWithTeamsAsync(IEnumerable<LeagueEntity> leagues, IEnumerable<IEnumerable<TeamEntity>> teams)
         {
             for (int i = 0; i < leagues.Count(); i++)
+            {
                 leagues.ElementAt(i).Teams = teams.ElementAt(i).ToList();
+            }
 
             return leagues;
         }
