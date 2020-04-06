@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Betto.Configuration;
-using Betto.Services.Services;
+using Betto.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

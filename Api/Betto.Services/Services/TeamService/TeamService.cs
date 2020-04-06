@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Betto.DataAccessLayer.Repositories;
 
-namespace Betto.Services.Services
+namespace Betto.Services
 {
     public class TeamService : ITeamService
     {

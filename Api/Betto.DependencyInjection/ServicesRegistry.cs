@@ -1,4 +1,4 @@
-﻿using Betto.Services.Services;
+﻿using Betto.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Betto.DependencyInjection

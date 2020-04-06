@@ -1,4 +1,4 @@
-﻿using Betto.Services.Services;
+﻿using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;

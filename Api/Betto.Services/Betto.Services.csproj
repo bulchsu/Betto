@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Betto.DataAccessLayer\Betto.DataAccessLayer.csproj" />
-    <ProjectReference Include="..\Betto.Helpers\Betto.Helpers.csproj" />
-    <ProjectReference Include="..\Betto.Model\Betto.Model.csproj" />
   </ItemGroup>
 
 </Project>

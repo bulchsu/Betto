@@ -1,31 +1,31 @@
 ﻿using Betto.DataAccessLayer.Repositories;
-using Betto.Helpers;
 using Betto.Model.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Betto.RapidApiCommunication.Managers;
 
-namespace Betto.Services.Services
+namespace Betto.Services
 {
     public class ImportService : IImportService
     {
         private readonly ILeagueRepository _leagueRepository;
-        private readonly ILeagueParser _leagueParser;
-        private readonly ITeamParser _teamParser;
+        private readonly ILeagueManager _leagueManager;
+        private readonly ITeamManager _teamManager;
 
-        public ImportService(ILeagueRepository leagueRepository, ILeagueParser leagueParser, ITeamParser teamParser)
+        public ImportService(ILeagueRepository leagueRepository, ILeagueManager leagueManager, ITeamManager teamManager)
         {
             this._leagueRepository = leagueRepository;
-            this._leagueParser = leagueParser;
-            this._teamParser = teamParser;
+            this._leagueManager = leagueManager;
+            this._teamManager = teamManager;
         }
 
         public async Task ImportExternalDataAsync()
         {   
             _leagueRepository.Clear();
 
-            var leaguesBeforeCombination = await _leagueParser.GetLeaguesAsync();
-            var teams = await _teamParser.GetTeamsAsync();
+            var leaguesBeforeCombination = await _leagueManager.GetLeaguesAsync();
+            var teams = await _teamManager.GetTeamsAsync();
 
             var leagues = CombineLeaguesWithTeamsAsync(leaguesBeforeCombination, teams);
 
@@ -35,9 +35,12 @@ namespace Betto.Services.Services
 
         private IEnumerable<LeagueEntity> CombineLeaguesWithTeamsAsync(IEnumerable<LeagueEntity> leagues, IEnumerable<IEnumerable<TeamEntity>> teams)
         {
-            for (int i = 0; i < leagues.Count(); i++)
+            if (leagues != null && teams != null)
             {
-                leagues.ElementAt(i).Teams = teams.ElementAt(i).ToList();
+                for (var i = 0; i < leagues.Count(); i++)
+                {
+                    leagues.ElementAt(i).Teams = teams.ElementAt(i).ToList();
+                }
             }
 
             return leagues;

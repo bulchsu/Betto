@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Betto.Services.Services
+namespace Betto.Services
 {
     public class LeagueService : ILeagueService
     {

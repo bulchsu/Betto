@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Betto.DataAccessLayer\Betto.DataAccessLayer.csproj" />
     <ProjectReference Include="..\Betto.Services\Betto.Services.csproj" />
   </ItemGroup>
 

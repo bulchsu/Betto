@@ -4,7 +4,7 @@ using Betto.Helpers;
 using Betto.Model.DTO;
 using Betto.Model.Entities;
 
-namespace Betto.Services.Services
+namespace Betto.Services
 {
     public class UserService : IUserService
     {

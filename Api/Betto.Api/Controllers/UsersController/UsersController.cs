@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Betto.Api.Text;
 using Betto.Model.DTO;
-using Betto.Services.Services;
+using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;

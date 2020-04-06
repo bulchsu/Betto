@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Betto.Model.DTO;
 
-namespace Betto.Services.Services
+namespace Betto.Services
 {
     public interface IUserService
     {
