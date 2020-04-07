@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Betto.Api.Text;
 using Betto.Model.DTO;
+using Betto.Resources.Shared;
 using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

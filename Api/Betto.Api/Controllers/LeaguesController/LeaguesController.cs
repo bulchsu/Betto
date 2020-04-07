@@ -5,22 +5,23 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Api.Text;
+using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers
 {
-    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class LeaguesController : ControllerBase
     {
         private readonly ILeagueService _leagueService;
+        private readonly ITeamService _teamService;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public LeaguesController(ILeagueService leagueService, IStringLocalizer<ErrorMessages> localizer)
+        public LeaguesController(ILeagueService leagueService, ITeamService teamService, IStringLocalizer<ErrorMessages> localizer)
         {
             this._leagueService = leagueService;
+            this._teamService = teamService;
             this._localizer = localizer;
         }
 
@@ -63,6 +64,39 @@ namespace Betto.Api.Controllers
                 }
 
                 return Ok(league);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
+            }
+        }
+
+        [HttpGet("{leagueId:int}/teams")]
+        public async Task<ActionResult<IEnumerable<TeamDTO>>> GetLeagueTeamsAsync(int leagueId)
+        {
+            try
+            {
+                var league = await _leagueService.GetLeagueByIdAsync(leagueId);
+
+                if (league == null)
+                {
+                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
+                }
+
+                var teams = await _teamService.GetLeagueTeamsAsync(leagueId);
+
+                if (teams == null)
+                {
+                    return NotFound(new { Message = _localizer["LackOfTeamsErrorMessage"].Value });
+                }
+
+                return Ok(teams);
             }
             catch (Exception ex)
             {

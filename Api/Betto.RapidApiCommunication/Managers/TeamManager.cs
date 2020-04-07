@@ -12,8 +12,8 @@ namespace Betto.RapidApiCommunication.Managers
     {
         private readonly IParser<TeamEntity> _teamParser;
 
-        public TeamManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, IParser<TeamEntity> teamParser)
-            : base(configuration, logger)
+        public TeamManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, IParser<TeamEntity> teamParser, ApiClient apiClient)
+            : base(configuration, logger, apiClient)
         {
             _teamParser = teamParser;
         }

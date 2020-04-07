@@ -1,4 +1,5 @@
 ﻿using Betto.Model.Entities;
+using Betto.RapidApiCommunication;
 using Betto.RapidApiCommunication.Managers;
 using Betto.RapidApiCommunication.Parsers;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ namespace Betto.DependencyInjection
         {
 
             return services
+                .AddScoped<ApiClient>()
                 .AddScoped(typeof(IParser<TeamEntity>), typeof(TeamParser))
                 .AddScoped(typeof(IParser<LeagueEntity>), typeof(LeagueParser))
                 .AddScoped<ITeamManager, TeamManager>()

@@ -13,8 +13,8 @@ namespace Betto.RapidApiCommunication.Managers
     {
         private readonly IParser<LeagueEntity> _leagueParser;
 
-        public LeagueManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, IParser<LeagueEntity> leagueParser)
-            : base(configuration, logger)
+        public LeagueManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, IParser<LeagueEntity> leagueParser, ApiClient apiClient)
+            : base(configuration, logger, apiClient)
         {
             _leagueParser = leagueParser;
         }

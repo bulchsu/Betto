@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Betto.Api.Text;
+using Betto.Resources.Shared;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ImportController : ControllerBase
