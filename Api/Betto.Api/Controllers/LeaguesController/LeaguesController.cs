@@ -1,10 +1,12 @@
 ﻿using Betto.Model.DTO;
-using Betto.Services.Services;
+using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Resources.Shared;
+using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers
 {
@@ -13,10 +15,14 @@ namespace Betto.Api.Controllers
     public class LeaguesController : ControllerBase
     {
         private readonly ILeagueService _leagueService;
+        private readonly ITeamService _teamService;
+        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public LeaguesController(ILeagueService leagueService)
+        public LeaguesController(ILeagueService leagueService, ITeamService teamService, IStringLocalizer<ErrorMessages> localizer)
         {
-            _leagueService = leagueService;
+            this._leagueService = leagueService;
+            this._teamService = teamService;
+            this._localizer = localizer;
         }
 
         [HttpGet]
@@ -27,13 +33,21 @@ namespace Betto.Api.Controllers
                 var leagues = await _leagueService.GetLeaguesAsync();
 
                 if (leagues == null)
-                    return NotFound(new { Message = "There are no leagues in the database" });
+                {
+                    return NotFound(new { Message = _localizer["LackOfLeaguesErrorMessage"].Value });
+                }
 
                 return Ok(leagues);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.InnerException != null ? $"{ex.Message} {ex.InnerException.Message}" : ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
             }
         }
 
@@ -45,13 +59,54 @@ namespace Betto.Api.Controllers
                 var league = await _leagueService.GetLeagueByIdAsync(id);
 
                 if (league == null)
-                    return NotFound(new { Message = "League not found" });
+                {
+                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
+                }
 
                 return Ok(league);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.InnerException != null ? $"{ex.Message} {ex.InnerException.Message}" : ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
+            }
+        }
+
+        [HttpGet("{leagueId:int}/teams")]
+        public async Task<ActionResult<IEnumerable<TeamDTO>>> GetLeagueTeamsAsync(int leagueId)
+        {
+            try
+            {
+                var league = await _leagueService.GetLeagueByIdAsync(leagueId);
+
+                if (league == null)
+                {
+                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
+                }
+
+                var teams = await _teamService.GetLeagueTeamsAsync(leagueId);
+
+                if (teams == null)
+                {
+                    return NotFound(new { Message = _localizer["LackOfTeamsErrorMessage"].Value });
+                }
+
+                return Ok(teams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
             }
         }
     }

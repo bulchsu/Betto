@@ -82,6 +82,77 @@ namespace Betto.DataAccessLayer.Migrations
                     b.ToTable("Fixtures");
                 });
 
+            modelBuilder.Entity("Betto.Model.Entities.GameEntity", b =>
+                {
+                    b.Property<int>("GameId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AwayTeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Elapsed")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("EventTimeStamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FirstHalfStart")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("GoalsAwayTeam")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GoalsHomeTeam")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HomeTeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LeagueId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Referee")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.Property<string>("Round")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<long>("SecondHalfStart")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("StatusShort")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Venue")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.HasKey("GameId");
+
+                    b.HasIndex("AwayTeamId");
+
+                    b.HasIndex("HomeTeamId");
+
+                    b.HasIndex("LeagueId");
+
+                    b.ToTable("Games");
+                });
+
             modelBuilder.Entity("Betto.Model.Entities.LeagueEntity", b =>
                 {
                     b.Property<int>("LeagueId")
@@ -135,6 +206,30 @@ namespace Betto.DataAccessLayer.Migrations
                     b.ToTable("Leagues");
                 });
 
+            modelBuilder.Entity("Betto.Model.Entities.ScoreEntity", b =>
+                {
+                    b.Property<int>("GameId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExtraTime")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullTime")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<string>("HalfTime")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<string>("Penalty")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GameId");
+
+                    b.ToTable("Scores");
+                });
+
             modelBuilder.Entity("Betto.Model.Entities.TeamEntity", b =>
                 {
                     b.Property<int>("TeamId")
@@ -176,6 +271,32 @@ namespace Betto.DataAccessLayer.Migrations
                     b.HasIndex("LeagueId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("Betto.Model.Entities.UserEntity", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("MailAddress")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(64)")
+                        .HasMaxLength(64);
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Betto.Model.Entities.VenueEntity", b =>
@@ -229,6 +350,36 @@ namespace Betto.DataAccessLayer.Migrations
                     b.HasOne("Betto.Model.Entities.CoverageEntity", "Coverage")
                         .WithOne("Fixtures")
                         .HasForeignKey("Betto.Model.Entities.FixturesEntity", "CoverageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Betto.Model.Entities.GameEntity", b =>
+                {
+                    b.HasOne("Betto.Model.Entities.TeamEntity", "AwayTeam")
+                        .WithMany("AwayGames")
+                        .HasForeignKey("AwayTeamId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Betto.Model.Entities.TeamEntity", "HomeTeam")
+                        .WithMany("HomeGames")
+                        .HasForeignKey("HomeTeamId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Betto.Model.Entities.LeagueEntity", "League")
+                        .WithMany("Games")
+                        .HasForeignKey("LeagueId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Betto.Model.Entities.ScoreEntity", b =>
+                {
+                    b.HasOne("Betto.Model.Entities.GameEntity", "Game")
+                        .WithOne("Score")
+                        .HasForeignKey("Betto.Model.Entities.ScoreEntity", "GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

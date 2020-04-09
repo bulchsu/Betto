@@ -1,20 +1,26 @@
-﻿using Betto.Services.Services;
+﻿using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Betto.Resources.Shared;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ImportController : ControllerBase
     {
         private readonly IImportService _importService;
+        private readonly IStringLocalizer<InformationMessages> _localizer;
 
-        public ImportController(IImportService importService)
+        public ImportController(IImportService importService, IStringLocalizer<InformationMessages> localizer)
         {
             this._importService = importService;
+            this._localizer = localizer;
         }
 
         [HttpOptions("leagues")]
@@ -24,11 +30,17 @@ namespace Betto.Api.Controllers
             {
                 await _importService.ImportExternalDataAsync();
 
-                return Ok(new { Message = "Successfully imported leagues from external server" });
+                return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { Message = ex.InnerException != null ? $"{ex.Message} {ex.InnerException.Message}" : ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
             }
         }
     }
