@@ -24,7 +24,9 @@ namespace Betto.DataAccessLayer.Repositories
             IQueryable<TeamEntity> query = DbContext.Teams;
 
             if (includeVenue)
+            {
                 query = query.Include(t => t.Venue);
+            }
 
             return await query.SingleOrDefaultAsync(t => t.TeamId == id);
         }
