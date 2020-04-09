@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Betto.Configuration;
 using Betto.Helpers;
@@ -18,16 +19,10 @@ namespace Betto.RapidApiCommunication.Managers
             _teamParser = teamParser;
         }
 
-        public async Task<IEnumerable<IEnumerable<TeamEntity>>> GetTeamsAsync()
+        public async Task<IEnumerable<TeamEntity>> GetTeamsAsync(IEnumerable<int> leagueIds)
         {
-            var tasks = new List<Task<IEnumerable<TeamEntity>>>();
-
-            for (int i = 1; i < Configuration.LeaguesAmount + 1; i++)
-            {
-                tasks.Add(GetLeagueTeamsAsync(i));
-            }
-
-            var teams = await Task.WhenAll(tasks);
+            var tasks = leagueIds.Select(GetLeagueTeamsAsync).ToList();
+            var teams = (await Task.WhenAll(tasks)).SelectMany(t => t);
 
             return teams;
         }
@@ -42,11 +37,20 @@ namespace Betto.RapidApiCommunication.Managers
             Logger.LogToFile($"league_{leagueId}_teams", rawJson);
 
             var teams = _teamParser.Parse(rawJson);
+            ConnectTeamsToCorrectLeague(leagueId, teams);
 
             return teams;
         }
 
         private string GetTeamsUrl(int leagueId)
             => string.Concat(Configuration.RapidApiUrl, Configuration.TeamsRoute, leagueId);
+
+        private void ConnectTeamsToCorrectLeague(int leagueId, IEnumerable<TeamEntity> teams)
+        {
+            foreach (var team in teams)
+            {
+                team.LeagueId = leagueId;
+            }
+        }
     }
 }

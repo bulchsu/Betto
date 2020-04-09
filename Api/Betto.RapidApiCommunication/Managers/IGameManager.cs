@@ -4,8 +4,8 @@ using Betto.Model.Entities;
 
 namespace Betto.RapidApiCommunication.Managers
 {
-    public interface ITeamManager
+    public interface IGameManager
     {
-        Task<IEnumerable<TeamEntity>> GetTeamsAsync(IEnumerable<int> leagueIds);
+        Task<IEnumerable<GameEntity>> GetGamesAsync(IEnumerable<int> leagueIds);
     }
 }

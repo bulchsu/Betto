@@ -17,13 +17,24 @@ namespace Betto.DataAccessLayer
         public DbSet<TeamEntity> Teams { get; set; }
         public DbSet<VenueEntity> Venues { get; set; }
         public DbSet<UserEntity> Users { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder builder)
-            => base.OnConfiguring(builder);
+        public DbSet<GameEntity> Games { get; set; }
+        public DbSet<ScoreEntity> Scores { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<GameEntity>()
+                .HasOne(g => g.HomeTeam)
+                .WithMany(t => t.HomeGames)
+                .HasForeignKey(g => g.HomeTeamId)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<GameEntity>()
+                .HasOne(g => g.AwayTeam)
+                .WithMany(t => t.AwayGames)
+                .HasForeignKey(g => g.AwayTeamId)
+                .OnDelete(DeleteBehavior.ClientCascade);
 
             builder.Entity<FixturesEntity>()
                 .HasOne(f => f.Coverage)

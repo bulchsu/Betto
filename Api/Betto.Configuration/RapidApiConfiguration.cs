@@ -10,5 +10,8 @@
         public string LeaguesRoute { get; set; }
         public string TeamsRoute { get; set; }
         public int LeaguesAmount { get; set; }
+        public string LeagueFixturesRoute { get; set; }
+        public int DefaultAmountOfMatches { get; set; }
+        public string Timezone { get; set; }
     }
 }

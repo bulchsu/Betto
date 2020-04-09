@@ -11,7 +11,7 @@ namespace Betto.DataAccessLayer.Repositories
             this.DbContext = dbContext;
         }
 
-        public async Task<int> SaveChangesAsync()
+        public virtual async Task<int> SaveChangesAsync()
             => await DbContext.SaveChangesAsync();
     }
 }

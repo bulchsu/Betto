@@ -13,8 +13,10 @@ namespace Betto.DependencyInjection
 
             return services
                 .AddScoped<ApiClient>()
+                .AddScoped(typeof(IParser<GameEntity>), typeof(GameParser))
                 .AddScoped(typeof(IParser<TeamEntity>), typeof(TeamParser))
                 .AddScoped(typeof(IParser<LeagueEntity>), typeof(LeagueParser))
+                .AddScoped<IGameManager, GameManager>()
                 .AddScoped<ITeamManager, TeamManager>()
                 .AddScoped<ILeagueManager, LeagueManager>();
         }

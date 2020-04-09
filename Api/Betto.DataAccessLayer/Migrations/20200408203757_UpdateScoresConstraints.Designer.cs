@@ -4,14 +4,16 @@ using Betto.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Betto.DataAccessLayer.Migrations
 {
     [DbContext(typeof(BettoDbContext))]
-    partial class BettoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200408203757_UpdateScoresConstraints")]
+    partial class UpdateScoresConstraints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,30 +119,25 @@ namespace Betto.DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Referee")
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Round")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("SecondHalfStart")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StatusShort")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Venue")
-                        .HasColumnType("nvarchar(200)")
-                        .HasMaxLength(200);
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("GameId");
 
@@ -211,18 +208,16 @@ namespace Betto.DataAccessLayer.Migrations
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ExtraTime")
+                    b.Property<string>("ExtraTimeScore")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FullTime")
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
+                    b.Property<string>("FullTimeScore")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("HalfTime")
-                        .HasColumnType("nvarchar(20)")
-                        .HasMaxLength(20);
+                    b.Property<string>("HalfTimeScore")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Penalty")
+                    b.Property<string>("PenaltyScore")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("GameId");

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,8 +7,11 @@ namespace Betto.Model.Entities
 {
     public class TeamEntity
     {
-        [Key]
+        [Key, JsonProperty("team_id", NullValueHandling = NullValueHandling.Ignore)]
         public int TeamId { get; set; }
+        public LeagueEntity League { get; set; }
+        [ForeignKey("League")]
+        public int LeagueId { get; set; }
         [Required]
         [MaxLength(100)]
         public string Name { get; set; }
@@ -26,8 +30,7 @@ namespace Betto.Model.Entities
         public int? Founded { get; set; }
         [Required]
         public VenueEntity Venue { get; set; }
-        public LeagueEntity League { get; set; }
-        [ForeignKey("League")]
-        public int LeagueId { get; set; }
+        public ICollection<GameEntity> HomeGames { get; set; }
+        public ICollection<GameEntity> AwayGames { get; set; }
     }
 }

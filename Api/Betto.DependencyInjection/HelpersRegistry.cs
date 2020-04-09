@@ -10,7 +10,8 @@ namespace Betto.DependencyInjection
             return services.AddSingleton<ILogger, Logger>()
                 .AddScoped<IPasswordHasher, PasswordHasher>()
                 .AddScoped<ITokenGenerator, TokenGenerator>()
-                .AddScoped<IObjectValidator, ObjectValidator>();
+                .AddScoped<IObjectValidator, ObjectValidator>()
+                .AddScoped<IRelationCreator, RelationCreator>();
         }
     }
 }

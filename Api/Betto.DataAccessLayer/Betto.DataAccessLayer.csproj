@@ -5,6 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200407162754_AddGameModel.cs" />
+    <Compile Remove="Migrations\20200407162754_AddGameModel.Designer.cs" />
+    <Compile Remove="Migrations\20200407163259_AddGameModel.cs" />
+    <Compile Remove="Migrations\20200407163259_AddGameModel.Designer.cs" />
+    <Compile Remove="Migrations\20200408205721_RenameScores.cs" />
+    <Compile Remove="Migrations\20200408205721_RenameScores.Designer.cs" />
+    <Compile Remove="Migrations\20200408210236_RenameScores.cs" />
+    <Compile Remove="Migrations\20200408210236_RenameScores.Designer.cs" />
+    <Compile Remove="Migrations\20200408210513_RenameScoresColumn.cs" />
+    <Compile Remove="Migrations\20200408210513_RenameScoresColumn.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2">
       <PrivateAssets>all</PrivateAssets>
