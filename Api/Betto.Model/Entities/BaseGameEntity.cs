@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 
 namespace Betto.Model.Entities
 {
@@ -8,7 +7,7 @@ namespace Betto.Model.Entities
     /// </summary>
     public abstract class BaseGameEntity
     {
-        [Key, JsonProperty("fixture_id", NullValueHandling = NullValueHandling.Ignore)]
+        [Key]
         public int GameId { get; set; }
     }
 }

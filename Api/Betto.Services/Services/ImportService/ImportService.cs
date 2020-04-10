@@ -34,7 +34,7 @@ namespace Betto.Services
             _leagueRepository.Clear();
 
             IList<LeagueEntity> leagues = (await _leagueManager.GetLeaguesAsync()).ToList();
-            var leagueIds = leagues.Select(l => l.LeagueId).ToList();
+            var leagueIds = leagues.Select(l => l.RapidApiExternalId).ToList();
 
             var teams = (await _teamManager.GetTeamsAsync(leagueIds)).ToList();
             var games = (await _gameManager.GetGamesAsync(leagueIds)).ToList();

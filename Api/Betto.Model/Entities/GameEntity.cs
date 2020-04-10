@@ -45,5 +45,7 @@ namespace Betto.Model.Entities
         public int GoalsAwayTeam { get; set; }
         [InverseProperty("Game")]
         public ScoreEntity Score { get; set; }
+        [JsonProperty("fixture_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int RapidApiExternalId { get; set; }
     }
 }

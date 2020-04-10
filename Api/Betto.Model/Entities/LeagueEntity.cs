@@ -8,7 +8,7 @@ namespace Betto.Model.Entities
 {
     public class LeagueEntity
     {
-        [Key, JsonProperty("league_id", NullValueHandling = NullValueHandling.Ignore)]
+        [Key]
         public int LeagueId { get; set; }
         [Required, MaxLength(100)] 
         public string Name { get; set; }
@@ -36,5 +36,7 @@ namespace Betto.Model.Entities
         public CoverageEntity Coverage { get; set; }
         public ICollection<TeamEntity> Teams { get; set; }
         public ICollection<GameEntity> Games { get; set; }
+        [JsonProperty("league_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int RapidApiExternalId { get; set; }
     }
 }
