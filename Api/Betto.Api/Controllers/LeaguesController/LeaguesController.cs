@@ -52,11 +52,11 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id)
+        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(id);
+                var league = await _leagueService.GetLeagueByIdAsync(id, includeTeams, includeGames);
 
                 if (league == null)
                 {
@@ -82,7 +82,7 @@ namespace Betto.Api.Controllers
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(leagueId);
+                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
 
                 if (league == null)
                 {
@@ -97,6 +97,39 @@ namespace Betto.Api.Controllers
                 }
 
                 return Ok(teams);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
+            }
+        }
+
+        [HttpGet("{leagueId:int}/table")]
+        public async Task<ActionResult<LeagueTableDTO>> GetLeagueTableAsync(int leagueId)
+        {
+            try
+            {
+                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
+
+                if (league == null)
+                {
+                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
+                }
+
+                var table = await _leagueService.GetLeagueTableAsync(leagueId);
+
+                if (table == null)
+                {
+                    return BadRequest(new {Message = _localizer["CreateLeagueTableErrorMessage", leagueId].Value});
+                }
+
+                return Ok(table);
             }
             catch (Exception ex)
             {

@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CantCreateCupTableErrorMessage" xml:space="preserve">
+    <value>Cannot create {0} table, it's a cup</value>
+  </data>
+  <data name="CreateLeagueTableErrorMessage" xml:space="preserve">
+    <value>Something went wrong while creating league {0} table</value>
+  </data>
   <data name="HttpGetExternalApiErrorMessage" xml:space="preserve">
     <value>Could not retrieve data from {0}</value>
   </data>

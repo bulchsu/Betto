@@ -6,7 +6,8 @@ namespace Betto.Services
 {
     public interface ILeagueService
     {
-        Task<LeagueDTO> GetLeagueByIdAsync(int leagueId);
+        Task<LeagueDTO> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames);
         Task<IEnumerable<LeagueDTO>> GetLeaguesAsync();
+        Task<LeagueTableDTO> GetLeagueTableAsync(int leagueId);
     }
 }
