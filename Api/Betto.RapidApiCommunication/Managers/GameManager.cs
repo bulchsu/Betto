@@ -44,8 +44,8 @@ namespace Betto.RapidApiCommunication.Managers
             return leagueGames;
         }
 
-        private string GetLeagueMatchesUrl(int leagueId)
-            => string.Concat(Configuration.RapidApiUrl, Configuration.LeagueFixturesRoute, leagueId,
-                "/last/", Configuration.DefaultAmountOfMatches, "?timezone=", Configuration.Timezone);
+        private string GetLeagueMatchesUrl(int leagueId) =>
+            string.Concat(Configuration.RapidApiUrl, Configuration.LeagueFixturesRoute, leagueId, 
+                "?timezone=", Configuration.Timezone);
     }
 }

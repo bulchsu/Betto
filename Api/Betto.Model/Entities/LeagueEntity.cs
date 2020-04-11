@@ -8,26 +8,21 @@ namespace Betto.Model.Entities
 {
     public class LeagueEntity
     {
-        [Key, JsonProperty("league_id", NullValueHandling = NullValueHandling.Ignore)]
+        [Key]
         public int LeagueId { get; set; }
-        [Required]
-        [MaxLength(100)]
+        [Required, MaxLength(100)] 
         public string Name { get; set; }
-        [Required]
-        [MaxLength(100)]
+        [Required, MaxLength(100)]
         public string Type { get; set; }
         [MaxLength(100)]
         public string Country { get; set; }
-        [MaxLength(10)]
-        [Column(TypeName = "varchar(10)")]
+        [MaxLength(10), Column(TypeName = "varchar(10)")]
         public string CountryCode { get; set; }
         [Required]
         public int Season { get; set; }
-        [Required]
-        [JsonProperty("season_start", NullValueHandling = NullValueHandling.Ignore)]
+        [Required, JsonProperty("season_start", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime SeasonStart { get; set; }
-        [Required]
-        [JsonProperty("season_end", NullValueHandling = NullValueHandling.Ignore)]
+        [Required, JsonProperty("season_end", NullValueHandling = NullValueHandling.Ignore)]
         public DateTime SeasonEnd { get; set; }
         [MaxLength(300)]
         public string Logo { get; set; }
@@ -35,12 +30,13 @@ namespace Betto.Model.Entities
         public string Flag { get; set; }
         [Required]
         public bool Standings { get; set; }
-        [Required]
-        [JsonProperty("is_current", NullValueHandling = NullValueHandling.Ignore)]
+        [Required, JsonProperty("is_current", NullValueHandling = NullValueHandling.Ignore)]
         public bool IsCurrent { get; set; }
         [Required]
         public CoverageEntity Coverage { get; set; }
         public ICollection<TeamEntity> Teams { get; set; }
         public ICollection<GameEntity> Games { get; set; }
+        [JsonProperty("league_id", NullValueHandling = NullValueHandling.Ignore)]
+        public int RapidApiExternalId { get; set; }
     }
 }

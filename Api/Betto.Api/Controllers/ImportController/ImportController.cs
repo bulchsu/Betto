@@ -23,12 +23,33 @@ namespace Betto.Api.Controllers
             this._localizer = localizer;
         }
 
-        [HttpOptions("leagues")]
-        public async Task<IActionResult> ImportDataAsync()
+        [HttpOptions("initial")]
+        public async Task<IActionResult> ImportInitialDataAsync()
         {
             try
             {
-                await _importService.ImportExternalDataAsync();
+                await _importService.ImportInitialDataAsync();
+
+                return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
+            }
+        }
+
+        [HttpOptions("leagues/next/{amount:int}")]
+        public async Task<IActionResult> ImportAdditionalLeaguesAsync(int amount)
+        {
+            try
+            {
+                await _importService.ImportNextLeaguesAsync(amount);
 
                 return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
             }

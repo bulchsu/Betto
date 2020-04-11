@@ -19,7 +19,7 @@ namespace Betto.RapidApiCommunication.Managers
             _leagueParser = leagueParser;
         }
 
-        public async Task<IEnumerable<LeagueEntity>> GetLeaguesAsync()
+        public async Task<IEnumerable<LeagueEntity>> GetLeaguesAsync(ICollection<int> leaguesToImportIds)
         {
             var url = GetLeaguesUrl();
             var headers = GetRapidApiAuthenticationHeaders();
@@ -30,7 +30,7 @@ namespace Betto.RapidApiCommunication.Managers
 
             var leagues = _leagueParser.Parse(rawJson);
 
-            return leagues.Take(Configuration.LeaguesAmount);
+            return leagues.Where(l => leaguesToImportIds.Contains(l.RapidApiExternalId));
         }
 
         private string GetLeaguesUrl()

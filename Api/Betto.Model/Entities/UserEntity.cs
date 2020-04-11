@@ -7,14 +7,11 @@ namespace Betto.Model.Entities
     {
         [Key]
         public int UserId { get; set; }
-        [Required]
-        [StringLength(100, MinimumLength = 3)]
+        [Required, StringLength(100, MinimumLength = 3)]
         public string Username { get; set; }
-        [Required]
-        [Column(TypeName = "varchar(100)")]
+        [Required, Column(TypeName = "varchar(100)")]
         public string MailAddress { get; set; }
-        [Required]
-        [MaxLength(64)]
+        [Required, MaxLength(64)]
         public byte[] PasswordHash { get; set; }
     }
 }

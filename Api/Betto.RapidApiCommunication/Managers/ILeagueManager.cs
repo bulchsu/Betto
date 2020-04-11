@@ -6,6 +6,6 @@ namespace Betto.RapidApiCommunication.Managers
 {
     public interface ILeagueManager
     {
-        Task<IEnumerable<LeagueEntity>> GetLeaguesAsync();
+        Task<IEnumerable<LeagueEntity>> GetLeaguesAsync(ICollection<int> leaguesToImportIds);
     }
 }
