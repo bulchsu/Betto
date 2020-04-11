@@ -19,8 +19,8 @@ namespace Betto.Helpers
         {
             foreach (var league in leagues.GetEmptyIfNull())
             {
-                league.Teams = teams.Where(t => t.LeagueId == league.LeagueId).ToList();
-                league.Games = games.Where(g => g.LeagueId == league.LeagueId).ToList();
+                league.Teams = teams.Where(t => t.LeagueId == league.RapidApiExternalId).ToList();
+                league.Games = games.Where(g => g.LeagueId == league.RapidApiExternalId).ToList();
             }
         }
 
@@ -28,16 +28,16 @@ namespace Betto.Helpers
         {
             foreach (var team in teams.GetEmptyIfNull())
             {
-                team.HomeGames = games.Where(g => g.HomeTeam.TeamId == team.TeamId).ToList();
-                team.AwayGames = games.Where(g => g.AwayTeam.TeamId == team.TeamId).ToList();
+                team.HomeGames = games.Where(g => g.HomeTeam.RapidApiExternalId == team.RapidApiExternalId).ToList();
+                team.AwayGames = games.Where(g => g.AwayTeam.RapidApiExternalId == team.RapidApiExternalId).ToList();
             }
         }
 
-        private void PrepareGamesToSave(ICollection<GameEntity> games)
+        private void PrepareGamesToSave(ICollection<GameEntity> games) //avoid repetitions in entity tracking
         {
             foreach (var game in games.GetEmptyIfNull())
             {
-                game.HomeTeam = null; //avoid repetitions in entity tracking
+                game.HomeTeam = null; 
                 game.AwayTeam = null;
             }
         }

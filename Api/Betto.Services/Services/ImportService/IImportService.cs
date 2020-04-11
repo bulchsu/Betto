@@ -4,6 +4,7 @@ namespace Betto.Services
 {
     public interface IImportService
     {
-        Task ImportExternalDataAsync();
+        Task ImportInitialDataAsync();
+        Task ImportNextLeaguesAsync(int leaguesAmount);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Betto.DataAccessLayer.Repositories
 {
-    public abstract class BaseRepository : IBaseRepository
+    public abstract class BaseRepository
     { 
         protected readonly BettoDbContext DbContext;
 

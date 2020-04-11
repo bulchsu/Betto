@@ -9,7 +9,8 @@ namespace Betto.DependencyInjection
         {
             return services.AddScoped<IUserRepository, UserRepository>()
                 .AddScoped<ILeagueRepository, LeagueRepository>()
-                .AddScoped<ITeamRepository, TeamRepository>();
+                .AddScoped<ITeamRepository, TeamRepository>()
+                .AddScoped<IGameRepository, GameRepository>();
         }
     }
 }
