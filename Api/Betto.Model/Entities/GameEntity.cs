@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
@@ -47,5 +48,6 @@ namespace Betto.Model.Entities
         public ScoreEntity Score { get; set; }
         [JsonProperty("fixture_id", NullValueHandling = NullValueHandling.Ignore)]
         public int RapidApiExternalId { get; set; }
+        public BetRatesEntity Rates { get; set; }
     }
 }
