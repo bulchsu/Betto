@@ -11,7 +11,8 @@ namespace Betto.DependencyInjection
                 .AddScoped<IPasswordHasher, PasswordHasher>()
                 .AddScoped<ITokenGenerator, TokenGenerator>()
                 .AddScoped<IObjectValidator, ObjectValidator>()
-                .AddScoped<IRelationCreator, RelationCreator>();
+                .AddScoped<IRelationCreator, RelationCreator>()
+                .AddScoped<IRateCalculator, RateCalculator>();
         }
     }
 }
