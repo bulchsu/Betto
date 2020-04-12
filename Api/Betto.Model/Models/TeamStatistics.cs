@@ -1,6 +1,6 @@
-﻿namespace Betto.Model.DTO
+﻿namespace Betto.Model.Models
 {
-    public class TeamStatisticsDTO
+    public class TeamStatistics
     {
         public int Position { get; set; }
         public int TeamId { get; set; }

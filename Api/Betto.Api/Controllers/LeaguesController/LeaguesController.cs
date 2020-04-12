@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
@@ -110,8 +111,8 @@ namespace Betto.Api.Controllers
             }
         }
 
-        [HttpGet("{leagueId:int}/table")]
-        public async Task<ActionResult<LeagueTableDTO>> GetLeagueTableAsync(int leagueId)
+        [HttpGet("{leagueId:int}/table")] //TODO Delete, only for testing
+        public async Task<ActionResult<LeagueTable>> GetLeagueTableAsync(int leagueId)
         {
             try
             {

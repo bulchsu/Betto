@@ -1,6 +1,7 @@
 ﻿using Betto.Model.DTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 
 namespace Betto.Services
 {
@@ -8,6 +9,6 @@ namespace Betto.Services
     {
         Task<LeagueDTO> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames);
         Task<IEnumerable<LeagueDTO>> GetLeaguesAsync();
-        Task<LeagueTableDTO> GetLeagueTableAsync(int leagueId);
+        Task<LeagueTable> GetLeagueTableAsync(int leagueId);
     }
 }

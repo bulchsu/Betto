@@ -3,31 +3,31 @@ using System.Linq;
 using Betto.Model.Constants;
 using Betto.Model.Entities;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.Models
 {
-    public partial class LeagueTableDTO
+    public partial class LeagueTable
     {
         public static class Factory
         {
-            public static LeagueTableDTO NewLeagueTable(LeagueEntity league)
+            public static LeagueTable NewLeagueTable(LeagueEntity league)
             {
                 var table = SortOutLeagueTeams(league);
-                return new LeagueTableDTO(league.LeagueId, league.Name, table);
+                return new LeagueTable(league.LeagueId, league.Name, table);
             }
 
-            private static Queue<TeamStatisticsDTO> SortOutLeagueTeams(LeagueEntity league)
+            private static Queue<TeamStatistics> SortOutLeagueTeams(LeagueEntity league)
             {
                 var statistics = GenerateLeagueTeamsStatistics(league)
                     .OrderByDescending(t => t.Points);
 
-                var queue = new Queue<TeamStatisticsDTO>(statistics);
+                var queue = new Queue<TeamStatistics>(statistics);
 
                 SetTablePositions(queue);
 
                 return queue;
             }
 
-            private static IEnumerable<TeamStatisticsDTO> GenerateLeagueTeamsStatistics(LeagueEntity league)
+            private static IEnumerable<TeamStatistics> GenerateLeagueTeamsStatistics(LeagueEntity league)
             {
                 foreach (var team in league.Teams)
                 {
@@ -47,7 +47,7 @@ namespace Betto.Model.DTO
                     var points = (homeGamesWon + awayGamesWon) * GameConstants.WonGamePointsAmount +
                                  (homeGamesTied + awayGamesTied) * GameConstants.TiedGamePointsAmount;
 
-                    var teamStatistics = new TeamStatisticsDTO
+                    var teamStatistics = new TeamStatistics
                     {
                         TeamId = team.TeamId,
                         TeamName = team.Name,
@@ -63,7 +63,7 @@ namespace Betto.Model.DTO
                 }
             }
 
-            private static void SetTablePositions(Queue<TeamStatisticsDTO> teamStatistics)
+            private static void SetTablePositions(Queue<TeamStatistics> teamStatistics)
             {
                 var position = 1;
 

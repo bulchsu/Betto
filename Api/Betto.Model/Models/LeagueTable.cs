@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.Models
 {
-    public partial class LeagueTableDTO
+    public partial class LeagueTable
     {
-        private LeagueTableDTO(int leagueId, string leagueName, Queue<TeamStatisticsDTO> table)
+        private LeagueTable(int leagueId, string leagueName, Queue<TeamStatistics> table)
         {
             LeagueId = leagueId;
             LeagueName = leagueName;
@@ -13,6 +13,6 @@ namespace Betto.Model.DTO
 
         public int LeagueId { get; set; }
         public string LeagueName { get; set; }
-        public Queue<TeamStatisticsDTO> Table { get; set; }
+        public Queue<TeamStatistics> Table { get; set; }
     }
 }

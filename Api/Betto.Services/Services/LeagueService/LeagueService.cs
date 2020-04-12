@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Betto.Model.Constants;
+using Betto.Model.Models;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
@@ -21,7 +22,7 @@ namespace Betto.Services
             _localizer = localizer;
         }
 
-        public async Task<LeagueTableDTO> GetLeagueTableAsync(int leagueId)
+        public async Task<LeagueTable> GetLeagueTableAsync(int leagueId)
         {
             var league = await _leagueRepository.GetLeagueByIdAsync(leagueId, true, true);
 
@@ -30,7 +31,7 @@ namespace Betto.Services
                 throw new Exception(_localizer["CantCreateCupTableErrorMessage", league.Name].Value);
             }
 
-            return LeagueTableDTO.Factory.NewLeagueTable(league);
+            return LeagueTable.Factory.NewLeagueTable(league);
         }
 
         public async Task<LeagueDTO> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
