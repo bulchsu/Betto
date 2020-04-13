@@ -12,13 +12,13 @@ namespace Betto.Services
 
         public LeagueService(ILeagueRepository leagueRepository)
         {
-            this._leagueRepository = leagueRepository;
+            _leagueRepository = leagueRepository;
         }
 
-        public async Task<LeagueDTO> GetLeagueByIdAsync(int leagueId)
-            => (LeagueDTO)(await _leagueRepository.GetLeagueByIdAsync(leagueId));
+        public async Task<LeagueDTO> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
+            => (LeagueDTO)(await _leagueRepository.GetLeagueByIdAsync(leagueId, includeTeams, includeGames));
 
-        public async Task<IEnumerable<LeagueDTO>> GetLeaguesAsync()
-            => (await _leagueRepository.GetLeaguesAsync()).Select(l => (LeagueDTO)l);
+        public async Task<IEnumerable<LeagueDTO>> GetLeaguesAsync(bool includeTeams, bool includeGames)
+            => (await _leagueRepository.GetLeaguesAsync(includeTeams, includeGames)).Select(l => (LeagueDTO)l);
     }
 }

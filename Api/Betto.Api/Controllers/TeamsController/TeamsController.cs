@@ -18,8 +18,8 @@ namespace Betto.Api.Controllers
 
         public TeamsController(ITeamService teamService, IStringLocalizer<ErrorMessages> localizer)
         {
-            this._teamService = teamService;
-            this._localizer = localizer;
+            _teamService = teamService;
+            _localizer = localizer;
         }
 
 

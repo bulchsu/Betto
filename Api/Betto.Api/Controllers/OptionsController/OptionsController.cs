@@ -12,23 +12,24 @@ namespace Betto.Api.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class ImportController : ControllerBase
+    public class OptionsController : ControllerBase
     {
-        private readonly IImportService _importService;
+        private readonly IOptionsService _optionsService;
         private readonly IStringLocalizer<InformationMessages> _localizer;
 
-        public ImportController(IImportService importService, IStringLocalizer<InformationMessages> localizer)
+        public OptionsController(IOptionsService optionsService, IStringLocalizer<InformationMessages> localizer)
         {
-            this._importService = importService;
-            this._localizer = localizer;
+            _optionsService = optionsService;
+            _localizer = localizer;
         }
 
-        [HttpOptions("initial")]
+        [HttpOptions("initialize")]
         public async Task<IActionResult> ImportInitialDataAsync()
         {
             try
             {
-                await _importService.ImportInitialDataAsync();
+                await _optionsService.ImportInitialDataAsync();
+                await _optionsService.SetBetRatesForAllLeaguesAsync();
 
                 return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
             }
@@ -44,12 +45,13 @@ namespace Betto.Api.Controllers
             }
         }
 
-        [HttpOptions("leagues/next/{amount:int}")]
+        [HttpOptions("add/next/{amount:int}")]
         public async Task<IActionResult> ImportAdditionalLeaguesAsync(int amount)
         {
             try
             {
-                await _importService.ImportNextLeaguesAsync(amount);
+                await _optionsService.ImportNextLeaguesAsync(amount);
+                await _optionsService.SetBetRatesForAdditionalLeaguesAsync(amount);
 
                 return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
             }

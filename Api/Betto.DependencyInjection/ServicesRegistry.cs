@@ -7,7 +7,7 @@ namespace Betto.DependencyInjection
     {
         internal static IServiceCollection RegisterServices(this IServiceCollection services)
         {
-            return services.AddScoped<IImportService, ImportService>()
+            return services.AddScoped<IOptionsService, OptionsService>()
                 .AddScoped<ILeagueService, LeagueService>()
                 .AddScoped<ITeamService, TeamService>()
                 .AddScoped<IUserService, UserService>();

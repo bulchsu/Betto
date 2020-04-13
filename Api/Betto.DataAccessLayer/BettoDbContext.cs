@@ -19,10 +19,31 @@ namespace Betto.DataAccessLayer
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<GameEntity> Games { get; set; }
         public DbSet<ScoreEntity> Scores { get; set; }
+        public DbSet<BetRatesEntity> Rates { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<FixturesEntity>()
+                .HasOne(f => f.Coverage)
+                .WithOne(c => c.Fixtures)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<CoverageEntity>()
+                .HasOne(c => c.League)
+                .WithOne(l => l.Coverage)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<VenueEntity>()
+                .HasOne(v => v.Team)
+                .WithOne(t => t.Venue)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<BetRatesEntity>()
+                .HasOne(b => b.Game)
+                .WithOne(g => g.Rates)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<GameEntity>()
                 .HasOne(g => g.HomeTeam)
@@ -35,21 +56,6 @@ namespace Betto.DataAccessLayer
                 .WithMany(t => t.AwayGames)
                 .HasForeignKey(g => g.AwayTeamId)
                 .OnDelete(DeleteBehavior.ClientCascade);
-
-            builder.Entity<FixturesEntity>()
-                .HasOne(f => f.Coverage)
-                .WithOne(c => c.Fixtures)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<VenueEntity>()
-                .HasOne(v => v.Team)
-                .WithOne(t => t.Venue)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.Entity<CoverageEntity>()
-                .HasOne(c => c.League)
-                .WithOne(l => l.Coverage)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<TeamEntity>()
                 .HasOne(t => t.League)

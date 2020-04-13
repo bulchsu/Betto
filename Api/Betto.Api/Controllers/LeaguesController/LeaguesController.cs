@@ -18,19 +18,21 @@ namespace Betto.Api.Controllers
         private readonly ITeamService _teamService;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public LeaguesController(ILeagueService leagueService, ITeamService teamService, IStringLocalizer<ErrorMessages> localizer)
+        public LeaguesController(ILeagueService leagueService, 
+            ITeamService teamService, 
+            IStringLocalizer<ErrorMessages> localizer)
         {
-            this._leagueService = leagueService;
-            this._teamService = teamService;
-            this._localizer = localizer;
+            _leagueService = leagueService;
+            _teamService = teamService;
+            _localizer = localizer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync()
+        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var leagues = await _leagueService.GetLeaguesAsync();
+                var leagues = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
 
                 if (leagues == null)
                 {
@@ -52,11 +54,11 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id)
+        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(id);
+                var league = await _leagueService.GetLeagueByIdAsync(id, includeTeams, includeGames);
 
                 if (league == null)
                 {
@@ -82,7 +84,7 @@ namespace Betto.Api.Controllers
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(leagueId);
+                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
 
                 if (league == null)
                 {

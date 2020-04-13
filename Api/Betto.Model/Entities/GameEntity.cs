@@ -47,5 +47,6 @@ namespace Betto.Model.Entities
         public ScoreEntity Score { get; set; }
         [JsonProperty("fixture_id", NullValueHandling = NullValueHandling.Ignore)]
         public int RapidApiExternalId { get; set; }
+        public BetRatesEntity Rates { get; set; }
     }
 }
