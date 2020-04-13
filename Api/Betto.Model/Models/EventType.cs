@@ -2,8 +2,8 @@
 {
     public enum EventType
     {
+        Tie,
         HomeTeamWin,
-        AwayTeamWin,
-        Tie
+        AwayTeamWin
     }
 }

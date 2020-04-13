@@ -18,7 +18,9 @@ namespace Betto.Services
         public async Task<LeagueDTO> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
             => (LeagueDTO)(await _leagueRepository.GetLeagueByIdAsync(leagueId, includeTeams, includeGames));
 
-        public async Task<IEnumerable<LeagueDTO>> GetLeaguesAsync(bool includeTeams, bool includeGames)
-            => (await _leagueRepository.GetLeaguesAsync(includeTeams, includeGames)).Select(l => (LeagueDTO)l);
+        public async Task<ICollection<LeagueDTO>> GetLeaguesAsync(bool includeTeams, bool includeGames)
+            => (await _leagueRepository.GetLeaguesAsync(includeTeams, includeGames))
+                .Select(l => (LeagueDTO)l)
+                .ToList();
     }
 }

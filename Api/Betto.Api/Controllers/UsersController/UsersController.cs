@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Helpers.Extensions;
 using Betto.Model.DTO;
 using Betto.Resources.Shared;
 using Betto.Services;
+using Betto.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -15,11 +19,15 @@ namespace Betto.Api.Controllers.UsersController
     {
         private readonly IUserService _userService;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
+        private readonly ITicketService _ticketService;
 
-        public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> localizer)
+        public UsersController(IUserService userService, 
+            IStringLocalizer<ErrorMessages> localizer,
+            ITicketService ticketService)
         {
             _userService = userService;
             _localizer = localizer;
+            _ticketService = ticketService;
         }
 
         [HttpPost("authenticate")]
@@ -82,6 +90,34 @@ namespace Betto.Api.Controllers.UsersController
                 }
 
                 return Ok(user);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = e.InnerException != null
+                            ? $"{e.Message} {e.InnerException.Message}"
+                            : e.Message
+                    });
+            }
+        }
+
+        [HttpGet("{userId:int}/tickets"), Authorize]
+        public async Task<ActionResult<ICollection<TicketDTO>>> GetUserTicketsAsync(int userId)
+        {
+            try
+            {
+                var user = await _userService.GetUserByIdAsync(userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
+                }
+
+                var tickets = await _ticketService.GetUserTicketsAsync(userId);
+
+                return Ok(tickets.GetEmptyIfNull());
             }
             catch (Exception e)
             {
