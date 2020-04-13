@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Betto.Model.Entities
@@ -13,5 +14,6 @@ namespace Betto.Model.Entities
         public string MailAddress { get; set; }
         [Required, MaxLength(64)]
         public byte[] PasswordHash { get; set; }
+        public ICollection<TicketEntity> Tickets { get; set; }
     }
 }

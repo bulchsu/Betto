@@ -20,10 +20,22 @@ namespace Betto.DataAccessLayer
         public DbSet<GameEntity> Games { get; set; }
         public DbSet<ScoreEntity> Scores { get; set; }
         public DbSet<BetRatesEntity> Rates { get; set; }
+        public DbSet<TicketEntity> Tickets { get; set; }
+        public DbSet<EventEntity> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<EventEntity>()
+                .HasOne(e => e.Ticket)
+                .WithMany(t => t.Events)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<TicketEntity>()
+                .HasOne(t => t.User)
+                .WithMany(u => u.Tickets)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<FixturesEntity>()
                 .HasOne(f => f.Coverage)
