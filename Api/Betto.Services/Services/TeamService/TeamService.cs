@@ -12,7 +12,7 @@ namespace Betto.Services
 
         public TeamService(ITeamRepository teamRepository)
         {
-            this._teamRepository = teamRepository;
+            _teamRepository = teamRepository;
         }
 
         public async Task<IEnumerable<TeamDTO>> GetLeagueTeamsAsync(int leagueId)

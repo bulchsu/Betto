@@ -120,4 +120,7 @@
   <data name="SuccessfulImportMessage" xml:space="preserve">
     <value>Successfully imported leagues from external server</value>
   </data>
+  <data name="SucessfulRateCalculation" xml:space="preserve">
+    <value>Successfully calculated and saved bet rates for all leagues</value>
+  </data>
 </root>

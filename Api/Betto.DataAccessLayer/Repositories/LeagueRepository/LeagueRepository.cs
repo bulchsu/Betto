@@ -20,7 +20,16 @@ namespace Betto.DataAccessLayer.Repositories
         public void Clear()
             => DbContext.Leagues.RemoveRange(DbContext.Leagues);
 
-        public async Task<LeagueEntity> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
+        public async Task<LeagueEntity> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames) =>
+            await PrepareGetLeaguesQuery(includeTeams, includeGames)
+                .SingleOrDefaultAsync(l => l.LeagueId == leagueId);
+
+
+        public async Task<IEnumerable<LeagueEntity>> GetLeaguesAsync(bool includeTeams, bool includeGames) =>
+            await PrepareGetLeaguesQuery(includeTeams, includeGames)
+                .ToListAsync();
+
+        private IQueryable<LeagueEntity> PrepareGetLeaguesQuery(bool includeTeams, bool includeGames)
         {
             IQueryable<LeagueEntity> query = DbContext.Leagues;
 
@@ -32,12 +41,8 @@ namespace Betto.DataAccessLayer.Repositories
             {
                 query = query.Include(l => l.Games);
             }
-            
-            return await query.SingleOrDefaultAsync(l => l.LeagueId == leagueId);
-        }
-            
 
-        public async Task<IEnumerable<LeagueEntity>> GetLeaguesAsync()
-            => await DbContext.Leagues.ToListAsync();
+            return query;
+        }
     }
 }

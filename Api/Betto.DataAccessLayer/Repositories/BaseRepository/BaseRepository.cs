@@ -8,7 +8,7 @@ namespace Betto.DataAccessLayer.Repositories
 
         protected BaseRepository(BettoDbContext dbContext)
         {
-            this.DbContext = dbContext;
+            DbContext = dbContext;
         }
 
         public virtual async Task<int> SaveChangesAsync()

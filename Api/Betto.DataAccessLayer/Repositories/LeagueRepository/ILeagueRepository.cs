@@ -8,7 +8,7 @@ namespace Betto.DataAccessLayer.Repositories
     {
         Task AddLeaguesAsync(IEnumerable<LeagueEntity> leagues);
         Task<LeagueEntity> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames);
-        Task<IEnumerable<LeagueEntity>> GetLeaguesAsync();
+        Task<IEnumerable<LeagueEntity>> GetLeaguesAsync(bool includeTeams, bool includeGames);
         void Clear();
     }
 }

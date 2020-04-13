@@ -18,8 +18,8 @@ namespace Betto.Api.Controllers.UsersController
 
         public UsersController(IUserService userService, IStringLocalizer<ErrorMessages> localizer)
         {
-            this._userService = userService;
-            this._localizer = localizer;
+            _userService = userService;
+            _localizer = localizer;
         }
 
         [HttpPost("authenticate")]

@@ -5,6 +5,6 @@ namespace Betto.Helpers
 {
     public interface IRateCalculator
     {
-        ICollection<BetRatesEntity> GetLeagueGamesRates(LeagueEntity league)
+        ICollection<BetRatesEntity> GetLeagueGamesRates(LeagueEntity league);
     }
 }

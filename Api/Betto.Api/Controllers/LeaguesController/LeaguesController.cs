@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Model.Models;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
@@ -19,19 +18,21 @@ namespace Betto.Api.Controllers
         private readonly ITeamService _teamService;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public LeaguesController(ILeagueService leagueService, ITeamService teamService, IStringLocalizer<ErrorMessages> localizer)
+        public LeaguesController(ILeagueService leagueService, 
+            ITeamService teamService, 
+            IStringLocalizer<ErrorMessages> localizer)
         {
-            this._leagueService = leagueService;
-            this._teamService = teamService;
-            this._localizer = localizer;
+            _leagueService = leagueService;
+            _teamService = teamService;
+            _localizer = localizer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync()
+        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var leagues = await _leagueService.GetLeaguesAsync();
+                var leagues = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
 
                 if (leagues == null)
                 {
@@ -98,39 +99,6 @@ namespace Betto.Api.Controllers
                 }
 
                 return Ok(teams);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
-            }
-        }
-
-        [HttpGet("{leagueId:int}/table")] //TODO Delete, only for testing
-        public async Task<ActionResult<LeagueTable>> GetLeagueTableAsync(int leagueId)
-        {
-            try
-            {
-                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
-
-                if (league == null)
-                {
-                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
-                }
-
-                var table = await _leagueService.GetLeagueTableAsync(leagueId);
-
-                if (table == null)
-                {
-                    return BadRequest(new {Message = _localizer["CreateLeagueTableErrorMessage", leagueId].Value});
-                }
-
-                return Ok(table);
             }
             catch (Exception ex)
             {

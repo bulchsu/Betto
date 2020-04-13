@@ -22,7 +22,7 @@ namespace Betto.Helpers
                 var homeTeam = leagueTable.Table.SingleOrDefault(t => t.TeamId == game.HomeTeamId);
                 var awayTeam = leagueTable.Table.SingleOrDefault(t => t.TeamId == game.AwayTeamId);
 
-                var rates = GetCertainGameRates(homeTeam, awayTeam, league.Teams.Count);
+                var rates = GetGameRates(homeTeam, awayTeam, league.Teams.Count);
                 rates.GameId = game.GameId;
 
                 betRates.Add(rates);
@@ -31,7 +31,7 @@ namespace Betto.Helpers
             return betRates.ToList();
         }
 
-        private BetRatesEntity GetCertainGameRates(TeamStatistics homeTeam, TeamStatistics awayTeam, int leagueSize)
+        private BetRatesEntity GetGameRates(TeamStatistics homeTeam, TeamStatistics awayTeam, int leagueSize)
         {
             var positionDifference = GetPositionDifference(homeTeam, awayTeam);
             var probabilityInitialFactor = CalculateInitialProbabilityFactor(positionDifference);
@@ -46,22 +46,26 @@ namespace Betto.Helpers
             var tieProbability = 
                 initialProbability.TieFactor + randomExtraProbability.TieFactor;
 
+            homeTeamWinProbability = InverseNumber(homeTeamWinProbability);
+            awayTeamWinProbability = InverseNumber(awayTeamWinProbability);
+            tieProbability = InverseNumber(tieProbability);
+
             homeTeamWinProbability = SubtractGamblingCompanyFactor(homeTeamWinProbability);
             awayTeamWinProbability = SubtractGamblingCompanyFactor(awayTeamWinProbability);
             tieProbability = SubtractGamblingCompanyFactor(tieProbability);
 
             return new BetRatesEntity
             {
-                HomeTeamWinRate = InverseNumber(homeTeamWinProbability),
-                AwayTeamWinRate = InverseNumber(awayTeamWinProbability),
-                TieRate = InverseNumber(tieProbability)
+                HomeTeamWinRate = (float)Math.Round(homeTeamWinProbability, 2),
+                AwayTeamWinRate = (float)Math.Round(awayTeamWinProbability, 2),
+                TieRate = (float)Math.Round(tieProbability, 2)
             };
         }
 
         private ProbabilityFactors GetInitialProbability(TeamStatistics homeTeam, TeamStatistics awayTeam, float probabilityInitialFactor)
         {
-            var homeTeamWinInitialProbability = RatesConstants.WinInitialProbability + homeTeam.Position < awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor;
-            var awayTeamWinInitialProbability = RatesConstants.WinInitialProbability + homeTeam.Position > awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor;
+            var homeTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position < awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
+            var awayTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position > awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
             var tieInitialProbability = RatesConstants.CertainEventProbability - (homeTeamWinInitialProbability + awayTeamWinInitialProbability);
 
             return new ProbabilityFactors
@@ -76,17 +80,23 @@ namespace Betto.Helpers
         {
             var randomGenerator = new Random();
             var pointsToAllocate = leagueSize - positionDifference;
-            var isFirstFactorPositiveValue = randomGenerator.Next(1) == 1;
-            var randomBaseValue = randomGenerator.Next(pointsToAllocate);
-            var randomDependentValue = (pointsToAllocate - randomBaseValue) / 2;
+            var randomBaseValue = (float)randomGenerator.Next(pointsToAllocate);
+            var randomDependentValue = randomBaseValue / 2.0f;
+
+            var winExtraProbability =
+                (float) randomGenerator.NextDouble() * RatesConstants.WinInitialProbabilityVariation;
 
             var luckFactor =
-                (float)(randomGenerator.NextDouble() * (RatesConstants.MaximumLuckFactor - RatesConstants.MinimumLuckFactor) +
+                (float) (randomGenerator.NextDouble() * (RatesConstants.MaximumLuckFactor - RatesConstants.MinimumLuckFactor) +
                 RatesConstants.MinimumLuckFactor);
 
-            var homeTeamExtraProbability = (isFirstFactorPositiveValue ? randomBaseValue : -randomBaseValue) * luckFactor;
-            var awayTeamExtraProbability = (isFirstFactorPositiveValue ? -randomDependentValue : randomDependentValue) * luckFactor;
+            var homeTeamExtraProbability = randomBaseValue * luckFactor;
+            var awayTeamExtraProbability = -randomDependentValue * luckFactor;
             var tieExtraProbability = awayTeamExtraProbability;
+
+            homeTeamExtraProbability += winExtraProbability;
+            awayTeamExtraProbability += winExtraProbability;
+            tieExtraProbability -= (2.0f * winExtraProbability);
 
             return new ProbabilityFactors
             {
@@ -103,7 +113,9 @@ namespace Betto.Helpers
             Math.Abs(homeTeamStatistics.Position - awayTeamStatistics.Position);
 
         private float SubtractGamblingCompanyFactor(float value) =>
-            RatesConstants.GamblingCompanyProbabilityFactor * value;
+            RatesConstants.GamblingCompanyProbabilityFactor * value > RatesConstants.MinimumCalculatedProbability
+                ? RatesConstants.GamblingCompanyProbabilityFactor * value
+                : RatesConstants.MinimumCalculatedProbability;
 
         private float InverseNumber(float value) =>
             (float)Math.Pow(value, -1);

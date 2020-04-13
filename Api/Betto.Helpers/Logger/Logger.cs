@@ -12,7 +12,7 @@ namespace Betto.Helpers
 
         public Logger(IOptions<LoggingConfiguration> configuration)
         {
-            this._configuration = configuration.Value;
+            _configuration = configuration.Value;
         }
 
         public void LogToFile(string filename, string content)
