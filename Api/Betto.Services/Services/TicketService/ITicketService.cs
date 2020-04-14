@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Betto.Model.DTO;
+using Betto.Model.Models;
 
 namespace Betto.Services.Services
 {
     public interface ITicketService
     {
-        Task<TicketDTO> AddTicketAsync(CreateTicketDTO ticket);
-        Task<ICollection<TicketDTO>> GetUserTicketsAsync(int userId);
-        Task<TicketDTO> GetTicketByIdAsync(int ticketId);
-        Task<bool> CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket);
-        Task<TicketDTO> RevealTicketAsync(int ticketId);
+        Task<RequestResponse<TicketDTO>> GetTicketByIdAsync(int ticketId);
+        Task<RequestResponse<IEnumerable<TicketDTO>>> GetUserTicketsAsync(int userId);
+        Task<RequestResponse<TicketDTO>> AddTicketAsync(CreateTicketDTO ticket);
+        Task<RequestResponse<TicketDTO>> RevealTicketAsync(int ticketId);
     }
 }

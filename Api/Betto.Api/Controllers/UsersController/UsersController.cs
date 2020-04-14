@@ -108,16 +108,11 @@ namespace Betto.Api.Controllers.UsersController
         {
             try
             {
-                var user = await _userService.GetUserByIdAsync(userId);
+                var response = await _ticketService.GetUserTicketsAsync(userId);
 
-                if (user == null)
-                {
-                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
-                }
-
-                var tickets = await _ticketService.GetUserTicketsAsync(userId);
-
-                return Ok(tickets.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception e)
             {

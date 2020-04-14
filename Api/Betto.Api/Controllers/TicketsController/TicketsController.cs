@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Betto.Helpers.Extensions;
 using Betto.Model.DTO;
-using Betto.Resources.Shared;
-using Betto.Services;
 using Betto.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers.TicketsController
 {
@@ -17,16 +12,10 @@ namespace Betto.Api.Controllers.TicketsController
     public class TicketsController : ControllerBase
     {
         private readonly ITicketService _ticketService;
-        private readonly IUserService _userService;
-        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
-        public TicketsController(ITicketService ticketService,
-            IUserService userService,
-            IStringLocalizer<ErrorMessages> localizer)
+        public TicketsController(ITicketService ticketService)
         {
             _ticketService = ticketService;
-            _userService = userService;
-            _localizer = localizer;
         }
 
         /// <summary>
@@ -39,14 +28,11 @@ namespace Betto.Api.Controllers.TicketsController
         {
             try
             {
-                var ticket = await _ticketService.GetTicketByIdAsync(ticketId);
+                var response = await _ticketService.GetTicketByIdAsync(ticketId);
 
-                if (ticket == null)
-                {
-                    return NotFound(new { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
-                }
-
-                return Ok(ticket);
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
@@ -65,33 +51,11 @@ namespace Betto.Api.Controllers.TicketsController
         {
             try
             {
-                if (!ticket.Events.GetEmptyIfNull().Any())
-                {
-                    return BadRequest(new {Message = _localizer["LackOfEventsErrorMessage"].Value});
-                }
+                var response = await _ticketService.AddTicketAsync(ticket);
 
-                var user = await _userService.GetUserByIdAsync(ticket.UserId);
-
-                if (user == null)
-                {
-                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", ticket.UserId].Value });
-                }
-
-                var invalidTicket = await _ticketService.CheckHasUserPlayedAnyOfGamesBeforeAsync(ticket);
-
-                if (invalidTicket)
-                {
-                    return BadRequest(new { Message = _localizer["EventsRepeatedByUserErrorMessage"].Value });
-                }
-
-                var createdTicket = await _ticketService.AddTicketAsync(ticket);
-
-                if (createdTicket == null)
-                {
-                    return BadRequest(new { Message = _localizer["TicketNotCreatedErrorMessage"].Value });
-                }
-                
-                return CreatedAtAction(nameof(GetTicketById), new {ticketId = createdTicket.TicketId}, createdTicket);
+                return response.StatusCode == StatusCodes.Status201Created
+                    ? CreatedAtAction(nameof(GetTicketById), new {ticketId = response.Result.TicketId}, response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
@@ -110,21 +74,11 @@ namespace Betto.Api.Controllers.TicketsController
         {
             try
             {
-                var ticket = await _ticketService.GetTicketByIdAsync(ticketId);
+                var response = await _ticketService.RevealTicketAsync(ticketId);
 
-                if (ticket == null)
-                {
-                    return NotFound(new { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
-                }
-
-                var revealedTicket = await _ticketService.RevealTicketAsync(ticketId);
-
-                if (revealedTicket == null)
-                {
-                    return BadRequest(new { Message = _localizer["RevealTicketErrorMessage", ticketId].Value });
-                }
-
-                return Ok(revealedTicket);
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {

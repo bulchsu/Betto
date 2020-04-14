@@ -9,6 +9,7 @@ using Betto.Model.DTO;
 using Betto.Model.Entities;
 using Betto.Model.Models;
 using Betto.Resources.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 
 namespace Betto.Services.Services
@@ -16,96 +17,227 @@ namespace Betto.Services.Services
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IGameRepository _gameRepository;
         private readonly IRatesRepository _ratesRepository;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public TicketService(ITicketRepository ticketRepository,
+            IUserRepository userRepository,
             IGameRepository gameRepository,
             IRatesRepository ratesRepository,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _ticketRepository = ticketRepository;
+            _userRepository = userRepository;
             _gameRepository = gameRepository;
             _ratesRepository = ratesRepository;
             _localizer = localizer;
         }
 
-        public async Task<TicketDTO> AddTicketAsync(CreateTicketDTO ticket)
+        public async Task<RequestResponse<TicketDTO>> GetTicketByIdAsync(int ticketId)
+        {
+            var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+
+            if (ticket == null)
+            {
+                return new RequestResponse<TicketDTO>(StatusCodes.Status404NotFound,
+                    new List<ErrorResponse>{ new ErrorResponse { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value }},
+                    null);
+            }
+
+            var result = PrepareResponseTicket(ticket);
+
+            return new RequestResponse<TicketDTO>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorResponse>(), 
+                result);
+        }
+
+        public async Task<RequestResponse<IEnumerable<TicketDTO>>> GetUserTicketsAsync(int userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                return new RequestResponse<IEnumerable<TicketDTO>>(StatusCodes.Status404NotFound,
+                    new List<ErrorResponse>{ new ErrorResponse { Message = _localizer["UserNotFoundErrorMessage", userId].Value }}, 
+                    null);
+            }
+
+            var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId)).ToList();
+            var results = new List<TicketDTO>(userTickets.Count);
+            results.AddRange(userTickets.Select(PrepareResponseTicket));
+
+            return new RequestResponse<IEnumerable<TicketDTO>>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorResponse>(),
+                    results);
+        }
+
+        public async Task<RequestResponse<TicketDTO>> AddTicketAsync(CreateTicketDTO ticket)
+        {
+            var validationResults = await ValidateTicketBeforeSavingAsync(ticket);
+
+            if (validationResults.Any())
+            {
+                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
+                    validationResults,
+                    null);
+            }
+
+            var createdTicket = await SaveTicketAsync(ticket);
+
+            if (createdTicket == null)
+            {
+                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
+                    new List<ErrorResponse> { new ErrorResponse { Message = _localizer["TicketNotCreatedErrorMessage"].Value }},
+                    null);
+            }
+
+            var result = PrepareResponseTicket(createdTicket);
+
+            return new RequestResponse<TicketDTO>(StatusCodes.Status201Created, 
+                Enumerable.Empty<ErrorResponse>(), 
+                result);
+        }
+
+        public async Task<RequestResponse<TicketDTO>> RevealTicketAsync(int ticketId)
+        {
+            var validationResults = await ValidateTicketBeforeRevealingAsync(ticketId);
+
+            if (validationResults.Any())
+            {
+                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
+                    validationResults,
+                    null);
+            }
+
+            var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+            await DetermineTicketResultAsync(ticket);
+
+            var result = PrepareResponseTicket(ticket);
+
+            return new RequestResponse<TicketDTO>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorResponse>(),
+                result);
+        }
+
+        private async Task<ICollection<ErrorResponse>> ValidateTicketBeforeSavingAsync(CreateTicketDTO ticket)
+        {// TODO sprawdzic czy uzytkownika stac na kupon
+            var errors = new List<ErrorResponse>();
+
+            CheckDoesTicketContainEvents(ticket, errors);
+            var doesExist = await CheckDoesOwnerOfTheTicketExistAsync(ticket.UserId, errors);
+
+            if (doesExist)
+            {
+                await CheckHasUserPlayedAnyOfGamesBeforeAsync(ticket, errors);
+            }
+
+            return errors;
+        }
+
+        private async Task<ICollection<ErrorResponse>> ValidateTicketBeforeRevealingAsync(int ticketId)
+        {
+            var errors = new List<ErrorResponse>();
+            var doesExist = await CheckDoesTicketExistAsync(ticketId, errors);
+
+            if (doesExist)
+            {
+                await CheckIsTicketAlreadyRevealedAsync(ticketId, errors);
+            }
+
+            return errors;
+        }
+
+        private void CheckDoesTicketContainEvents(CreateTicketDTO ticket, ICollection<ErrorResponse> errors)
+        {
+            if (!ticket.Events.GetEmptyIfNull().Any())
+            {
+                errors.Add(new ErrorResponse { Message = _localizer["LackOfEventsErrorMessage"].Value });
+            }
+        }
+
+        private async Task<bool> CheckDoesOwnerOfTheTicketExistAsync(int userId, ICollection<ErrorResponse> errors)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                errors.Add(new ErrorResponse { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
+            }
+
+            return user != null;
+        }
+
+        private async Task CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket, ICollection<ErrorResponse> errors)
+        {
+            var gameIds = ticket.Events.Select(e => e.GameId);
+            var userTickets = await _ticketRepository.GetUserTicketsAsync(ticket.UserId);
+            var playedGames = userTickets.SelectMany(t => t.Events);
+            var isTicketInvalid = playedGames.Any(g => gameIds.Contains(g.GameId));
+
+            if (isTicketInvalid)
+            {
+                errors.Add(new ErrorResponse { Message = _localizer["EventsRepeatedByUserErrorMessage"].Value });
+            }
+        }
+
+        private async Task<bool> CheckDoesTicketExistAsync(int ticketId, ICollection<ErrorResponse> errors)
+        {
+            var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+
+            if (ticket == null)
+            {
+                errors.Add(new ErrorResponse { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
+            }
+
+            return ticket != null;
+        }
+
+        private async Task CheckIsTicketAlreadyRevealedAsync(int ticketId, ICollection<ErrorResponse> errors)
+        {
+            var ticket = (TicketDTO) await _ticketRepository.GetTicketByIdAsync(ticketId);
+            var isAlreadyRevealed = IsTicketRevealed(ticket);
+
+            if (isAlreadyRevealed)
+            {
+                errors.Add(new ErrorResponse { Message = _localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value });
+            }
+        }
+
+        private async Task<TicketEntity> SaveTicketAsync(CreateTicketDTO ticket)
         {
             var ticketEntity = (TicketEntity) ticket;
 
             await FindEventsRatesAsync(ticketEntity);
             await FindEventResultsAsync(ticketEntity.Events);
 
-            // TODO sprawdzic czy uzytkownika stac na kupon
             var createdTicket = await _ticketRepository.AddTicketAsync(ticketEntity);
             await _ticketRepository.SaveChangesAsync();
 
-            var result = (TicketDTO) createdTicket;
-            SetProperEventResults(result);
-
-            return result;
+            return createdTicket;
         }
 
-        public async Task<ICollection<TicketDTO>> GetUserTicketsAsync(int userId)
+        private async Task DetermineTicketResultAsync(TicketEntity ticket)
         {
-            var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId))
-                .Select(t => (TicketDTO) t)
-                .ToList();
-
-            foreach (var ticket in userTickets)
-            {
-                SetProperEventResults(ticket);
-            }
-
-            return userTickets;
-        }
-
-        public async Task<TicketDTO> GetTicketByIdAsync(int ticketId)
-        { 
-            var ticket = (TicketDTO) await _ticketRepository.GetTicketByIdAsync(ticketId);
-
-            if (ticket != null)
-            {
-                SetProperEventResults(ticket);
-            }
-
-            return ticket;
-        }
-
-        public async Task<bool> CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket)
-        {
-            var gameIds = ticket.Events.Select(e => e.GameId);
-            var userTickets = await _ticketRepository.GetUserTicketsAsync(ticket.UserId);
-            var playedGames = userTickets.SelectMany(t => t.Events);
-
-            return playedGames.Any(g => gameIds.Contains(g.GameId));
-        }
-
-        public async Task<TicketDTO> RevealTicketAsync(int ticketId)
-        {
-            var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
-
-            var isAlreadyRevealed = IsTicketRevealed((TicketDTO)ticket);
-
-            if (isAlreadyRevealed)
-            {
-                throw new Exception(_localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value);
-            }
-
-            var isWon = VerifyTicket(ticket.Events);
+            var isWon = VerifyTicketEvents(ticket.Events);
             SetTicketResults(isWon, ticket);
 
             await _ticketRepository.SaveChangesAsync();
+        }
 
+        private TicketDTO PrepareResponseTicket(TicketEntity ticket)
+        {
             var result = (TicketDTO) ticket;
-            SetProperEventResults(result);
+            FilterTicketEventsResults(result);
 
             return result;
         }
 
-        private void SetProperEventResults(TicketDTO ticket)
+        private bool VerifyTicketEvents(IEnumerable<EventEntity> events) =>
+            events.All(e => e.HiddenEventResult == ResultEnum.Lost);
+
+        private void FilterTicketEventsResults(TicketDTO ticket)
         {
             var isRevealed = IsTicketRevealed(ticket);
 
@@ -115,7 +247,7 @@ namespace Betto.Services.Services
             }
         }
 
-        private void HideEventResult(ICollection<TicketEventDTO> events)
+        private void HideEventResult(IEnumerable<TicketEventDTO> events)
         {
             foreach (var eventDto in events)
             {
@@ -141,14 +273,11 @@ namespace Betto.Services.Services
             foreach (var eventEntity in events)
             {
                 var relatedGame = games.SingleOrDefault(g => g.GameId == eventEntity.GameId);
-                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsHomeTeam);
+                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsAwayTeam);
 
                 eventEntity.HiddenEventResult = gameResult == eventEntity.Type ? ResultEnum.Won : ResultEnum.Lost;
             }
         }
-
-        private bool VerifyTicket(ICollection<EventEntity> events) =>
-            events.All(e => e.HiddenEventResult == ResultEnum.Lost);
 
         private EventType CheckGameResult(int homeTeamGoals, int awayTeamGoals)
         {
@@ -186,7 +315,7 @@ namespace Betto.Services.Services
                 _ => throw new ArgumentException(_localizer["IncorrectEventTypeErrorMessage", type].Value, nameof(type))
             };
 
-        private float CalculateTotalConfirmedRate(ICollection<EventEntity> events) =>
+        private float CalculateTotalConfirmedRate(IEnumerable<EventEntity> events) =>
             (float) Math.Round(events.Select(e => e.ConfirmedRate).Product(), 2);
     }
 }
