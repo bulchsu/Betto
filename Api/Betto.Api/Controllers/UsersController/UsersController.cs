@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 using Betto.Services;
@@ -11,8 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Betto.Api.Controllers.UsersController
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -39,12 +39,7 @@ namespace Betto.Api.Controllers.UsersController
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
 
@@ -62,12 +57,7 @@ namespace Betto.Api.Controllers.UsersController
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
 
@@ -85,12 +75,7 @@ namespace Betto.Api.Controllers.UsersController
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
     }

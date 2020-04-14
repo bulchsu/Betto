@@ -5,21 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Resources.Shared;
-using Microsoft.Extensions.Localization;
+using Betto.Model.Models;
 
 namespace Betto.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class LeaguesController : ControllerBase
     {
         private readonly ILeagueService _leagueService;
         private readonly ITeamService _teamService;
 
         public LeaguesController(ILeagueService leagueService, 
-            ITeamService teamService, 
-            IStringLocalizer<ErrorMessages> localizer)
+            ITeamService teamService)
         {
             _leagueService = leagueService;
             _teamService = teamService;
@@ -40,12 +37,7 @@ namespace Betto.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
@@ -64,12 +56,7 @@ namespace Betto.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
@@ -87,12 +74,7 @@ namespace Betto.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Betto.Api.Controllers
@@ -31,12 +32,7 @@ namespace Betto.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
@@ -54,12 +50,7 @@ namespace Betto.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
     }

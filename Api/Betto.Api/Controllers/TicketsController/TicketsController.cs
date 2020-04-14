@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 using Betto.Services.Services;
@@ -38,12 +39,7 @@ namespace Betto.Api.Controllers.TicketsController
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
@@ -61,12 +57,7 @@ namespace Betto.Api.Controllers.TicketsController
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
@@ -84,12 +75,7 @@ namespace Betto.Api.Controllers.TicketsController
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
     }
