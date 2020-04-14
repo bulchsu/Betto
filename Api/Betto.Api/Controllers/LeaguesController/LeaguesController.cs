@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Helpers.Extensions;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
@@ -34,12 +35,7 @@ namespace Betto.Api.Controllers
             {
                 var leagues = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
 
-                if (leagues == null)
-                {
-                    return NotFound(new { Message = _localizer["LackOfLeaguesErrorMessage"].Value });
-                }
-
-                return Ok(leagues);
+                return Ok(leagues.GetEmptyIfNull());
             }
             catch (Exception ex)
             {
@@ -93,12 +89,7 @@ namespace Betto.Api.Controllers
 
                 var teams = await _teamService.GetLeagueTeamsAsync(leagueId);
 
-                if (teams == null)
-                {
-                    return NotFound(new { Message = _localizer["LackOfTeamsErrorMessage"].Value });
-                }
-
-                return Ok(teams);
+                return Ok(teams.GetEmptyIfNull());
             }
             catch (Exception ex)
             {

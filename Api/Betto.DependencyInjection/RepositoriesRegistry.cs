@@ -12,7 +12,8 @@ namespace Betto.DependencyInjection
                 .AddScoped<ILeagueRepository, LeagueRepository>()
                 .AddScoped<ITeamRepository, TeamRepository>()
                 .AddScoped<IGameRepository, GameRepository>()
-                .AddScoped<IRatesRepository, RatesRepository>();
+                .AddScoped<IRatesRepository, RatesRepository>()
+                .AddScoped<ITicketRepository, TicketRepository>();
         }
     }
 }

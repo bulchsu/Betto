@@ -123,17 +123,17 @@
   <data name="CreateLeagueTableErrorMessage" xml:space="preserve">
     <value>Something went wrong while creating league {0} table</value>
   </data>
+  <data name="EventsRepeatedByUserErrorMessage" xml:space="preserve">
+    <value>You have played at least one of selected matches before! You can select specific game just once.</value>
+  </data>
   <data name="HttpGetExternalApiErrorMessage" xml:space="preserve">
     <value>Could not retrieve data from {0}</value>
   </data>
   <data name="IncorrectPasswordErrorMessage" xml:space="preserve">
     <value>Incorrect password</value>
   </data>
-  <data name="LackOfLeaguesErrorMessage" xml:space="preserve">
-    <value>There are no leagues in the database</value>
-  </data>
-  <data name="LackOfTeamsErrorMessage" xml:space="preserve">
-    <value>There are no teams in the database</value>
+  <data name="LackOfEventsErrorMessage" xml:space="preserve">
+    <value>Ticket must contain at least one event</value>
   </data>
   <data name="LeagueNotFoundErrorMessage" xml:space="preserve">
     <value>League not found</value>
@@ -141,8 +141,20 @@
   <data name="MailAddressAlreadyTakenErrorMessage" xml:space="preserve">
     <value>Mail {0} already taken</value>
   </data>
+  <data name="RevealTicketErrorMessage" xml:space="preserve">
+    <value>Could not reveal ticket {0}. Try again later! </value>
+  </data>
   <data name="TeamNotFoundErrorMessage" xml:space="preserve">
     <value>Team not found</value>
+  </data>
+  <data name="TicketAlreadyRevealedErrorMessage" xml:space="preserve">
+    <value>Ticket {0} has been already revealed.</value>
+  </data>
+  <data name="TicketNotCreatedErrorMessage" xml:space="preserve">
+    <value>Could not create a ticket. Try again later</value>
+  </data>
+  <data name="TicketNotFoundErrorMessage" xml:space="preserve">
+    <value>Ticket {0} does not exist</value>
   </data>
   <data name="UserCreationErrorMessage" xml:space="preserve">
     <value>Could not create user</value>

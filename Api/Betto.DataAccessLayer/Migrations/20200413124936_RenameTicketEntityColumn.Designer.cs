@@ -4,14 +4,16 @@ using Betto.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Betto.DataAccessLayer.Migrations
 {
     [DbContext(typeof(BettoDbContext))]
-    partial class BettoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200413124936_RenameTicketEntityColumn")]
+    partial class RenameTicketEntityColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,9 +92,6 @@ namespace Betto.DataAccessLayer.Migrations
                         .HasColumnType("real");
 
                     b.Property<int>("GameId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HiddenEventResult")
                         .HasColumnType("int");
 
                     b.Property<int>("TicketId")

@@ -4,14 +4,16 @@ using Betto.DataAccessLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Betto.DataAccessLayer.Migrations
 {
     [DbContext(typeof(BettoDbContext))]
-    partial class BettoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200413103122_AddTickets")]
+    partial class AddTickets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,12 +91,6 @@ namespace Betto.DataAccessLayer.Migrations
                     b.Property<float>("ConfirmedRate")
                         .HasColumnType("real");
 
-                    b.Property<int>("GameId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HiddenEventResult")
-                        .HasColumnType("int");
-
                     b.Property<int>("TicketId")
                         .HasColumnType("int");
 
@@ -102,8 +98,6 @@ namespace Betto.DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EventId");
-
-                    b.HasIndex("GameId");
 
                     b.HasIndex("TicketId");
 
@@ -350,7 +344,7 @@ namespace Betto.DataAccessLayer.Migrations
                     b.Property<DateTime>("CreationDateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("RevealDateTime")
+                    b.Property<DateTime?>("PendingDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<double>("Stake")
@@ -455,12 +449,6 @@ namespace Betto.DataAccessLayer.Migrations
 
             modelBuilder.Entity("Betto.Model.Entities.EventEntity", b =>
                 {
-                    b.HasOne("Betto.Model.Entities.GameEntity", "Game")
-                        .WithMany()
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Betto.Model.Entities.TicketEntity", "Ticket")
                         .WithMany("Events")
                         .HasForeignKey("TicketId")

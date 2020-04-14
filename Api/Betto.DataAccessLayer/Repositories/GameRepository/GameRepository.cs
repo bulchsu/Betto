@@ -15,6 +15,13 @@ namespace Betto.DataAccessLayer.Repositories
         }
 
         public async Task<ICollection<GameEntity>> GetLeagueGamesAsync(int leagueId) =>
-            await DbContext.Games.Where(g => g.LeagueId == leagueId).ToListAsync();
+            await DbContext.Games
+                .Where(g => g.LeagueId == leagueId)
+                .ToListAsync();
+
+        public async Task<ICollection<GameEntity>> GetGamesByBunchOfIdsAsync(IEnumerable<int> ids) =>
+            await DbContext.Games
+                .Where(g => ids.Contains(g.GameId))
+                .ToListAsync();
     }
 }

@@ -15,9 +15,10 @@ namespace Betto.Services
             _teamRepository = teamRepository;
         }
 
-        public async Task<IEnumerable<TeamDTO>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<ICollection<TeamDTO>> GetLeagueTeamsAsync(int leagueId)
             => (await _teamRepository.GetLeagueTeamsAsync(leagueId))
-            .Select(t => (TeamDTO)t);
+            .Select(t => (TeamDTO)t)
+            .ToList();
 
         public async Task<TeamDTO> GetTeamByIdAsync(int id, bool includeVenue)
             => (TeamDTO)(await _teamRepository.GetTeamByIdAsync(id, includeVenue));
