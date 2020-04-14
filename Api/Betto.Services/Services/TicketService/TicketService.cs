@@ -66,8 +66,8 @@ namespace Betto.Services.Services
             }
 
             var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId)).ToList();
-            var results = new List<TicketViewModel>(userTickets.Count);
-            results.AddRange(userTickets.Select(PrepareResponseTicket));
+            var results = new List<TicketViewModel>(userTickets.Select(PrepareResponseTicket))
+                .GetEmptyIfNull();
 
             return new RequestResponse<IEnumerable<TicketViewModel>>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),

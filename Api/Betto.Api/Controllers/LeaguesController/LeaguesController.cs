@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Helpers.Extensions;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
 
@@ -17,7 +16,6 @@ namespace Betto.Api.Controllers
     {
         private readonly ILeagueService _leagueService;
         private readonly ITeamService _teamService;
-        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public LeaguesController(ILeagueService leagueService, 
             ITeamService teamService, 
@@ -25,17 +23,19 @@ namespace Betto.Api.Controllers
         {
             _leagueService = leagueService;
             _teamService = teamService;
-            _localizer = localizer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeagueViewModel>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        public async Task<ActionResult<IEnumerable<LeagueViewModel>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, 
+            [FromQuery] bool includeGames = false)
         {
             try
             {
-                var leagues = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
+                var response = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
 
-                return Ok(leagues.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
@@ -49,19 +49,17 @@ namespace Betto.Api.Controllers
             }
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<LeagueViewModel>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        [HttpGet("{leagueId:int}")]
+        public async Task<ActionResult<LeagueViewModel>> GetLeagueByIdAsync([FromRoute] int leagueId, 
+            [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(id, includeTeams, includeGames);
+                var response = await _leagueService.GetLeagueByIdAsync(leagueId, includeTeams, includeGames);
 
-                if (league == null)
-                {
-                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
-                }
-
-                return Ok(league);
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
@@ -76,20 +74,15 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{leagueId:int}/teams")]
-        public async Task<ActionResult<IEnumerable<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<ActionResult<IEnumerable<TeamViewModel>>> GetLeagueTeamsAsync([FromRoute] int leagueId)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
+                var response = await _teamService.GetLeagueTeamsAsync(leagueId);
 
-                if (league == null)
-                {
-                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
-                }
-
-                var teams = await _teamService.GetLeagueTeamsAsync(leagueId);
-
-                return Ok(teams.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {

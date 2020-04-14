@@ -1,12 +1,12 @@
 ﻿using Betto.Model.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Betto.Model.Models;
 
 namespace Betto.Services
 {
     public interface ITeamService
     {
-        Task<ICollection<TeamViewModel>> GetLeagueTeamsAsync(int leagueId);
-        Task<TeamViewModel> GetTeamByIdAsync(int id, bool includeVenue);
+        Task<RequestResponse<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId);
     }
 }
