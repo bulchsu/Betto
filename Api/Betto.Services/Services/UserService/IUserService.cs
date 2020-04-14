@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Betto.Model.Models;
 using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 
@@ -6,11 +7,8 @@ namespace Betto.Services
 {
     public interface IUserService
     {
-        Task<WebTokenViewModel> AuthenticateUserAsync(LoginWriteModel loginData);
-        Task<UserViewModel> SignUpAsync(SignUpWriteModel signUpData);
-        Task<UserViewModel> GetUserByUsernameAsync(string username);
+        Task<RequestResponse<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginData);
+        Task<RequestResponse<UserViewModel>> SignUpAsync(SignUpWriteModel signUpData);
         Task<bool> CheckIsUsernameAlreadyTakenAsync(string username);
-        Task<bool> CheckIsMailAlreadyTakenAsync(string mailAddress);
-        Task<UserViewModel> GetUserByIdAsync(int userId);
     }
 }

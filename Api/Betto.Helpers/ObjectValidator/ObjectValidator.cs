@@ -1,35 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+using Betto.Model.Models;
 
 namespace Betto.Helpers
 {
     public class ObjectValidator : IObjectValidator
     {
-        public void ValidateObject(object validatedInstance)
+        public ICollection<ErrorViewModel> ValidateObject(object validatedInstance)
         {
+            var errors = new List<ErrorViewModel>();
             var context = new ValidationContext(validatedInstance, null, null);
             var results = new List<ValidationResult>();
             var isValid = Validator.TryValidateObject(validatedInstance, context, results, true);
 
             if (!isValid)
             {
-                var errorMessage = PrepareErrorMessage(results);
-                throw new Exception(errorMessage);
+                GetErrors(results, errors);
             }
+
+            return errors;
         }
 
-        private string PrepareErrorMessage(IEnumerable<ValidationResult> validationResults)
+        private static void GetErrors(IEnumerable<ValidationResult> validationResults, ICollection<ErrorViewModel> errors)
         {
-            var builder = new StringBuilder();
-
             foreach (var result in validationResults)
             {
-                builder.Append(result.ErrorMessage + Environment.NewLine);
+                errors.Add(new ErrorViewModel {Message = result.ErrorMessage});
             }
-
-            return builder.ToString();
         }
     }
 }

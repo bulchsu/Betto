@@ -1,7 +1,10 @@
-﻿namespace Betto.Helpers
+﻿using System.Collections.Generic;
+using Betto.Model.Models;
+
+namespace Betto.Helpers
 {
     public interface IObjectValidator
     {
-        void ValidateObject(object validatedInstance);
+        ICollection<ErrorViewModel> ValidateObject(object validatedInstance);
     }
 }
