@@ -1,9 +1,9 @@
 ﻿using Betto.Model.Entities;
 using System;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.ViewModels
 {
-    public class LeagueDTO
+    public class LeagueViewModel
     {
         public int LeagueId { get; set; }
         public string Name { get; set; }
@@ -16,8 +16,8 @@ namespace Betto.Model.DTO
         public string Flag { get; set; }
         public bool Standings { get; set; }
 
-        public static explicit operator LeagueDTO(LeagueEntity league)
-            => league == null ? null : new LeagueDTO
+        public static explicit operator LeagueViewModel(LeagueEntity league)
+            => league == null ? null : new LeagueViewModel
             {
                 LeagueId = league.LeagueId,
                 Name = league.Name,

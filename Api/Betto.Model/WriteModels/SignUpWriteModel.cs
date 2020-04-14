@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Betto.Model.DTO
-{
-    public class SignUpDTO
+namespace Betto.Model.WriteModels
+{ 
+    public class SignUpWriteModel
     {
         [Required, StringLength(100, MinimumLength = 3)]
         public string Username { get; set; }

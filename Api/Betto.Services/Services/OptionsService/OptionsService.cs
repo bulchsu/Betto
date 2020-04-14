@@ -8,7 +8,12 @@ using Betto.Configuration;
 using Betto.DataAccessLayer.Repositories.RatesRepository;
 using Betto.Helpers;
 using Betto.Helpers.Extensions;
+using Betto.Model.Models;
+using Betto.Model.ViewModelss;
 using Betto.RapidApiCommunication.Managers;
+using Betto.Resources.Shared;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace Betto.Services
@@ -22,6 +27,7 @@ namespace Betto.Services
         private readonly IGameManager _gameManager;
         private readonly IRelationCreator _relationCreator;
         private readonly IRateCalculator _rateCalculator;
+        private readonly IStringLocalizer<InformationMessages> _localizer;
         private readonly RapidApiConfiguration _configuration;
 
         public OptionsService(ILeagueRepository leagueRepository,
@@ -31,7 +37,8 @@ namespace Betto.Services
             IGameManager gameManager,
             IRelationCreator relationCreator,
             IRateCalculator rateCalculator,
-            IOptions<RapidApiConfiguration> configuration)
+            IOptions<RapidApiConfiguration> configuration,
+            IStringLocalizer<InformationMessages> localizer)
         {
             _leagueRepository = leagueRepository;
             _rateRepository = rateRepository;
@@ -40,10 +47,11 @@ namespace Betto.Services
             _gameManager = gameManager;
             _relationCreator = relationCreator;
             _rateCalculator = rateCalculator;
+            _localizer = localizer;
             _configuration = configuration.Value;
         }
 
-        public async Task ImportInitialDataAsync()
+        public async Task<RequestResponse<InfoViewModel>> ImportInitialDataAsync()
         {   
             _leagueRepository.Clear();
 
@@ -51,9 +59,14 @@ namespace Betto.Services
             var leagues = await RetrieveLeaguesAsync(leagueIds);
 
             await SaveLeaguesAsync(leagues);
+            await SetBetRatesForAllLeaguesAsync();
+
+            return new RequestResponse<InfoViewModel>(StatusCodes.Status200OK, 
+                Enumerable.Empty<ErrorViewModel>(), 
+                new InfoViewModel { Message = _localizer["SuccessfulImportMessage"].Value });
         }
 
-        public async Task ImportNextLeaguesAsync(int leaguesAmount)
+        public async Task<RequestResponse<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount)
         {
             var highestStoredLeagueId = (await _leagueRepository.GetLeaguesAsync(false, false)).Max(l => l.RapidApiExternalId);
             var leagueIds = CalculateLeaguesIds(leaguesAmount, highestStoredLeagueId).ToList();
@@ -61,9 +74,14 @@ namespace Betto.Services
             var leagues = await RetrieveLeaguesAsync(leagueIds);
 
             await SaveLeaguesAsync(leagues);
+            await SetBetRatesForAdditionalLeaguesAsync(leaguesAmount);
+
+            return new RequestResponse<InfoViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
+                new InfoViewModel { Message = _localizer["SuccessfulImportMessage"].Value });
         }
 
-        public async Task SetBetRatesForAllLeaguesAsync()
+        private async Task SetBetRatesForAllLeaguesAsync()
         {
             _rateRepository.Clear();
             var leagues = await _leagueRepository.GetLeaguesAsync(true, true);
@@ -71,7 +89,7 @@ namespace Betto.Services
             await SetRatesForLeagues(leagues);
         }
 
-        public async Task SetBetRatesForAdditionalLeaguesAsync(int leaguesAmount)
+        private async Task SetBetRatesForAdditionalLeaguesAsync(int leaguesAmount)
         {
             var leagues = (await _leagueRepository.GetLeaguesAsync(true, true)).TakeLast(leaguesAmount);
             await SetRatesForLeagues(leagues);
@@ -112,7 +130,7 @@ namespace Betto.Services
             }
         }
 
-        private async Task<int> SaveLeaguesAsync(ICollection<LeagueEntity> leagues)
+        private async Task<int> SaveLeaguesAsync(IEnumerable<LeagueEntity> leagues)
         {
             await _leagueRepository.AddLeaguesAsync(leagues);
             return await _leagueRepository.SaveChangesAsync();

@@ -1,6 +1,6 @@
-﻿namespace Betto.Model.DTO
+﻿namespace Betto.Model.ViewModels
 {
-    public class WebTokenDTO
+    public class WebTokenViewModel
     {
         public string Username { get; set; }
         public string AuthenticationToken { get; set; }

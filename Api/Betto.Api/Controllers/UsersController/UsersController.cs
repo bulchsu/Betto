@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Helpers.Extensions;
-using Betto.Model.DTO;
+using Betto.Model.ViewModels;
+using Betto.Model.WriteModels;
 using Betto.Resources.Shared;
 using Betto.Services;
 using Betto.Services.Services;
@@ -31,7 +31,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpPost("authenticate")]
-        public async Task<ActionResult<WebTokenDTO>> AuthenticateUserAsync([FromBody] LoginDTO loginData)
+        public async Task<ActionResult<WebTokenViewModel>> AuthenticateUserAsync([FromBody] LoginWriteModel loginData)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDTO>> SignUpAsync([FromBody] SignUpDTO signUpData)
+        public async Task<ActionResult<UserViewModel>> SignUpAsync([FromBody] SignUpWriteModel signUpData)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpGet("{userId:int}/tickets"), Authorize]
-        public async Task<ActionResult<ICollection<TicketDTO>>> GetUserTicketsAsync(int userId)
+        public async Task<ActionResult<ICollection<TicketViewModel>>> GetUserTicketsAsync(int userId)
         {
             try
             {

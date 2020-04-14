@@ -5,7 +5,7 @@ namespace Betto.Model.Models
     public class RequestResponse<T> where T : class
     {
         public RequestResponse(int statusCode, 
-            IEnumerable<ErrorResponse> errors, 
+            IEnumerable<ErrorViewModel> errors, 
             T result)
         {
             StatusCode = statusCode;
@@ -14,7 +14,7 @@ namespace Betto.Model.Models
         }
 
         public int StatusCode { get; set; }
-        public IEnumerable<ErrorResponse> Errors { get; set; }
+        public IEnumerable<ErrorViewModel> Errors { get; set; }
         public T Result { get; set; }
     }
 }

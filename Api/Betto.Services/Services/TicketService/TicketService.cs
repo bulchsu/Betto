@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using Betto.DataAccessLayer.Repositories;
 using Betto.DataAccessLayer.Repositories.RatesRepository;
 using Betto.Helpers.Extensions;
-using Betto.Model.DTO;
+using Betto.Model.ViewModels;
 using Betto.Model.Entities;
 using Betto.Model.Models;
+using Betto.Model.WriteModels;
 using Betto.Resources.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
@@ -35,51 +36,51 @@ namespace Betto.Services.Services
             _localizer = localizer;
         }
 
-        public async Task<RequestResponse<TicketDTO>> GetTicketByIdAsync(int ticketId)
+        public async Task<RequestResponse<TicketViewModel>> GetTicketByIdAsync(int ticketId)
         {
             var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
 
             if (ticket == null)
             {
-                return new RequestResponse<TicketDTO>(StatusCodes.Status404NotFound,
-                    new List<ErrorResponse>{ new ErrorResponse { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value }},
+                return new RequestResponse<TicketViewModel>(StatusCodes.Status404NotFound,
+                    new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value }},
                     null);
             }
 
             var result = PrepareResponseTicket(ticket);
 
-            return new RequestResponse<TicketDTO>(StatusCodes.Status200OK,
-                Enumerable.Empty<ErrorResponse>(), 
+            return new RequestResponse<TicketViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(), 
                 result);
         }
 
-        public async Task<RequestResponse<IEnumerable<TicketDTO>>> GetUserTicketsAsync(int userId)
+        public async Task<RequestResponse<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
 
             if (user == null)
             {
-                return new RequestResponse<IEnumerable<TicketDTO>>(StatusCodes.Status404NotFound,
-                    new List<ErrorResponse>{ new ErrorResponse { Message = _localizer["UserNotFoundErrorMessage", userId].Value }}, 
+                return new RequestResponse<IEnumerable<TicketViewModel>>(StatusCodes.Status404NotFound,
+                    new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", userId].Value }}, 
                     null);
             }
 
             var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId)).ToList();
-            var results = new List<TicketDTO>(userTickets.Count);
+            var results = new List<TicketViewModel>(userTickets.Count);
             results.AddRange(userTickets.Select(PrepareResponseTicket));
 
-            return new RequestResponse<IEnumerable<TicketDTO>>(StatusCodes.Status200OK,
-                Enumerable.Empty<ErrorResponse>(),
+            return new RequestResponse<IEnumerable<TicketViewModel>>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
                     results);
         }
 
-        public async Task<RequestResponse<TicketDTO>> AddTicketAsync(CreateTicketDTO ticket)
+        public async Task<RequestResponse<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket)
         {
             var validationResults = await ValidateTicketBeforeSavingAsync(ticket);
 
             if (validationResults.Any())
             {
-                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
+                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
                     validationResults,
                     null);
             }
@@ -88,25 +89,25 @@ namespace Betto.Services.Services
 
             if (createdTicket == null)
             {
-                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
-                    new List<ErrorResponse> { new ErrorResponse { Message = _localizer["TicketNotCreatedErrorMessage"].Value }},
+                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
+                    new List<ErrorViewModel> { new ErrorViewModel { Message = _localizer["TicketNotCreatedErrorMessage"].Value }},
                     null);
             }
 
             var result = PrepareResponseTicket(createdTicket);
 
-            return new RequestResponse<TicketDTO>(StatusCodes.Status201Created, 
-                Enumerable.Empty<ErrorResponse>(), 
+            return new RequestResponse<TicketViewModel>(StatusCodes.Status201Created, 
+                Enumerable.Empty<ErrorViewModel>(), 
                 result);
         }
 
-        public async Task<RequestResponse<TicketDTO>> RevealTicketAsync(int ticketId)
+        public async Task<RequestResponse<TicketViewModel>> RevealTicketAsync(int ticketId)
         {
             var validationResults = await ValidateTicketBeforeRevealingAsync(ticketId);
 
             if (validationResults.Any())
             {
-                return new RequestResponse<TicketDTO>(StatusCodes.Status400BadRequest,
+                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
                     validationResults,
                     null);
             }
@@ -116,14 +117,14 @@ namespace Betto.Services.Services
 
             var result = PrepareResponseTicket(ticket);
 
-            return new RequestResponse<TicketDTO>(StatusCodes.Status200OK,
-                Enumerable.Empty<ErrorResponse>(),
+            return new RequestResponse<TicketViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
                 result);
         }
 
-        private async Task<ICollection<ErrorResponse>> ValidateTicketBeforeSavingAsync(CreateTicketDTO ticket)
+        private async Task<ICollection<ErrorViewModel>> ValidateTicketBeforeSavingAsync(TicketWriteModel ticket)
         {// TODO sprawdzic czy uzytkownika stac na kupon
-            var errors = new List<ErrorResponse>();
+            var errors = new List<ErrorViewModel>();
 
             CheckDoesTicketContainEvents(ticket, errors);
             var doesExist = await CheckDoesOwnerOfTheTicketExistAsync(ticket.UserId, errors);
@@ -136,9 +137,9 @@ namespace Betto.Services.Services
             return errors;
         }
 
-        private async Task<ICollection<ErrorResponse>> ValidateTicketBeforeRevealingAsync(int ticketId)
+        private async Task<ICollection<ErrorViewModel>> ValidateTicketBeforeRevealingAsync(int ticketId)
         {
-            var errors = new List<ErrorResponse>();
+            var errors = new List<ErrorViewModel>();
             var doesExist = await CheckDoesTicketExistAsync(ticketId, errors);
 
             if (doesExist)
@@ -149,27 +150,27 @@ namespace Betto.Services.Services
             return errors;
         }
 
-        private void CheckDoesTicketContainEvents(CreateTicketDTO ticket, ICollection<ErrorResponse> errors)
+        private void CheckDoesTicketContainEvents(TicketWriteModel ticket, ICollection<ErrorViewModel> errors)
         {
             if (!ticket.Events.GetEmptyIfNull().Any())
             {
-                errors.Add(new ErrorResponse { Message = _localizer["LackOfEventsErrorMessage"].Value });
+                errors.Add(new ErrorViewModel { Message = _localizer["LackOfEventsErrorMessage"].Value });
             }
         }
 
-        private async Task<bool> CheckDoesOwnerOfTheTicketExistAsync(int userId, ICollection<ErrorResponse> errors)
+        private async Task<bool> CheckDoesOwnerOfTheTicketExistAsync(int userId, ICollection<ErrorViewModel> errors)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
 
             if (user == null)
             {
-                errors.Add(new ErrorResponse { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
+                errors.Add(new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
             }
 
             return user != null;
         }
 
-        private async Task CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket, ICollection<ErrorResponse> errors)
+        private async Task CheckHasUserPlayedAnyOfGamesBeforeAsync(TicketWriteModel ticket, ICollection<ErrorViewModel> errors)
         {
             var gameIds = ticket.Events.Select(e => e.GameId);
             var userTickets = await _ticketRepository.GetUserTicketsAsync(ticket.UserId);
@@ -178,34 +179,34 @@ namespace Betto.Services.Services
 
             if (isTicketInvalid)
             {
-                errors.Add(new ErrorResponse { Message = _localizer["EventsRepeatedByUserErrorMessage"].Value });
+                errors.Add(new ErrorViewModel { Message = _localizer["EventsRepeatedByUserErrorMessage"].Value });
             }
         }
 
-        private async Task<bool> CheckDoesTicketExistAsync(int ticketId, ICollection<ErrorResponse> errors)
+        private async Task<bool> CheckDoesTicketExistAsync(int ticketId, ICollection<ErrorViewModel> errors)
         {
             var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
 
             if (ticket == null)
             {
-                errors.Add(new ErrorResponse { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
+                errors.Add(new ErrorViewModel { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
             }
 
             return ticket != null;
         }
 
-        private async Task CheckIsTicketAlreadyRevealedAsync(int ticketId, ICollection<ErrorResponse> errors)
+        private async Task CheckIsTicketAlreadyRevealedAsync(int ticketId, ICollection<ErrorViewModel> errors)
         {
-            var ticket = (TicketDTO) await _ticketRepository.GetTicketByIdAsync(ticketId);
+            var ticket = (TicketViewModel) await _ticketRepository.GetTicketByIdAsync(ticketId);
             var isAlreadyRevealed = IsTicketRevealed(ticket);
 
             if (isAlreadyRevealed)
             {
-                errors.Add(new ErrorResponse { Message = _localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value });
+                errors.Add(new ErrorViewModel { Message = _localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value });
             }
         }
 
-        private async Task<TicketEntity> SaveTicketAsync(CreateTicketDTO ticket)
+        private async Task<TicketEntity> SaveTicketAsync(TicketWriteModel ticket)
         {
             var ticketEntity = (TicketEntity) ticket;
 
@@ -226,9 +227,9 @@ namespace Betto.Services.Services
             await _ticketRepository.SaveChangesAsync();
         }
 
-        private TicketDTO PrepareResponseTicket(TicketEntity ticket)
+        private TicketViewModel PrepareResponseTicket(TicketEntity ticket)
         {
-            var result = (TicketDTO) ticket;
+            var result = (TicketViewModel) ticket;
             FilterTicketEventsResults(result);
 
             return result;
@@ -237,7 +238,7 @@ namespace Betto.Services.Services
         private bool VerifyTicketEvents(IEnumerable<EventEntity> events) =>
             events.All(e => e.HiddenEventResult == ResultEnum.Lost);
 
-        private void FilterTicketEventsResults(TicketDTO ticket)
+        private void FilterTicketEventsResults(TicketViewModel ticket)
         {
             var isRevealed = IsTicketRevealed(ticket);
 
@@ -247,11 +248,11 @@ namespace Betto.Services.Services
             }
         }
 
-        private void HideEventResult(IEnumerable<TicketEventDTO> events)
+        private void HideEventResult(IEnumerable<TicketEventViewModel> events)
         {
-            foreach (var eventDto in events)
+            foreach (var eventViewModel in events)
             {
-                eventDto.Result = ResultEnum.Pending;
+                eventViewModel.Result = ResultEnum.Pending;
             }
         }
 
@@ -262,7 +263,7 @@ namespace Betto.Services.Services
         }
 
 
-        private bool IsTicketRevealed(TicketDTO ticket) =>
+        private bool IsTicketRevealed(TicketViewModel ticket) =>
             ticket.Status != ResultEnum.Pending && ticket.RevealDateTime.HasValue;
 
         private async Task FindEventResultsAsync(ICollection<EventEntity> events)

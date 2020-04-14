@@ -15,8 +15,8 @@
     <Compile Remove="Migrations\20200408210236_RenameScores.Designer.cs" />
     <Compile Remove="Migrations\20200408210513_RenameScoresColumn.cs" />
     <Compile Remove="Migrations\20200408210513_RenameScoresColumn.Designer.cs" />
-    <Compile Remove="Migrations\20200409190746_AddRapidApiExternalIdToSomeEntities.cs" />
-    <Compile Remove="Migrations\20200409190746_AddRapidApiExternalIdToSomeEntities.Designer.cs" />
+    <Compile Remove="Migrations\20200409190746_AddRapidApiExternalIViewModelSomeEntities.cs" />
+    <Compile Remove="Migrations\20200409190746_AddRapidApiExternalIViewModelSomeEntities.Designer.cs" />
     <Compile Remove="Migrations\20200412084414_AddRatesEntity.cs" />
     <Compile Remove="Migrations\20200412084414_AddRatesEntity.Designer.cs" />
   </ItemGroup>

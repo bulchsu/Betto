@@ -1,8 +1,8 @@
 ﻿using Betto.Model.Models;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.WriteModels
 {
-    public class CreateTicketEventDTO
+    public class TicketEventWriteModel
     {
         public int GameId { get; set; }
         public EventType Type { get; set; }

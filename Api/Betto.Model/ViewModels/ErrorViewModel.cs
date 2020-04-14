@@ -1,6 +1,6 @@
 ﻿namespace Betto.Model.Models
 {
-    public class ErrorResponse
+    public class ErrorViewModel
     {
         public string Message { get; set; }
     }

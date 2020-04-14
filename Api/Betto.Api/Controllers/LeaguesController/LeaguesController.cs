@@ -1,4 +1,4 @@
-﻿using Betto.Model.DTO;
+﻿using Betto.Model.ViewModels;
 using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        public async Task<ActionResult<IEnumerable<LeagueViewModel>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        public async Task<ActionResult<LeagueViewModel>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Betto.Api.Controllers
         }
 
         [HttpGet("{leagueId:int}/teams")]
-        public async Task<ActionResult<IEnumerable<TeamDTO>>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<ActionResult<IEnumerable<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
         {
             try
             {

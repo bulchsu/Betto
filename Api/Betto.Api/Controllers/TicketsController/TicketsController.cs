@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Betto.Model.DTO;
+using Betto.Model.ViewModels;
+using Betto.Model.WriteModels;
 using Betto.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,7 +25,7 @@ namespace Betto.Api.Controllers.TicketsController
         /// <param name="ticketId"></param>
         /// <returns></returns>
         [HttpGet("{ticketId:int}")]
-        public async Task<ActionResult<TicketDTO>> GetTicketById([FromRoute] int ticketId)
+        public async Task<ActionResult<TicketViewModel>> GetTicketById([FromRoute] int ticketId)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace Betto.Api.Controllers.TicketsController
         }
 
         [HttpPost]
-        public async Task<ActionResult<TicketDTO>> CreateTicketAsync([FromBody] CreateTicketDTO ticket)
+        public async Task<ActionResult<TicketViewModel>> CreateTicketAsync([FromBody] TicketWriteModel ticket)
         {
             try
             {
@@ -70,7 +71,7 @@ namespace Betto.Api.Controllers.TicketsController
         }
 
         [HttpPost("{ticketId:int}/reveal")]
-        public async Task<ActionResult<TicketDTO>> RevealTicketAsync(int ticketId)
+        public async Task<ActionResult<TicketViewModel>> RevealTicketAsync(int ticketId)
         {
             try
             {

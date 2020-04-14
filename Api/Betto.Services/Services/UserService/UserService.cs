@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Betto.DataAccessLayer.Repositories;
 using Betto.Helpers;
-using Betto.Model.DTO;
+using Betto.Model.ViewModels;
 using Betto.Model.Entities;
+using Betto.Model.WriteModels;
 
 namespace Betto.Services
 {
@@ -24,17 +25,17 @@ namespace Betto.Services
             _objectValidator = objectValidator;
         }
 
-        public async Task<WebTokenDTO> AuthenticateUserAsync(LoginDTO loginData)
+        public async Task<WebTokenViewModel> AuthenticateUserAsync(LoginWriteModel loginData)
         {
             var user = await _userRepository.GetUserByUsernameAsync(loginData.Username);
             var authenticated = _passwordHasher.VerifyPassword(user.PasswordHash, loginData.Password);
 
             return authenticated
-                ? new WebTokenDTO { AuthenticationToken = _tokenGenerator.GenerateToken(loginData.Username), Username = user.Username }
+                ? new WebTokenViewModel { AuthenticationToken = _tokenGenerator.GenerateToken(loginData.Username), Username = user.Username }
                 : null;
         }
 
-        public async Task<UserDTO> SignUpAsync(SignUpDTO signUpData)
+        public async Task<UserViewModel> SignUpAsync(SignUpWriteModel signUpData)
         {
             var passwordHash = _passwordHasher.EncodePassword(signUpData.Password);
 
@@ -46,11 +47,11 @@ namespace Betto.Services
             var registeredUser = await _userRepository.SignUpAsync(newUser);
             await _userRepository.SaveChangesAsync();
 
-            return (UserDTO) registeredUser;
+            return (UserViewModel) registeredUser;
         }
 
-        public async Task<UserDTO> GetUserByUsernameAsync(string username) =>
-            (UserDTO) await _userRepository.GetUserByUsernameAsync(username);
+        public async Task<UserViewModel> GetUserByUsernameAsync(string username) =>
+            (UserViewModel) await _userRepository.GetUserByUsernameAsync(username);
 
         public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
             await _userRepository.GetUserByUsernameAsync(username) != null;
@@ -58,7 +59,7 @@ namespace Betto.Services
         public async Task<bool> CheckIsMailAlreadyTakenAsync(string mailAddress) =>
             await _userRepository.GetUserByMailAsync(mailAddress) != null;
 
-        public async Task<UserDTO> GetUserByIdAsync(int userId) =>
-            (UserDTO) await _userRepository.GetUserByIdAsync(userId);
+        public async Task<UserViewModel> GetUserByIdAsync(int userId) =>
+            (UserViewModel) await _userRepository.GetUserByIdAsync(userId);
     }
 }

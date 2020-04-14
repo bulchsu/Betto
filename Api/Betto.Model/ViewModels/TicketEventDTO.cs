@@ -1,9 +1,9 @@
 ﻿using Betto.Model.Entities;
 using Betto.Model.Models;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.ViewModels
 {
-    public class TicketEventDTO
+    public class TicketEventViewModel
     {
         public int EventId { get; set; }
         public int TicketId { get; set; }
@@ -12,9 +12,9 @@ namespace Betto.Model.DTO
         public float ConfirmedRate { get; set; }
         public ResultEnum Result { get; set; }
 
-        public static explicit operator TicketEventDTO(EventEntity eventEntity) => eventEntity == null
+        public static explicit operator TicketEventViewModel(EventEntity eventEntity) => eventEntity == null
             ? null
-            : new TicketEventDTO
+            : new TicketEventViewModel
             {
                 EventId = eventEntity.EventId,
                 TicketId = eventEntity.TicketId,

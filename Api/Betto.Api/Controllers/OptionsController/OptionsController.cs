@@ -3,24 +3,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
-using Betto.Resources.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]"), Authorize]
     public class OptionsController : ControllerBase
     {
         private readonly IOptionsService _optionsService;
-        private readonly IStringLocalizer<InformationMessages> _localizer;
 
-        public OptionsController(IOptionsService optionsService, IStringLocalizer<InformationMessages> localizer)
+        public OptionsController(IOptionsService optionsService)
         {
             _optionsService = optionsService;
-            _localizer = localizer;
         }
 
         [HttpOptions("initialize")]
@@ -28,10 +22,11 @@ namespace Betto.Api.Controllers
         {
             try
             {
-                await _optionsService.ImportInitialDataAsync();
-                await _optionsService.SetBetRatesForAllLeaguesAsync();
+                var response = await _optionsService.ImportInitialDataAsync();
 
-                return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
@@ -50,10 +45,11 @@ namespace Betto.Api.Controllers
         {
             try
             {
-                await _optionsService.ImportNextLeaguesAsync(amount);
-                await _optionsService.SetBetRatesForAdditionalLeaguesAsync(amount);
+                var response = await _optionsService.ImportNextLeaguesAsync(amount);
 
-                return Ok(new { Message = _localizer["SuccessfulImportMessage"].Value });
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {

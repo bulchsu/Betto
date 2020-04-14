@@ -1,8 +1,8 @@
 ﻿using Betto.Model.Entities;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.ViewModels
 {
-    public class TeamDTO
+    public class TeamViewModel
     {
         public int TeamId { get; set; }
         public int LeagueId { get; set; }
@@ -10,10 +10,10 @@ namespace Betto.Model.DTO
         public string Logo { get; set; }
         public string Country { get; set; }
         public string IsNational { get; set; }
-        public VenueDTO Venue { get; set; }
+        public VenueViewModel Venue { get; set; }
 
-        public static explicit operator TeamDTO(TeamEntity team)
-            => team == null ? null : new TeamDTO
+        public static explicit operator TeamViewModel(TeamEntity team)
+            => team == null ? null : new TeamViewModel
             {
                 TeamId = team.TeamId,
                 LeagueId = team.LeagueId,
@@ -21,7 +21,7 @@ namespace Betto.Model.DTO
                 Logo = team.Logo,
                 Country = team.Country,
                 IsNational = team.IsNational,
-                Venue = (VenueDTO)team.Venue
+                Venue = (VenueViewModel)team.Venue
             };
     }
 }

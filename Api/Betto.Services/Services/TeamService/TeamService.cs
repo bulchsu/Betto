@@ -1,4 +1,4 @@
-﻿using Betto.Model.DTO;
+﻿using Betto.Model.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -15,12 +15,12 @@ namespace Betto.Services
             _teamRepository = teamRepository;
         }
 
-        public async Task<ICollection<TeamDTO>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<ICollection<TeamViewModel>> GetLeagueTeamsAsync(int leagueId)
             => (await _teamRepository.GetLeagueTeamsAsync(leagueId))
-            .Select(t => (TeamDTO)t)
+            .Select(t => (TeamViewModel)t)
             .ToList();
 
-        public async Task<TeamDTO> GetTeamByIdAsync(int id, bool includeVenue)
-            => (TeamDTO)(await _teamRepository.GetTeamByIdAsync(id, includeVenue));
+        public async Task<TeamViewModel> GetTeamByIdAsync(int id, bool includeVenue)
+            => (TeamViewModel)(await _teamRepository.GetTeamByIdAsync(id, includeVenue));
     }
 }

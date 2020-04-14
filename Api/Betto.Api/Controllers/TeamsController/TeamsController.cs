@@ -1,4 +1,4 @@
-﻿using Betto.Model.DTO;
+﻿using Betto.Model.ViewModels;
 using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +24,7 @@ namespace Betto.Api.Controllers
 
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<TeamDTO>> GetTeamByIdAsync(int id, bool includeVenue = false)
+        public async Task<ActionResult<TeamViewModel>> GetTeamByIdAsync(int id, bool includeVenue = false)
         {
             try
             {

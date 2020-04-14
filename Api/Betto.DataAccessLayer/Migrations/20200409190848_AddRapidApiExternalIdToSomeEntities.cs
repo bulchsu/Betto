@@ -2,7 +2,7 @@
 
 namespace Betto.DataAccessLayer.Migrations
 {
-    public partial class AddRapidApiExternalIdToSomeEntities : Migration
+    public partial class AddRapidApiExternalIViewModelSomeEntities : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

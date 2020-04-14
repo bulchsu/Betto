@@ -1,8 +1,8 @@
 ﻿using Betto.Model.Entities;
 
-namespace Betto.Model.DTO
+namespace Betto.Model.ViewModels
 {
-    public class VenueDTO
+    public class VenueViewModel
     {
         public string Name { get; set; }
         public string Surface { get; set; }
@@ -10,8 +10,8 @@ namespace Betto.Model.DTO
         public string City { get; set; }
         public int Capacity { get; set; }
 
-        public static explicit operator VenueDTO(VenueEntity venue)
-            => venue == null ? null : new VenueDTO
+        public static explicit operator VenueViewModel(VenueEntity venue)
+            => venue == null ? null : new VenueViewModel
             {
                 Name = venue.Name,
                 Surface = venue.Surface,
