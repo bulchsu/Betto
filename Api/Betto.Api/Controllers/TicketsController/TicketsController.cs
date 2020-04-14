@@ -104,5 +104,38 @@ namespace Betto.Api.Controllers.TicketsController
                     });
             }
         }
+
+        [HttpPost("{ticketId:int}/reveal")]
+        public async Task<ActionResult<TicketDTO>> RevealTicketAsync(int ticketId)
+        {
+            try
+            {
+                var ticket = await _ticketService.GetTicketByIdAsync(ticketId);
+
+                if (ticket == null)
+                {
+                    return NotFound(new { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
+                }
+
+                var revealedTicket = await _ticketService.RevealTicketAsync(ticketId);
+
+                if (revealedTicket == null)
+                {
+                    return BadRequest(new { Message = _localizer["RevealTicketErrorMessage", ticketId].Value });
+                }
+
+                return Ok(revealedTicket);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        Message = ex.InnerException != null
+                            ? $"{ex.Message} {ex.InnerException.Message}"
+                            : ex.Message
+                    });
+            }
+        }
     }
 }

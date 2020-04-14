@@ -1,9 +1,9 @@
 ﻿namespace Betto.Model.Models
 {
-    public enum TicketStatus
+    public enum ResultEnum
     {
-        Won,
         Lost,
+        Won,
         Pending
     }
 }

@@ -10,6 +10,7 @@ namespace Betto.Model.DTO
         public int GameId { get; set; }
         public EventType Type { get; set; }
         public float ConfirmedRate { get; set; }
+        public ResultEnum Result { get; set; }
 
         public static explicit operator TicketEventDTO(EventEntity eventEntity) => eventEntity == null
             ? null
@@ -19,7 +20,8 @@ namespace Betto.Model.DTO
                 TicketId = eventEntity.TicketId,
                 GameId = eventEntity.GameId,
                 Type = eventEntity.Type,
-                ConfirmedRate = eventEntity.ConfirmedRate
+                ConfirmedRate = eventEntity.ConfirmedRate,
+                Result = eventEntity.HiddenEventResult
             };
     }
 }

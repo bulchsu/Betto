@@ -141,8 +141,14 @@
   <data name="MailAddressAlreadyTakenErrorMessage" xml:space="preserve">
     <value>Mail {0} already taken</value>
   </data>
+  <data name="RevealTicketErrorMessage" xml:space="preserve">
+    <value>Could not reveal ticket {0}. Try again later! </value>
+  </data>
   <data name="TeamNotFoundErrorMessage" xml:space="preserve">
     <value>Team not found</value>
+  </data>
+  <data name="TicketAlreadyRevealedErrorMessage" xml:space="preserve">
+    <value>Ticket {0} has been already revealed.</value>
   </data>
   <data name="TicketNotCreatedErrorMessage" xml:space="preserve">
     <value>Could not create a ticket. Try again later</value>

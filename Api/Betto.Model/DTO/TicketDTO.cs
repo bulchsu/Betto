@@ -14,7 +14,7 @@ namespace Betto.Model.DTO
         public DateTime CreationDateTime { get; set; }
         public double Stake { get; set; }
         public float TotalConfirmedRate { get; set; }
-        public TicketStatus Status { get; set; }
+        public ResultEnum Status { get; set; }
         public DateTime? RevealDateTime { get; set; }
 
         public static explicit operator TicketDTO(TicketEntity ticket) => ticket == null

@@ -16,14 +16,17 @@ namespace Betto.Services.Services
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
+        private readonly IGameRepository _gameRepository;
         private readonly IRatesRepository _ratesRepository;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public TicketService(ITicketRepository ticketRepository,
+            IGameRepository gameRepository,
             IRatesRepository ratesRepository,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _ticketRepository = ticketRepository;
+            _gameRepository = gameRepository;
             _ratesRepository = ratesRepository;
             _localizer = localizer;
         }
@@ -31,22 +34,45 @@ namespace Betto.Services.Services
         public async Task<TicketDTO> AddTicketAsync(CreateTicketDTO ticket)
         {
             var ticketEntity = (TicketEntity) ticket;
+
             await FindEventsRatesAsync(ticketEntity);
+            await FindEventResultsAsync(ticketEntity.Events);
 
             // TODO sprawdzic czy uzytkownika stac na kupon
             var createdTicket = await _ticketRepository.AddTicketAsync(ticketEntity);
             await _ticketRepository.SaveChangesAsync();
 
-            return (TicketDTO) createdTicket;
+            var result = (TicketDTO) createdTicket;
+            SetProperEventResults(result);
+
+            return result;
         }
 
-        public async Task<ICollection<TicketDTO>> GetUserTicketsAsync(int userId) =>
-            (await _ticketRepository.GetUserTicketsAsync(userId))
-            .Select(t => (TicketDTO) t)
-            .ToList();
+        public async Task<ICollection<TicketDTO>> GetUserTicketsAsync(int userId)
+        {
+            var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId))
+                .Select(t => (TicketDTO) t)
+                .ToList();
 
-        public async Task<TicketDTO> GetTicketByIdAsync(int ticketId) =>
-            (TicketDTO) (await _ticketRepository.GetTicketByIdAsync(ticketId));
+            foreach (var ticket in userTickets)
+            {
+                SetProperEventResults(ticket);
+            }
+
+            return userTickets;
+        }
+
+        public async Task<TicketDTO> GetTicketByIdAsync(int ticketId)
+        { 
+            var ticket = (TicketDTO) await _ticketRepository.GetTicketByIdAsync(ticketId);
+
+            if (ticket != null)
+            {
+                SetProperEventResults(ticket);
+            }
+
+            return ticket;
+        }
 
         public async Task<bool> CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket)
         {
@@ -55,6 +81,89 @@ namespace Betto.Services.Services
             var playedGames = userTickets.SelectMany(t => t.Events);
 
             return playedGames.Any(g => gameIds.Contains(g.GameId));
+        }
+
+        public async Task<TicketDTO> RevealTicketAsync(int ticketId)
+        {
+            var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
+
+            var isAlreadyRevealed = IsTicketRevealed((TicketDTO)ticket);
+
+            if (isAlreadyRevealed)
+            {
+                throw new Exception(_localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value);
+            }
+
+            var isWon = VerifyTicket(ticket.Events);
+            SetTicketResults(isWon, ticket);
+
+            await _ticketRepository.SaveChangesAsync();
+
+            var result = (TicketDTO) ticket;
+            SetProperEventResults(result);
+
+            return result;
+        }
+
+        private void SetProperEventResults(TicketDTO ticket)
+        {
+            var isRevealed = IsTicketRevealed(ticket);
+
+            if (!isRevealed)
+            {
+                HideEventResult(ticket.Events);
+            }
+        }
+
+        private void HideEventResult(ICollection<TicketEventDTO> events)
+        {
+            foreach (var eventDto in events)
+            {
+                eventDto.Result = ResultEnum.Pending;
+            }
+        }
+
+        private void SetTicketResults(bool isWon, TicketEntity ticket)
+        {
+            ticket.Status = isWon ? ResultEnum.Won : ResultEnum.Lost;
+            ticket.RevealDateTime = DateTime.Now;
+        }
+
+
+        private bool IsTicketRevealed(TicketDTO ticket) =>
+            ticket.Status != ResultEnum.Pending && ticket.RevealDateTime.HasValue;
+
+        private async Task FindEventResultsAsync(ICollection<EventEntity> events)
+        {
+            var gameIds = events.Select(g => g.GameId);
+            var games = await _gameRepository.GetGamesByBunchOfIdsAsync(gameIds);
+
+            foreach (var eventEntity in events)
+            {
+                var relatedGame = games.SingleOrDefault(g => g.GameId == eventEntity.GameId);
+                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsHomeTeam);
+
+                eventEntity.HiddenEventResult = gameResult == eventEntity.Type ? ResultEnum.Won : ResultEnum.Lost;
+            }
+        }
+
+        private bool VerifyTicket(ICollection<EventEntity> events) =>
+            events.All(e => e.HiddenEventResult == ResultEnum.Lost);
+
+        private EventType CheckGameResult(int homeTeamGoals, int awayTeamGoals)
+        {
+            var result = EventType.HomeTeamWin;
+
+            if (homeTeamGoals == awayTeamGoals)
+            {
+                result = EventType.Tie;
+            }
+            else if (awayTeamGoals > homeTeamGoals)
+            {
+                result = EventType.AwayTeamWin;
+            }
+
+            return result;
         }
 
         private async Task FindEventsRatesAsync(TicketEntity ticket)

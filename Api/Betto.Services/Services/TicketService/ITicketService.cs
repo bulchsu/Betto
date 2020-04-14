@@ -10,5 +10,6 @@ namespace Betto.Services.Services
         Task<ICollection<TicketDTO>> GetUserTicketsAsync(int userId);
         Task<TicketDTO> GetTicketByIdAsync(int ticketId);
         Task<bool> CheckHasUserPlayedAnyOfGamesBeforeAsync(CreateTicketDTO ticket);
+        Task<TicketDTO> RevealTicketAsync(int ticketId);
     }
 }

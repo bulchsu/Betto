@@ -17,6 +17,7 @@ namespace Betto.Model.Entities
         public int GameId { get; set; }
         public EventType Type { get; set; }
         public float ConfirmedRate { get; set; }
+        public ResultEnum HiddenEventResult { get; set; }
 
         public static explicit operator EventEntity(CreateTicketEventDTO eventDto) => eventDto == null
             ? null
