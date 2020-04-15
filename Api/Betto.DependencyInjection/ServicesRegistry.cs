@@ -12,7 +12,8 @@ namespace Betto.DependencyInjection
                 .AddScoped<ILeagueService, LeagueService>()
                 .AddScoped<ITeamService, TeamService>()
                 .AddScoped<IUserService, UserService>()
-                .AddScoped<ITicketService, TicketService>();
+                .AddScoped<ITicketService, TicketService>()
+                .AddScoped<IPaymentService, PaymentService>();
         }
     }
 }

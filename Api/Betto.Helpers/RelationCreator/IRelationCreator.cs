@@ -5,6 +5,6 @@ namespace Betto.Helpers
 {
     public interface IRelationCreator
     {
-        void RelateImportedData(IList<LeagueEntity> leagues, IList<TeamEntity> teams, IList<GameEntity> games);
+        void RelateImportedData(ICollection<LeagueEntity> leagues, ICollection<TeamEntity> teams, ICollection<GameEntity> games);
     }
 }

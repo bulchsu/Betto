@@ -32,11 +32,8 @@ namespace Betto.Services
                 return new RequestResponseModel<LeagueViewModel>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>
                     {
-                        new ErrorViewModel
-                        {
-                            Message = _localizer["LeagueNotFoundErrorMessage"]
-                                .Value
-                        }
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["LeagueNotFoundErrorMessage"]
+                            .Value)
                     },
                     null);
             }

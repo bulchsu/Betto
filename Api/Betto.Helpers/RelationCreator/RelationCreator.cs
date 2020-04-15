@@ -7,8 +7,9 @@ namespace Betto.Helpers
 {
     public class RelationCreator : IRelationCreator
     {
-        public void RelateImportedData(IList<LeagueEntity> leagues, IList<TeamEntity> teams,
-            IList<GameEntity> games)
+        public void RelateImportedData(ICollection<LeagueEntity> leagues, 
+            ICollection<TeamEntity> teams, 
+            ICollection<GameEntity> games)
         {
             PrepareLeaguesToSave(leagues, teams, games);
             PrepareTeamsToSave(teams, games);

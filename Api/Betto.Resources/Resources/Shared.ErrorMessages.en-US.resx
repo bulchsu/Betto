@@ -147,6 +147,9 @@
   <data name="MailAddressAlreadyTakenErrorMessage" xml:space="preserve">
     <value>Mail {0} already taken</value>
   </data>
+  <data name="PaymentNotCreatedErrorMessage" xml:space="preserve">
+    <value>Could not create payment</value>
+  </data>
   <data name="RevealTicketErrorMessage" xml:space="preserve">
     <value>Could not reveal ticket {0}. Try again later! </value>
   </data>

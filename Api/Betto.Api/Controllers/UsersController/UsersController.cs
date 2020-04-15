@@ -17,12 +17,15 @@ namespace Betto.Api.Controllers.UsersController
     {
         private readonly IUserService _userService;
         private readonly ITicketService _ticketService;
+        private readonly IPaymentService _paymentService;
 
         public UsersController(IUserService userService,
-            ITicketService ticketService)
+            ITicketService ticketService,
+            IPaymentService paymentService)
         {
             _userService = userService;
             _ticketService = ticketService;
+            _paymentService = paymentService;
         }
 
         [HttpPost("authenticate")]
@@ -50,7 +53,7 @@ namespace Betto.Api.Controllers.UsersController
             {
                 var response = await _userService.SignUpAsync(signUpData);
 
-                return response.StatusCode == StatusCodes.Status201Created
+                return response.StatusCode == StatusCodes.Status200OK
                     ? Ok(response.Result)
                     : StatusCode(response.StatusCode, response.Errors);
             }
@@ -67,6 +70,23 @@ namespace Betto.Api.Controllers.UsersController
             try
             {
                 var response = await _ticketService.GetUserTicketsAsync(userId);
+
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ErrorViewModel.Factory.NewErrorFromException(e));
+            }
+        }
+
+        public async Task<ActionResult<ICollection<PaymentViewModel>>> GetUserPaymentsAsync(int userId)
+        {
+            try
+            {
+                var response = await _paymentService.GetUserPaymentsAsync(userId);
 
                 return response.StatusCode == StatusCodes.Status200OK
                     ? Ok(response.Result)
