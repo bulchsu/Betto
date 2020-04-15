@@ -15,7 +15,7 @@ namespace Betto.Helpers
             PrepareGamesToSave(games);
         }
 
-        private void PrepareLeaguesToSave(ICollection<LeagueEntity> leagues, ICollection<TeamEntity> teams, ICollection<GameEntity> games)
+        private static void PrepareLeaguesToSave(ICollection<LeagueEntity> leagues, ICollection<TeamEntity> teams, ICollection<GameEntity> games)
         {
             foreach (var league in leagues.GetEmptyIfNull())
             {
@@ -24,7 +24,7 @@ namespace Betto.Helpers
             }
         }
 
-        private void PrepareTeamsToSave(ICollection<TeamEntity> teams, ICollection<GameEntity> games)
+        private static void PrepareTeamsToSave(ICollection<TeamEntity> teams, ICollection<GameEntity> games)
         {
             foreach (var team in teams.GetEmptyIfNull())
             {
@@ -33,7 +33,7 @@ namespace Betto.Helpers
             }
         }
 
-        private void PrepareGamesToSave(ICollection<GameEntity> games) //avoid repetitions in entity tracking
+        private static void PrepareGamesToSave(ICollection<GameEntity> games) //avoid repetitions in entity tracking
         {
             foreach (var game in games.GetEmptyIfNull())
             {

@@ -31,7 +31,7 @@ namespace Betto.Helpers
             return betRates.ToList();
         }
 
-        private BetRatesEntity GetGameRates(TeamStatistics homeTeam, TeamStatistics awayTeam, int leagueSize)
+        private static BetRatesEntity GetGameRates(TeamStatistics homeTeam, TeamStatistics awayTeam, int leagueSize)
         {
             var positionDifference = GetPositionDifference(homeTeam, awayTeam);
             var probabilityInitialFactor = CalculateInitialProbabilityFactor(positionDifference);
@@ -62,7 +62,7 @@ namespace Betto.Helpers
             };
         }
 
-        private ProbabilityFactors GetInitialProbability(TeamStatistics homeTeam, TeamStatistics awayTeam, float probabilityInitialFactor)
+        private static ProbabilityFactors GetInitialProbability(TeamStatistics homeTeam, TeamStatistics awayTeam, float probabilityInitialFactor)
         {
             var homeTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position < awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
             var awayTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position > awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
@@ -76,7 +76,7 @@ namespace Betto.Helpers
             };
         }
 
-        private ProbabilityFactors GetRandomExtraProbability(int positionDifference, int leagueSize)
+        private static ProbabilityFactors GetRandomExtraProbability(int positionDifference, int leagueSize)
         {
             var randomGenerator = new Random();
             var pointsToAllocate = leagueSize - positionDifference;
@@ -106,18 +106,18 @@ namespace Betto.Helpers
             };
         }
 
-        private float CalculateInitialProbabilityFactor(int positionDifference) =>
+        private static float CalculateInitialProbabilityFactor(int positionDifference) =>
             RatesConstants.PositionDifferenceProbabilityFactor * positionDifference;
 
-        private int GetPositionDifference(TeamStatistics homeTeamStatistics, TeamStatistics awayTeamStatistics) =>
+        private static int GetPositionDifference(TeamStatistics homeTeamStatistics, TeamStatistics awayTeamStatistics) =>
             Math.Abs(homeTeamStatistics.Position - awayTeamStatistics.Position);
 
-        private float SubtractGamblingCompanyFactor(float value) =>
+        private static float SubtractGamblingCompanyFactor(float value) =>
             RatesConstants.GamblingCompanyProbabilityFactor * value > RatesConstants.MinimumCalculatedProbability
                 ? RatesConstants.GamblingCompanyProbabilityFactor * value
                 : RatesConstants.MinimumCalculatedProbability;
 
-        private float InverseNumber(float value) =>
+        private static float InverseNumber(float value) =>
             (float)Math.Pow(value, -1);
     }
 }

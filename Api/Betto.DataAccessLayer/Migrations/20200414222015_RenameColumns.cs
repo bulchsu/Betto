@@ -2,16 +2,16 @@
 
 namespace Betto.DataAccessLayer.Migrations
 {
-    public partial class RenameEventColumn : Migration
+    public partial class RenameColumns : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn("HiddenTicketResult", "Events", "EventStatus");
+            migrationBuilder.RenameColumn("Type", "Events", "BetType");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn("EventStatus", "Events", "HiddenTicketResult");
+            migrationBuilder.RenameColumn("BetType", "Events", "Type");
         }
     }
 }

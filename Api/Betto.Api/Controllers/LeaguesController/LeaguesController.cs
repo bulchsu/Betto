@@ -1,105 +1,80 @@
-﻿using Betto.Model.DTO;
+﻿using Betto.Model.ViewModels;
 using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Helpers.Extensions;
-using Betto.Resources.Shared;
-using Microsoft.Extensions.Localization;
+using Betto.Model.Models;
 
 namespace Betto.Api.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class LeaguesController : ControllerBase
     {
         private readonly ILeagueService _leagueService;
         private readonly ITeamService _teamService;
-        private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public LeaguesController(ILeagueService leagueService, 
-            ITeamService teamService, 
-            IStringLocalizer<ErrorMessages> localizer)
+            ITeamService teamService)
         {
             _leagueService = leagueService;
             _teamService = teamService;
-            _localizer = localizer;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LeagueDTO>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        public async Task<ActionResult<IEnumerable<LeagueViewModel>>> GetLeaguesAsync([FromQuery] bool includeTeams = false, 
+            [FromQuery] bool includeGames = false)
         {
             try
             {
-                var leagues = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
+                var response = await _leagueService.GetLeaguesAsync(includeTeams, includeGames);
 
-                return Ok(leagues.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<LeagueDTO>> GetLeagueByIdAsync(int id, [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
+        [HttpGet("{leagueId:int}")]
+        public async Task<ActionResult<LeagueViewModel>> GetLeagueByIdAsync([FromRoute] int leagueId, 
+            [FromQuery] bool includeTeams = false, [FromQuery] bool includeGames = false)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(id, includeTeams, includeGames);
+                var response = await _leagueService.GetLeagueByIdAsync(leagueId, includeTeams, includeGames);
 
-                if (league == null)
-                {
-                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
-                }
-
-                return Ok(league);
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
 
         [HttpGet("{leagueId:int}/teams")]
-        public async Task<ActionResult<IEnumerable<TeamDTO>>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<ActionResult<IEnumerable<TeamViewModel>>> GetLeagueTeamsAsync([FromRoute] int leagueId)
         {
             try
             {
-                var league = await _leagueService.GetLeagueByIdAsync(leagueId, false, false);
+                var response = await _teamService.GetLeagueTeamsAsync(leagueId);
 
-                if (league == null)
-                {
-                    return NotFound(new { Message = _localizer["LeagueNotFoundErrorMessage"].Value });
-                }
-
-                var teams = await _teamService.GetLeagueTeamsAsync(leagueId);
-
-                return Ok(teams.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = ex.InnerException != null
-                            ? $"{ex.Message} {ex.InnerException.Message}"
-                            : ex.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(ex));
             }
         }
     }

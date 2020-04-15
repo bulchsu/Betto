@@ -1,133 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Betto.Helpers.Extensions;
-using Betto.Model.DTO;
-using Betto.Resources.Shared;
+using Betto.Model.Models;
+using Betto.Model.ViewModels;
+using Betto.Model.WriteModels;
 using Betto.Services;
 using Betto.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 
 namespace Betto.Api.Controllers.UsersController
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IStringLocalizer<ErrorMessages> _localizer;
         private readonly ITicketService _ticketService;
 
-        public UsersController(IUserService userService, 
-            IStringLocalizer<ErrorMessages> localizer,
+        public UsersController(IUserService userService,
             ITicketService ticketService)
         {
             _userService = userService;
-            _localizer = localizer;
             _ticketService = ticketService;
         }
 
         [HttpPost("authenticate")]
-        public async Task<ActionResult<WebTokenDTO>> AuthenticateUserAsync([FromBody] LoginDTO loginData)
+        public async Task<ActionResult<WebTokenViewModel>> AuthenticateUserAsync([FromBody] LoginWriteModel loginData)
         {
             try
             {
-                var doesUserExist = await _userService.CheckIsUsernameAlreadyTakenAsync(loginData.Username);
+                var response = await _userService.AuthenticateUserAsync(loginData);
 
-                if (!doesUserExist)
-                {
-                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", loginData.Username].Value });
-                }
-
-                var token = await _userService.AuthenticateUserAsync(loginData);
-
-                if (token == null)
-                {
-                    return Unauthorized(new { Message = _localizer["IncorrectPasswordErrorMessage"].Value });
-                }
-
-                return Ok(token);
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDTO>> SignUpAsync([FromBody] SignUpDTO signUpData)
+        public async Task<ActionResult<UserViewModel>> SignUpAsync([FromBody] RegistrationWriteModel signUpData)
         {
             try
             {
-                var doesUserExist = await _userService.CheckIsUsernameAlreadyTakenAsync(signUpData.Username);
+                var response = await _userService.SignUpAsync(signUpData);
 
-                if (doesUserExist)
-                {
-                    return BadRequest(new { Message = _localizer["UsernameAlreadyTakenErrorMessage", signUpData.Username].Value });
-                }
-
-                doesUserExist = await _userService.CheckIsMailAlreadyTakenAsync(signUpData.MailAddress);
-
-                if (doesUserExist)
-                {
-                    return BadRequest(new { Message = _localizer["MailAddressAlreadyTakenErrorMessage", signUpData.MailAddress].Value });
-                }
-
-                var user = await _userService.SignUpAsync(signUpData);
-
-                if (user == null)
-                {
-                    return BadRequest(new { Message = _localizer["UserCreationErrorMessage"].Value });
-                }
-
-                return Ok(user);
+                return response.StatusCode == StatusCodes.Status201Created
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
 
         [HttpGet("{userId:int}/tickets"), Authorize]
-        public async Task<ActionResult<ICollection<TicketDTO>>> GetUserTicketsAsync(int userId)
+        public async Task<ActionResult<ICollection<TicketViewModel>>> GetUserTicketsAsync(int userId)
         {
             try
             {
-                var user = await _userService.GetUserByIdAsync(userId);
+                var response = await _ticketService.GetUserTicketsAsync(userId);
 
-                if (user == null)
-                {
-                    return NotFound(new { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
-                }
-
-                var tickets = await _ticketService.GetUserTicketsAsync(userId);
-
-                return Ok(tickets.GetEmptyIfNull());
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new
-                    {
-                        Message = e.InnerException != null
-                            ? $"{e.Message} {e.InnerException.Message}"
-                            : e.Message
-                    });
+                    ErrorViewModel.Factory.NewErrorFromException(e));
             }
         }
     }

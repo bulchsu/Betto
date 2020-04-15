@@ -13,7 +13,10 @@ namespace Betto.RapidApiCommunication.Managers
     {
         private readonly IParser<TeamEntity> _teamParser;
 
-        public TeamManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, IParser<TeamEntity> teamParser, ApiClient apiClient)
+        public TeamManager(IOptions<RapidApiConfiguration> configuration, 
+            ILogger logger, 
+            IParser<TeamEntity> teamParser, 
+            ApiClient apiClient)
             : base(configuration, logger, apiClient)
         {
             _teamParser = teamParser;
@@ -45,7 +48,7 @@ namespace Betto.RapidApiCommunication.Managers
         private string GetTeamsUrl(int leagueId)
             => string.Concat(Configuration.RapidApiUrl, Configuration.TeamsRoute, leagueId);
 
-        private void ConnectTeamsToCorrectLeague(int leagueId, IEnumerable<TeamEntity> teams)
+        private static void ConnectTeamsToCorrectLeague(int leagueId, IEnumerable<TeamEntity> teams)
         {
             foreach (var team in teams)
             {

@@ -4,8 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Betto.Model.Constants;
-using Betto.Model.DTO;
 using Betto.Model.Models;
+using Betto.Model.WriteModels;
 
 namespace Betto.Model.Entities
 {
@@ -21,10 +21,10 @@ namespace Betto.Model.Entities
         [Range(TicketConstants.MinimumStake, TicketConstants.MaximumStake)]
         public double Stake { get; set; }
         public float TotalConfirmedRate { get; set; }
-        public ResultEnum Status { get; set; }
+        public StatusEnum Status { get; set; }
         public DateTime? RevealDateTime { get; set; }
 
-        public static explicit operator TicketEntity(CreateTicketDTO ticket) => ticket == null
+        public static explicit operator TicketEntity(TicketWriteModel ticket) => ticket == null
             ? null
             : new TicketEntity
             {
@@ -32,7 +32,7 @@ namespace Betto.Model.Entities
                 Events = ticket.Events.Select(e => (EventEntity) e).ToList(),
                 CreationDateTime = DateTime.Now,
                 Stake = ticket.Stake,
-                Status = ResultEnum.Pending
+                Status = StatusEnum.Pending
             };
     }
 }

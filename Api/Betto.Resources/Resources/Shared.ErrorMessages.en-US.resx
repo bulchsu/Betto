@@ -129,8 +129,14 @@
   <data name="HttpGetExternalApiErrorMessage" xml:space="preserve">
     <value>Could not retrieve data from {0}</value>
   </data>
+  <data name="IncorrectMailAddressErrorMessage" xml:space="preserve">
+    <value>Mail address must match the following pattern {0}</value>
+  </data>
   <data name="IncorrectPasswordErrorMessage" xml:space="preserve">
     <value>Incorrect password</value>
+  </data>
+  <data name="IncorrectUsernameLengthErrorMessage" xml:space="preserve">
+    <value>Username must be longer than 2 characters, and shorter than 100.</value>
   </data>
   <data name="LackOfEventsErrorMessage" xml:space="preserve">
     <value>Ticket must contain at least one event</value>
@@ -164,5 +170,8 @@
   </data>
   <data name="UserNotFoundErrorMessage" xml:space="preserve">
     <value>User {0} does not exist</value>
+  </data>
+  <data name="WeakPasswordErrorMessage" xml:space="preserve">
+    <value>Password must match the following pattern {0}</value>
   </data>
 </root>

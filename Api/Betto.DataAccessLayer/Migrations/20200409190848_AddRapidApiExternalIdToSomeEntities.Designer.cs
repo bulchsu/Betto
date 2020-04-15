@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Betto.DataAccessLayer.Migrations
 {
     [DbContext(typeof(BettoDbContext))]
-    [Migration("20200409190848_AddRapidApiExternalIdToSomeEntities")]
-    partial class AddRapidApiExternalIdToSomeEntities
+    [Migration("20200409190848_AddRapidApiExternalIViewModelSomeEntities")]
+    partial class AddRapidApiExternalIViewModelSomeEntities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

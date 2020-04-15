@@ -1,6 +1,6 @@
 ﻿namespace Betto.Model.Models
 {
-    public enum EventType
+    public enum BetType
     {
         Tie,
         HomeTeamWin,

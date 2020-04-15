@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Betto.Model.DTO;
 using Betto.Model.Models;
+using Betto.Model.WriteModels;
 
 namespace Betto.Model.Entities
 {
@@ -15,16 +15,16 @@ namespace Betto.Model.Entities
         public GameEntity Game { get; set; }
         [ForeignKey(nameof(Game))]
         public int GameId { get; set; }
-        public EventType Type { get; set; }
+        public BetType BetType { get; set; }
         public float ConfirmedRate { get; set; }
-        public ResultEnum HiddenEventResult { get; set; }
+        public StatusEnum EventStatus { get; set; }
 
-        public static explicit operator EventEntity(CreateTicketEventDTO eventDto) => eventDto == null
+        public static explicit operator EventEntity(TicketEventWriteModel eventViewModel) => eventViewModel == null
             ? null
             : new EventEntity
             {
-                GameId = eventDto.GameId,
-                Type = eventDto.Type
+                GameId = eventViewModel.GameId,
+                BetType = eventViewModel.BetType
             };
     }
 }
