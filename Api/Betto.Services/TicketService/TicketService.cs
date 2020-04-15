@@ -43,7 +43,12 @@ namespace Betto.Services.Services
             if (ticket == null)
             {
                 return new RequestResponseModel<TicketViewModel>(StatusCodes.Status404NotFound,
-                    new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value }},
+                    new List<ErrorViewModel>{ new ErrorViewModel
+                    {
+                        Message = _localizer["TicketNotFoundErrorMessage", 
+                            ticketId]
+                            .Value
+                    }},
                     null);
             }
 
@@ -61,7 +66,12 @@ namespace Betto.Services.Services
             if (user == null)
             {
                 return new RequestResponseModel<IEnumerable<TicketViewModel>>(StatusCodes.Status404NotFound,
-                    new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", userId].Value }}, 
+                    new List<ErrorViewModel>{ new ErrorViewModel
+                    {
+                        Message = _localizer["UserNotFoundErrorMessage", 
+                            userId]
+                            .Value
+                    }}, 
                     null);
             }
 
@@ -90,7 +100,11 @@ namespace Betto.Services.Services
             if (createdTicket == null)
             {
                 return new RequestResponseModel<TicketViewModel>(StatusCodes.Status400BadRequest,
-                    new List<ErrorViewModel> { new ErrorViewModel { Message = _localizer["TicketNotCreatedErrorMessage"].Value }},
+                    new List<ErrorViewModel> { new ErrorViewModel
+                    {
+                        Message = _localizer["TicketNotCreatedErrorMessage"]
+                            .Value
+                    }},
                     null);
             }
 
@@ -154,7 +168,11 @@ namespace Betto.Services.Services
         {
             if (!ticket.Events.GetEmptyIfNull().Any())
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["LackOfEventsErrorMessage"].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["LackOfEventsErrorMessage"]
+                        .Value
+                });
             }
         }
 
@@ -164,7 +182,12 @@ namespace Betto.Services.Services
 
             if (user == null)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", userId].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["UserNotFoundErrorMessage", 
+                        userId]
+                        .Value
+                });
             }
 
             return user != null;
@@ -179,7 +202,11 @@ namespace Betto.Services.Services
 
             if (isTicketInvalid)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["EventsRepeatedByUserErrorMessage"].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["EventsRepeatedByUserErrorMessage"]
+                        .Value
+                });
             }
         }
 
@@ -189,7 +216,12 @@ namespace Betto.Services.Services
 
             if (ticket == null)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["TicketNotFoundErrorMessage", 
+                        ticketId]
+                        .Value
+                });
             }
 
             return ticket != null;
@@ -202,7 +234,12 @@ namespace Betto.Services.Services
 
             if (isAlreadyRevealed)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["TicketAlreadyRevealedErrorMessage", ticketId].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["TicketAlreadyRevealedErrorMessage",
+                            ticketId]
+                        .Value
+                });
             }
         }
 
@@ -273,7 +310,7 @@ namespace Betto.Services.Services
             foreach (var eventEntity in events)
             {
                 var relatedGame = games.SingleOrDefault(g => g.GameId == eventEntity.GameId);
-                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsAwayTeam); //TODO NullReferenceException
+                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsAwayTeam);
 
                 eventEntity.EventStatus = gameResult == eventEntity.BetType ? StatusEnum.Won : StatusEnum.Lost;
             }

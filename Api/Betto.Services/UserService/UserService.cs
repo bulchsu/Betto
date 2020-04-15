@@ -18,19 +18,19 @@ namespace Betto.Services
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenGenerator _tokenGenerator;
-        private readonly IObjectValidator _objectValidator;
+        private readonly IRegistrationValidator _registrationValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public UserService(IUserRepository userRepository,
             IPasswordHasher passwordHasher,
             ITokenGenerator tokenGenerator,
-            IObjectValidator objectValidator,
+            IRegistrationValidator registrationValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _userRepository = userRepository;
             _passwordHasher = passwordHasher;
             _tokenGenerator = tokenGenerator;
-            _objectValidator = objectValidator;
+            _registrationValidator = registrationValidator;
             _localizer = localizer;
         }
 
@@ -62,19 +62,19 @@ namespace Betto.Services
 
             if (errors.Any())
             {
-                return new RequestResponseModel<UserViewModel>(StatusCodes.Status400BadRequest, errors, null);
+                return new RequestResponseModel<UserViewModel>(StatusCodes.Status400BadRequest, 
+                    errors, 
+                    null);
             }
 
             var passwordHash = _passwordHasher.EncodePassword(signUpData.Password);
 
-            var newUser = new UserEntity
+            var registeredUser = await _userRepository.SignUpAsync(new UserEntity
             {
-                MailAddress = signUpData.MailAddress, 
-                Username = signUpData.Username, 
+                MailAddress = signUpData.MailAddress,
+                Username = signUpData.Username,
                 PasswordHash = passwordHash
-            };
-
-            var registeredUser = await _userRepository.SignUpAsync(newUser);
+            });
 
             if (registeredUser == null)
             {
@@ -104,11 +104,13 @@ namespace Betto.Services
         private async Task<ICollection<ErrorViewModel>> CheckSignUpDataBeforeRegisteringAsync(
             RegistrationWriteModel signUpModel)
         {
-            var errors = new List<ErrorViewModel>();
+            var errors = _registrationValidator.ValidateRegistrationModel(signUpModel);
 
-            await CheckUsernameBeforeSignUpAsync(signUpModel.Username, errors);
-            await CheckMailAddressBeforeSignUpAsync(signUpModel.MailAddress, errors);
-            CheckPersonalDataCorrectness(signUpModel, errors);
+            if (!errors.Any())
+            {
+                await CheckUsernameBeforeSignUpAsync(signUpModel.Username, errors);
+                await CheckMailAddressBeforeSignUpAsync(signUpModel.MailAddress, errors);
+            }
 
             return errors;
         }
@@ -133,7 +135,12 @@ namespace Betto.Services
 
             if (doesExist)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["UsernameAlreadyTakenErrorMessage", username].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["UsernameAlreadyTakenErrorMessage",
+                            username]
+                        .Value
+                });
             }
         }
 
@@ -143,7 +150,12 @@ namespace Betto.Services
 
             if (isMailTaken)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["MailAddressAlreadyTakenErrorMessage", mailAddress].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["MailAddressAlreadyTakenErrorMessage",
+                            mailAddress]
+                        .Value
+                });
             }
         }
 
@@ -153,7 +165,12 @@ namespace Betto.Services
 
             if (!doesExist)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", username].Value });
+                errors.Add(new ErrorViewModel
+                {
+                    Message = _localizer["UserNotFoundErrorMessage", 
+                        username]
+                        .Value
+                });
             }
 
             return doesExist;
@@ -166,20 +183,11 @@ namespace Betto.Services
 
             if (!authenticated)
             {
-                errors.Add(new ErrorViewModel { Message = _localizer["IncorrectPasswordErrorMessage"].Value });
-            }
-        }
-
-        private void CheckPersonalDataCorrectness(RegistrationWriteModel signUpModel, ICollection<ErrorViewModel> errors) //TODO ogarnac validator
-        {
-            var correctnessErrors = _objectValidator.ValidateObject(signUpModel);
-
-            if (correctnessErrors.Any())
-            {
-                foreach (var error in correctnessErrors)
+                errors.Add(new ErrorViewModel
                 {
-                    errors.Add(error);
-                }
+                    Message = _localizer["IncorrectPasswordErrorMessage"]
+                        .Value
+                });
             }
         }
 
