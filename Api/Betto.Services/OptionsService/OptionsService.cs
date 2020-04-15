@@ -55,7 +55,10 @@ namespace Betto.Services
         {   
             _leagueRepository.Clear();
 
-            var leagueIds = CalculateLeaguesIds(_configuration.LeaguesAmount).ToList();
+            var leagueIds = CalculateLeaguesIds(_configuration.LeaguesAmount)
+                .ToList()
+                .GetEmptyIfNull();
+
             var leagues = await RetrieveLeaguesAsync(leagueIds);
 
             await SaveLeaguesAsync(leagues);
@@ -68,8 +71,14 @@ namespace Betto.Services
 
         public async Task<RequestResponseModel<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount)
         {
-            var highestStoredLeagueId = (await _leagueRepository.GetLeaguesAsync(false, false)).Max(l => l.RapidApiExternalId);
-            var leagueIds = CalculateLeaguesIds(leaguesAmount, highestStoredLeagueId).ToList();
+            var highestStoredLeagueId = (await _leagueRepository.GetLeaguesAsync(false, false))
+                .ToList()
+                .GetEmptyIfNull()
+                .Max(l => l.RapidApiExternalId);
+
+            var leagueIds = CalculateLeaguesIds(leaguesAmount, highestStoredLeagueId)
+                .ToList()
+                .GetEmptyIfNull();
 
             var leagues = await RetrieveLeaguesAsync(leagueIds);
 
@@ -84,14 +93,21 @@ namespace Betto.Services
         private async Task SetBetRatesForAllLeaguesAsync()
         {
             _rateRepository.Clear();
-            var leagues = await _leagueRepository.GetLeaguesAsync(true, true);
+
+            var leagues = (await _leagueRepository.GetLeaguesAsync(true, true))
+                .ToList()
+                .GetEmptyIfNull();
             
             await SetRatesForLeagues(leagues);
         }
 
         private async Task SetBetRatesForAdditionalLeaguesAsync(int leaguesAmount)
         {
-            var leagues = (await _leagueRepository.GetLeaguesAsync(true, true)).TakeLast(leaguesAmount);
+            var leagues = (await _leagueRepository.GetLeaguesAsync(true, true))
+                .TakeLast(leaguesAmount)
+                .ToList()
+                .GetEmptyIfNull();
+
             await SetRatesForLeagues(leagues);
         }
 
@@ -108,18 +124,45 @@ namespace Betto.Services
             await SaveRatesAsync(rates.ToList());
         }
 
-        private async Task<IList<LeagueEntity>> RetrieveLeaguesAsync(ICollection<int> leaguesToImportIds)
+        private async Task<ICollection<LeagueEntity>> RetrieveLeaguesAsync(ICollection<int> leaguesToImportIds)
         {
-            IList<LeagueEntity> leagues = (await _leagueManager.GetLeaguesAsync(leaguesToImportIds)).ToList();
-            var teams = (await _teamManager.GetTeamsAsync(leaguesToImportIds)).ToList();
-            var games = (await _gameManager.GetGamesAsync(leaguesToImportIds)).ToList();
+            var leagues = await GetLeaguesAsync(leaguesToImportIds);
+            var teams = await GetTeamsAsync(leaguesToImportIds);
+            var games = await GetGamesAsync(leaguesToImportIds);
 
             _relationCreator.RelateImportedData(leagues, teams, games);
 
             return leagues;
         }
 
-        private IEnumerable<int> CalculateLeaguesIds(int leaguesToImportAmount, int highestStoredLeagueId = 0)
+        private async Task<ICollection<LeagueEntity>> GetLeaguesAsync(ICollection<int> leaguesToImportIds) => 
+            (await _leagueManager.GetLeaguesAsync(leaguesToImportIds))
+            .ToList()
+            .GetEmptyIfNull();
+
+        private async Task<ICollection<TeamEntity>> GetTeamsAsync(ICollection<int> leaguesToImportIds) =>
+            (await _teamManager.GetTeamsAsync(leaguesToImportIds))
+            .ToList()
+            .GetEmptyIfNull();
+
+        private async Task<ICollection<GameEntity>> GetGamesAsync(ICollection<int> leaguesToImportIds) =>
+            (await _gameManager.GetGamesAsync(leaguesToImportIds))
+            .ToList()
+            .GetEmptyIfNull();
+
+        private async Task SaveLeaguesAsync(IEnumerable<LeagueEntity> leagues)
+        {
+            await _leagueRepository.AddLeaguesAsync(leagues);
+            await _leagueRepository.SaveChangesAsync();
+        }
+
+        private async Task SaveRatesAsync(ICollection<BetRatesEntity> rates)
+        {
+            await _rateRepository.AddRatesAsync(rates);
+            await _rateRepository.SaveChangesAsync();
+        }
+
+        private static IEnumerable<int> CalculateLeaguesIds(int leaguesToImportAmount, int highestStoredLeagueId = 0)
         {
             var leagueId = ++highestStoredLeagueId;
 
@@ -128,18 +171,6 @@ namespace Betto.Services
                 yield return leagueId;
                 ++leagueId;
             }
-        }
-
-        private async Task<int> SaveLeaguesAsync(IEnumerable<LeagueEntity> leagues)
-        {
-            await _leagueRepository.AddLeaguesAsync(leagues);
-            return await _leagueRepository.SaveChangesAsync();
-        }
-
-        private async Task<int> SaveRatesAsync(ICollection<BetRatesEntity> rates)
-        {
-            await _rateRepository.AddRatesAsync(rates);
-            return await _rateRepository.SaveChangesAsync();
         }
     }
 }

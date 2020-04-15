@@ -8,13 +8,22 @@ namespace Betto.Model.Models
         {
             public static ErrorViewModel NewErrorFromException(Exception e)
             {
-                return new ErrorViewModel
-                {
-                    Message = e.InnerException != null
-                        ? $"{e.Message} {e.InnerException.Message}"
-                        : e.Message
-                };
+                var message = e.InnerException != null
+                    ? $"{e.Message} {e.InnerException.Message}"
+                    : e.Message;
+
+                return new ErrorViewModel(message);
             }
+
+            public static ErrorViewModel NewErrorFromMessage(string message)
+            {
+                return new ErrorViewModel(message);
+            }
+        }
+
+        private ErrorViewModel(string message)
+        {
+            Message = message;
         }
 
         public string Message { get; set; }

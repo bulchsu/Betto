@@ -1,4 +1,5 @@
 ﻿using Betto.DataAccessLayer.Repositories;
+using Betto.DataAccessLayer.Repositories.PaymentRepository;
 using Betto.DataAccessLayer.Repositories.RatesRepository;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,8 @@ namespace Betto.DependencyInjection
                 .AddScoped<ITeamRepository, TeamRepository>()
                 .AddScoped<IGameRepository, GameRepository>()
                 .AddScoped<IRatesRepository, RatesRepository>()
-                .AddScoped<ITicketRepository, TicketRepository>();
+                .AddScoped<ITicketRepository, TicketRepository>()
+                .AddScoped<IPaymentRepository, PaymentRepository>();
         }
     }
 }

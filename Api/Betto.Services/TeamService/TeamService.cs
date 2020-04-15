@@ -28,18 +28,15 @@ namespace Betto.Services
 
         public async Task<RequestResponseModel<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
         {
-            var league = await _leagueRepository.GetLeagueByIdAsync(leagueId, false, false);
+            var doesLeagueExist = await CheckDoesLeagueExistAsync(leagueId);
 
-            if (league == null)
+            if (!doesLeagueExist)
             {
                 return new RequestResponseModel<ICollection<TeamViewModel>>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>
                     {
-                        new ErrorViewModel
-                        {
-                            Message = _localizer["LeagueNotFoundErrorMessage"]
-                                .Value
-                        }
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["LeagueNotFoundErrorMessage"]
+                            .Value)
                     },
                     null);
             }
@@ -53,5 +50,8 @@ namespace Betto.Services
                 Enumerable.Empty<ErrorViewModel>(), 
                 leagueTeams);
         }
+
+        private async Task<bool> CheckDoesLeagueExistAsync(int leagueId) =>
+            await _leagueRepository.GetLeagueByIdAsync(leagueId, false, false) != null;
     }
 }

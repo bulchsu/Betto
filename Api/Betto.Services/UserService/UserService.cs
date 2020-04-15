@@ -81,11 +81,8 @@ namespace Betto.Services
                 return new RequestResponseModel<UserViewModel>(StatusCodes.Status400BadRequest,
                     new List<ErrorViewModel>
                     {
-                        new ErrorViewModel
-                        {
-                            Message = _localizer["UserCreationErrorMessage"]
-                                .Value
-                        }
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserCreationErrorMessage"]
+                                .Value)
                     },
                     null);
             }
@@ -93,7 +90,7 @@ namespace Betto.Services
             await _userRepository.SaveChangesAsync();
             var result = (UserViewModel) registeredUser;
 
-            return new RequestResponseModel<UserViewModel>(StatusCodes.Status201Created, 
+            return new RequestResponseModel<UserViewModel>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 result);
         }
@@ -135,12 +132,9 @@ namespace Betto.Services
 
             if (doesExist)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["UsernameAlreadyTakenErrorMessage",
-                            username]
-                        .Value
-                });
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UsernameAlreadyTakenErrorMessage",
+                        username]
+                    .Value));
             }
         }
 
@@ -150,12 +144,9 @@ namespace Betto.Services
 
             if (isMailTaken)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["MailAddressAlreadyTakenErrorMessage",
-                            mailAddress]
-                        .Value
-                });
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["MailAddressAlreadyTakenErrorMessage",
+                        mailAddress]
+                    .Value));
             }
         }
 
@@ -165,12 +156,9 @@ namespace Betto.Services
 
             if (!doesExist)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["UserNotFoundErrorMessage", 
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage",
                         username]
-                        .Value
-                });
+                    .Value));
             }
 
             return doesExist;
@@ -183,11 +171,8 @@ namespace Betto.Services
 
             if (!authenticated)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["IncorrectPasswordErrorMessage"]
-                        .Value
-                });
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectPasswordErrorMessage"]
+                    .Value));
             }
         }
 

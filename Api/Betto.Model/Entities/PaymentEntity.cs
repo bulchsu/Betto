@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Betto.Model.Models;
+using Betto.Model.WriteModels;
 
 namespace Betto.Model.Entities
 {
@@ -15,5 +16,14 @@ namespace Betto.Model.Entities
         public double Amount { get; set; }
         public PaymentTypeEnum Type { get; set; }
         public DateTime PaymentDateTime { get; set; }
+
+        public static explicit operator PaymentEntity(PaymentWriteModel payment) => payment == null
+            ? null
+            : new PaymentEntity
+            {
+                UserId = payment.UserId,
+                Amount = payment.Amount,
+                Type = payment.Type
+            };
     }
 }

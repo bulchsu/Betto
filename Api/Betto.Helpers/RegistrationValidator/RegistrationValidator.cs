@@ -33,11 +33,8 @@ namespace Betto.Helpers
             if (username.Length < RegistrationValidatorConstants.MinimumUsernameLength ||
                 username.Length > RegistrationValidatorConstants.MaximumUsernameLength)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["IncorrectUsernameLengthErrorMessage"]
-                        .Value
-                });
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectUsernameLengthErrorMessage"]
+                        .Value));
             }
         }
 
@@ -47,12 +44,9 @@ namespace Betto.Helpers
 
             if (!match.Success)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["WeakPasswordErrorMessage", 
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["WeakPasswordErrorMessage", 
                         RegistrationValidatorConstants.PasswordPattern]
-                        .Value
-                });
+                        .Value));
             }
         }
 
@@ -62,12 +56,9 @@ namespace Betto.Helpers
 
             if (!match.Success)
             {
-                errors.Add(new ErrorViewModel
-                {
-                    Message = _localizer["IncorrectMailAddressErrorMessage", 
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectMailAddressErrorMessage", 
                         RegistrationValidatorConstants.MailAddressPattern]
-                        .Value
-                });
+                        .Value));
             }
         }
     }
