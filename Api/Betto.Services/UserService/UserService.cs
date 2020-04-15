@@ -34,20 +34,20 @@ namespace Betto.Services
             _localizer = localizer;
         }
 
-        public async Task<RequestResponse<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginModel)
+        public async Task<RequestResponseModel<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginModel)
         {
             var errors = await CheckLoginCredentials(loginModel);
 
             if (errors.Any())
             {
-                return new RequestResponse<WebTokenViewModel>(StatusCodes.Status400BadRequest, 
+                return new RequestResponseModel<WebTokenViewModel>(StatusCodes.Status400BadRequest, 
                     errors, 
                     null);
             }
 
             var authenticationToken = _tokenGenerator.GenerateToken(loginModel.Username);
 
-            return new RequestResponse<WebTokenViewModel>(StatusCodes.Status200OK,
+            return new RequestResponseModel<WebTokenViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                 new WebTokenViewModel
                 {
@@ -56,13 +56,13 @@ namespace Betto.Services
                 });
         }
 
-        public async Task<RequestResponse<UserViewModel>> SignUpAsync(SignUpWriteModel signUpData)
+        public async Task<RequestResponseModel<UserViewModel>> SignUpAsync(RegistrationWriteModel signUpData)
         {
             var errors = await CheckSignUpDataBeforeRegisteringAsync(signUpData);
 
             if (errors.Any())
             {
-                return new RequestResponse<UserViewModel>(StatusCodes.Status400BadRequest, errors, null);
+                return new RequestResponseModel<UserViewModel>(StatusCodes.Status400BadRequest, errors, null);
             }
 
             var passwordHash = _passwordHasher.EncodePassword(signUpData.Password);
@@ -74,11 +74,11 @@ namespace Betto.Services
                 PasswordHash = passwordHash
             };
 
-            var registeredUser = (UserViewModel) await _userRepository.SignUpAsync(newUser);
+            var registeredUser = await _userRepository.SignUpAsync(newUser);
 
             if (registeredUser == null)
             {
-                return new RequestResponse<UserViewModel>(StatusCodes.Status400BadRequest,
+                return new RequestResponseModel<UserViewModel>(StatusCodes.Status400BadRequest,
                     new List<ErrorViewModel>
                     {
                         new ErrorViewModel
@@ -91,17 +91,18 @@ namespace Betto.Services
             }
 
             await _userRepository.SaveChangesAsync();
+            var result = (UserViewModel) registeredUser;
 
-            return new RequestResponse<UserViewModel>(StatusCodes.Status201Created, 
+            return new RequestResponseModel<UserViewModel>(StatusCodes.Status201Created, 
                 Enumerable.Empty<ErrorViewModel>(), 
-                registeredUser);
+                result);
         }
 
         public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
             await _userRepository.GetUserByUsernameAsync(username) != null;
 
         private async Task<ICollection<ErrorViewModel>> CheckSignUpDataBeforeRegisteringAsync(
-            SignUpWriteModel signUpModel)
+            RegistrationWriteModel signUpModel)
         {
             var errors = new List<ErrorViewModel>();
 
@@ -169,7 +170,7 @@ namespace Betto.Services
             }
         }
 
-        private void CheckPersonalDataCorrectness(SignUpWriteModel signUpModel, ICollection<ErrorViewModel> errors)
+        private void CheckPersonalDataCorrectness(RegistrationWriteModel signUpModel, ICollection<ErrorViewModel> errors) //TODO ogarnac validator
         {
             var correctnessErrors = _objectValidator.ValidateObject(signUpModel);
 

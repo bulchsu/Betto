@@ -7,10 +7,12 @@ namespace Betto.RapidApiCommunication.Managers
 {
     public abstract class BaseApiManager
     {
-        protected BaseApiManager(IOptions<RapidApiConfiguration> configuration, ILogger logger, ApiClient apiClient)
+        protected BaseApiManager(IOptions<RapidApiConfiguration> configuration, 
+            ILogger logger, 
+            ApiClient apiClient)
         {
-            Logger = logger;
             Configuration = configuration.Value;
+            Logger = logger;
             ApiClient = apiClient;
         }
 

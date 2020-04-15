@@ -51,7 +51,7 @@ namespace Betto.Services
             _configuration = configuration.Value;
         }
 
-        public async Task<RequestResponse<InfoViewModel>> ImportInitialDataAsync()
+        public async Task<RequestResponseModel<InfoViewModel>> ImportInitialDataAsync()
         {   
             _leagueRepository.Clear();
 
@@ -61,12 +61,12 @@ namespace Betto.Services
             await SaveLeaguesAsync(leagues);
             await SetBetRatesForAllLeaguesAsync();
 
-            return new RequestResponse<InfoViewModel>(StatusCodes.Status200OK, 
+            return new RequestResponseModel<InfoViewModel>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 new InfoViewModel { Message = _localizer["SuccessfulImportMessage"].Value });
         }
 
-        public async Task<RequestResponse<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount)
+        public async Task<RequestResponseModel<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount)
         {
             var highestStoredLeagueId = (await _leagueRepository.GetLeaguesAsync(false, false)).Max(l => l.RapidApiExternalId);
             var leagueIds = CalculateLeaguesIds(leaguesAmount, highestStoredLeagueId).ToList();
@@ -76,7 +76,7 @@ namespace Betto.Services
             await SaveLeaguesAsync(leagues);
             await SetBetRatesForAdditionalLeaguesAsync(leaguesAmount);
 
-            return new RequestResponse<InfoViewModel>(StatusCodes.Status200OK,
+            return new RequestResponseModel<InfoViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                 new InfoViewModel { Message = _localizer["SuccessfulImportMessage"].Value });
         }

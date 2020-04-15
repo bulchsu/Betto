@@ -15,16 +15,16 @@ namespace Betto.Model.Entities
         public GameEntity Game { get; set; }
         [ForeignKey(nameof(Game))]
         public int GameId { get; set; }
-        public EventType Type { get; set; }
+        public BetType BetType { get; set; }
         public float ConfirmedRate { get; set; }
-        public ResultEnum HiddenEventResult { get; set; }
+        public StatusEnum EventStatus { get; set; }
 
         public static explicit operator EventEntity(TicketEventWriteModel eventViewModel) => eventViewModel == null
             ? null
             : new EventEntity
             {
                 GameId = eventViewModel.GameId,
-                Type = eventViewModel.Type
+                BetType = eventViewModel.BetType
             };
     }
 }

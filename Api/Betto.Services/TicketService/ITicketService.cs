@@ -8,9 +8,9 @@ namespace Betto.Services.Services
 {
     public interface ITicketService
     {
-        Task<RequestResponse<TicketViewModel>> GetTicketByIdAsync(int ticketId);
-        Task<RequestResponse<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId);
-        Task<RequestResponse<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket);
-        Task<RequestResponse<TicketViewModel>> RevealTicketAsync(int ticketId);
+        Task<RequestResponseModel<TicketViewModel>> GetTicketByIdAsync(int ticketId);
+        Task<RequestResponseModel<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId);
+        Task<RequestResponseModel<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket);
+        Task<RequestResponseModel<TicketViewModel>> RevealTicketAsync(int ticketId);
     }
 }

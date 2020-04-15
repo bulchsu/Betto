@@ -6,7 +6,7 @@ namespace Betto.Services
 {
     public interface IOptionsService
     {
-        Task<RequestResponse<InfoViewModel>> ImportInitialDataAsync();
-        Task<RequestResponse<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount);
+        Task<RequestResponseModel<InfoViewModel>> ImportInitialDataAsync();
+        Task<RequestResponseModel<InfoViewModel>> ImportNextLeaguesAsync(int leaguesAmount);
     }
 }

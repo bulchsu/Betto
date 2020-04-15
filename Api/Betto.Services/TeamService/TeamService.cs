@@ -26,13 +26,13 @@ namespace Betto.Services
             _localizer = localizer;
         }
 
-        public async Task<RequestResponse<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
+        public async Task<RequestResponseModel<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
         {
             var league = await _leagueRepository.GetLeagueByIdAsync(leagueId, false, false);
 
             if (league == null)
             {
-                return new RequestResponse<ICollection<TeamViewModel>>(StatusCodes.Status404NotFound,
+                return new RequestResponseModel<ICollection<TeamViewModel>>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>
                     {
                         new ErrorViewModel
@@ -49,7 +49,7 @@ namespace Betto.Services
                 .ToList()
                 .GetEmptyIfNull();
 
-            return new RequestResponse<ICollection<TeamViewModel>>(StatusCodes.Status200OK, 
+            return new RequestResponseModel<ICollection<TeamViewModel>>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 leagueTeams);
         }

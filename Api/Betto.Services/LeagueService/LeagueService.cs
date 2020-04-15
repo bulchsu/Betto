@@ -23,13 +23,13 @@ namespace Betto.Services
             _localizer = localizer;
         }
 
-        public async Task<RequestResponse<LeagueViewModel>> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
+        public async Task<RequestResponseModel<LeagueViewModel>> GetLeagueByIdAsync(int leagueId, bool includeTeams, bool includeGames)
         {
             var league = (LeagueViewModel) await _leagueRepository.GetLeagueByIdAsync(leagueId, includeTeams, includeGames);
 
             if (league == null)
             {
-                return new RequestResponse<LeagueViewModel>(StatusCodes.Status404NotFound,
+                return new RequestResponseModel<LeagueViewModel>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>
                     {
                         new ErrorViewModel
@@ -41,19 +41,19 @@ namespace Betto.Services
                     null);
             }
 
-            return new RequestResponse<LeagueViewModel>(StatusCodes.Status200OK, 
+            return new RequestResponseModel<LeagueViewModel>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 league);
         }
 
-        public async Task<RequestResponse<ICollection<LeagueViewModel>>> GetLeaguesAsync(bool includeTeams, bool includeGames)
+        public async Task<RequestResponseModel<ICollection<LeagueViewModel>>> GetLeaguesAsync(bool includeTeams, bool includeGames)
         {
             var leagues = (await _leagueRepository.GetLeaguesAsync(includeTeams, includeGames))
                 .Select(l => (LeagueViewModel)l)
                 .ToList()
                 .GetEmptyIfNull();
 
-            return new RequestResponse<ICollection<LeagueViewModel>>(StatusCodes.Status200OK, 
+            return new RequestResponseModel<ICollection<LeagueViewModel>>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 leagues);
         }

@@ -14,7 +14,7 @@ namespace Betto.Model.ViewModels
         public DateTime CreationDateTime { get; set; }
         public double Stake { get; set; }
         public float TotalConfirmedRate { get; set; }
-        public ResultEnum Status { get; set; }
+        public StatusEnum Status { get; set; }
         public DateTime? RevealDateTime { get; set; }
 
         public static explicit operator TicketViewModel(TicketEntity ticket) => ticket == null

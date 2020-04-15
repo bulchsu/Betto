@@ -8,9 +8,9 @@ namespace Betto.Model.ViewModels
         public int EventId { get; set; }
         public int TicketId { get; set; }
         public int GameId { get; set; }
-        public EventType Type { get; set; }
+        public BetType BetType { get; set; }
         public float ConfirmedRate { get; set; }
-        public ResultEnum Result { get; set; }
+        public StatusEnum EventStatus { get; set; }
 
         public static explicit operator TicketEventViewModel(EventEntity eventEntity) => eventEntity == null
             ? null
@@ -19,9 +19,9 @@ namespace Betto.Model.ViewModels
                 EventId = eventEntity.EventId,
                 TicketId = eventEntity.TicketId,
                 GameId = eventEntity.GameId,
-                Type = eventEntity.Type,
+                BetType = eventEntity.BetType,
                 ConfirmedRate = eventEntity.ConfirmedRate,
-                Result = eventEntity.HiddenEventResult
+                EventStatus = eventEntity.EventStatus
             };
     }
 }

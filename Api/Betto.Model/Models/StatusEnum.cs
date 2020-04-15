@@ -1,6 +1,6 @@
 ﻿namespace Betto.Model.Models
 {
-    public enum ResultEnum
+    public enum StatusEnum
     {
         Lost,
         Won,

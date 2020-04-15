@@ -36,31 +36,31 @@ namespace Betto.Services.Services
             _localizer = localizer;
         }
 
-        public async Task<RequestResponse<TicketViewModel>> GetTicketByIdAsync(int ticketId)
+        public async Task<RequestResponseModel<TicketViewModel>> GetTicketByIdAsync(int ticketId)
         {
             var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
 
             if (ticket == null)
             {
-                return new RequestResponse<TicketViewModel>(StatusCodes.Status404NotFound,
+                return new RequestResponseModel<TicketViewModel>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["TicketNotFoundErrorMessage", ticketId].Value }},
                     null);
             }
 
             var result = PrepareResponseTicket(ticket);
 
-            return new RequestResponse<TicketViewModel>(StatusCodes.Status200OK,
+            return new RequestResponseModel<TicketViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(), 
                 result);
         }
 
-        public async Task<RequestResponse<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId)
+        public async Task<RequestResponseModel<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
 
             if (user == null)
             {
-                return new RequestResponse<IEnumerable<TicketViewModel>>(StatusCodes.Status404NotFound,
+                return new RequestResponseModel<IEnumerable<TicketViewModel>>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>{ new ErrorViewModel { Message = _localizer["UserNotFoundErrorMessage", userId].Value }}, 
                     null);
             }
@@ -69,18 +69,18 @@ namespace Betto.Services.Services
             var results = new List<TicketViewModel>(userTickets.Select(PrepareResponseTicket))
                 .GetEmptyIfNull();
 
-            return new RequestResponse<IEnumerable<TicketViewModel>>(StatusCodes.Status200OK,
+            return new RequestResponseModel<IEnumerable<TicketViewModel>>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                     results);
         }
 
-        public async Task<RequestResponse<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket)
+        public async Task<RequestResponseModel<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket)
         {
             var validationResults = await ValidateTicketBeforeSavingAsync(ticket);
 
             if (validationResults.Any())
             {
-                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
+                return new RequestResponseModel<TicketViewModel>(StatusCodes.Status400BadRequest,
                     validationResults,
                     null);
             }
@@ -89,25 +89,25 @@ namespace Betto.Services.Services
 
             if (createdTicket == null)
             {
-                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
+                return new RequestResponseModel<TicketViewModel>(StatusCodes.Status400BadRequest,
                     new List<ErrorViewModel> { new ErrorViewModel { Message = _localizer["TicketNotCreatedErrorMessage"].Value }},
                     null);
             }
 
             var result = PrepareResponseTicket(createdTicket);
 
-            return new RequestResponse<TicketViewModel>(StatusCodes.Status201Created, 
+            return new RequestResponseModel<TicketViewModel>(StatusCodes.Status201Created, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 result);
         }
 
-        public async Task<RequestResponse<TicketViewModel>> RevealTicketAsync(int ticketId)
+        public async Task<RequestResponseModel<TicketViewModel>> RevealTicketAsync(int ticketId)
         {
             var validationResults = await ValidateTicketBeforeRevealingAsync(ticketId);
 
             if (validationResults.Any())
             {
-                return new RequestResponse<TicketViewModel>(StatusCodes.Status400BadRequest,
+                return new RequestResponseModel<TicketViewModel>(StatusCodes.Status400BadRequest,
                     validationResults,
                     null);
             }
@@ -117,7 +117,7 @@ namespace Betto.Services.Services
 
             var result = PrepareResponseTicket(ticket);
 
-            return new RequestResponse<TicketViewModel>(StatusCodes.Status200OK,
+            return new RequestResponseModel<TicketViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                 result);
         }
@@ -227,7 +227,7 @@ namespace Betto.Services.Services
             await _ticketRepository.SaveChangesAsync();
         }
 
-        private TicketViewModel PrepareResponseTicket(TicketEntity ticket)
+        private static TicketViewModel PrepareResponseTicket(TicketEntity ticket)
         {
             var result = (TicketViewModel) ticket;
             FilterTicketEventsResults(result);
@@ -235,10 +235,10 @@ namespace Betto.Services.Services
             return result;
         }
 
-        private bool VerifyTicketEvents(IEnumerable<EventEntity> events) =>
-            events.All(e => e.HiddenEventResult == ResultEnum.Lost);
+        private static bool VerifyTicketEvents(IEnumerable<EventEntity> events) =>
+            events.All(e => e.EventStatus == StatusEnum.Won);
 
-        private void FilterTicketEventsResults(TicketViewModel ticket)
+        private static void FilterTicketEventsResults(TicketViewModel ticket)
         {
             var isRevealed = IsTicketRevealed(ticket);
 
@@ -248,23 +248,22 @@ namespace Betto.Services.Services
             }
         }
 
-        private void HideEventResult(IEnumerable<TicketEventViewModel> events)
+        private static void HideEventResult(IEnumerable<TicketEventViewModel> events)
         {
             foreach (var eventViewModel in events)
             {
-                eventViewModel.Result = ResultEnum.Pending;
+                eventViewModel.EventStatus = StatusEnum.Pending;
             }
         }
 
-        private void SetTicketResults(bool isWon, TicketEntity ticket)
+        private static void SetTicketResults(bool isWon, TicketEntity ticket)
         {
-            ticket.Status = isWon ? ResultEnum.Won : ResultEnum.Lost;
+            ticket.Status = isWon ? StatusEnum.Won : StatusEnum.Lost;
             ticket.RevealDateTime = DateTime.Now;
         }
 
-
-        private bool IsTicketRevealed(TicketViewModel ticket) =>
-            ticket.Status != ResultEnum.Pending && ticket.RevealDateTime.HasValue;
+        private static bool IsTicketRevealed(TicketViewModel ticket) =>
+            ticket.Status != StatusEnum.Pending && ticket.RevealDateTime.HasValue;
 
         private async Task FindEventResultsAsync(ICollection<EventEntity> events)
         {
@@ -274,23 +273,23 @@ namespace Betto.Services.Services
             foreach (var eventEntity in events)
             {
                 var relatedGame = games.SingleOrDefault(g => g.GameId == eventEntity.GameId);
-                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsAwayTeam);
+                var gameResult = CheckGameResult(relatedGame.GoalsHomeTeam, relatedGame.GoalsAwayTeam); //TODO NullReferenceException
 
-                eventEntity.HiddenEventResult = gameResult == eventEntity.Type ? ResultEnum.Won : ResultEnum.Lost;
+                eventEntity.EventStatus = gameResult == eventEntity.BetType ? StatusEnum.Won : StatusEnum.Lost;
             }
         }
 
-        private EventType CheckGameResult(int homeTeamGoals, int awayTeamGoals)
+        private static BetType CheckGameResult(int homeTeamGoals, int awayTeamGoals)
         {
-            var result = EventType.HomeTeamWin;
+            var result = BetType.HomeTeamWin;
 
             if (homeTeamGoals == awayTeamGoals)
             {
-                result = EventType.Tie;
+                result = BetType.Tie;
             }
             else if (awayTeamGoals > homeTeamGoals)
             {
-                result = EventType.AwayTeamWin;
+                result = BetType.AwayTeamWin;
             }
 
             return result;
@@ -301,22 +300,22 @@ namespace Betto.Services.Services
             foreach (var eventEntity in ticket.Events.GetEmptyIfNull())
             {
                 var rates = await _ratesRepository.GetGameRatesAsync(eventEntity.GameId);
-                eventEntity.ConfirmedRate = GetCorrectRate(eventEntity.Type, rates);
+                eventEntity.ConfirmedRate = GetCorrectRate(eventEntity.BetType, rates);
             }
 
             ticket.TotalConfirmedRate = CalculateTotalConfirmedRate(ticket.Events);
         }
 
-        private float GetCorrectRate(EventType type, BetRatesEntity rates) =>
+        private float GetCorrectRate(BetType type, BetRatesEntity rates) =>
             type switch
             {
-                EventType.HomeTeamWin => rates.HomeTeamWinRate,
-                EventType.AwayTeamWin => rates.AwayTeamWinRate,
-                EventType.Tie => rates.TieRate,
-                _ => throw new ArgumentException(_localizer["IncorrectEventTypeErrorMessage", type].Value, nameof(type))
+                BetType.HomeTeamWin => rates.HomeTeamWinRate,
+                BetType.AwayTeamWin => rates.AwayTeamWinRate,
+                BetType.Tie => rates.TieRate,
+                _ => throw new ArgumentException(_localizer["IncorrectBetTypeErrorMessage", type].Value, nameof(type))
             };
 
-        private float CalculateTotalConfirmedRate(IEnumerable<EventEntity> events) =>
+        private static float CalculateTotalConfirmedRate(IEnumerable<EventEntity> events) =>
             (float) Math.Round(events.Select(e => e.ConfirmedRate).Product(), 2);
     }
 }

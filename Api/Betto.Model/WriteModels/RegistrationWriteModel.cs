@@ -2,7 +2,7 @@
 
 namespace Betto.Model.WriteModels
 { 
-    public class SignUpWriteModel
+    public class RegistrationWriteModel
     {
         [Required, StringLength(100, MinimumLength = 3)]
         public string Username { get; set; }

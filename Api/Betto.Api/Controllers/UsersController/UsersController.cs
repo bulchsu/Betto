@@ -44,7 +44,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserViewModel>> SignUpAsync([FromBody] SignUpWriteModel signUpData)
+        public async Task<ActionResult<UserViewModel>> SignUpAsync([FromBody] RegistrationWriteModel signUpData)
         {
             try
             {

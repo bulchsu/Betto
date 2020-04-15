@@ -94,7 +94,7 @@ namespace Betto.DataAccessLayer.Migrations
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
-                    b.Property<int>("HiddenEventResult")
+                    b.Property<int>("EventStatus")
                         .HasColumnType("int");
 
                     b.Property<int>("TicketId")

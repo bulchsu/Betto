@@ -5,6 +5,6 @@ namespace Betto.Model.WriteModels
     public class TicketEventWriteModel
     {
         public int GameId { get; set; }
-        public EventType Type { get; set; }
+        public BetType BetType { get; set; }
     }
 }

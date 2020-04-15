@@ -35,7 +35,7 @@ namespace Betto.Helpers
             return passwordHash;
         }
 
-        private bool VerifyEncryptedBytes(IReadOnlyList<byte> storedPasswordHash, IReadOnlyList<byte> passwordHash)
+        private static bool VerifyEncryptedBytes(IReadOnlyList<byte> storedPasswordHash, IReadOnlyList<byte> passwordHash)
         {
             var validBytes = 0;
 
@@ -50,7 +50,7 @@ namespace Betto.Helpers
             return validBytes == BytesToCheckAmount;
         }
 
-        private byte[] HashPassword(string passedPassword, byte[] salt)
+        private static byte[] HashPassword(string passedPassword, byte[] salt)
         {
             var key = new Rfc2898DeriveBytes(passedPassword, salt, HashIterationsAmount);
             return key.GetBytes(BytesToCheckAmount);

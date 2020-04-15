@@ -21,7 +21,7 @@ namespace Betto.Model.Entities
         [Range(TicketConstants.MinimumStake, TicketConstants.MaximumStake)]
         public double Stake { get; set; }
         public float TotalConfirmedRate { get; set; }
-        public ResultEnum Status { get; set; }
+        public StatusEnum Status { get; set; }
         public DateTime? RevealDateTime { get; set; }
 
         public static explicit operator TicketEntity(TicketWriteModel ticket) => ticket == null
@@ -32,7 +32,7 @@ namespace Betto.Model.Entities
                 Events = ticket.Events.Select(e => (EventEntity) e).ToList(),
                 CreationDateTime = DateTime.Now,
                 Stake = ticket.Stake,
-                Status = ResultEnum.Pending
+                Status = StatusEnum.Pending
             };
     }
 }

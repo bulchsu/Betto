@@ -7,8 +7,8 @@ namespace Betto.Services
 {
     public interface IUserService
     {
-        Task<RequestResponse<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginData);
-        Task<RequestResponse<UserViewModel>> SignUpAsync(SignUpWriteModel signUpData);
+        Task<RequestResponseModel<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginData);
+        Task<RequestResponseModel<UserViewModel>> SignUpAsync(RegistrationWriteModel signUpData);
         Task<bool> CheckIsUsernameAlreadyTakenAsync(string username);
     }
 }

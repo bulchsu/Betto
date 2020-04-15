@@ -2,9 +2,9 @@
 
 namespace Betto.Model.Models
 {
-    public class RequestResponse<T> where T : class
+    public class RequestResponseModel<T> where T : class
     {
-        public RequestResponse(int statusCode, 
+        public RequestResponseModel(int statusCode, 
             IEnumerable<ErrorViewModel> errors, 
             T result)
         {
