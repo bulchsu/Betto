@@ -7,14 +7,15 @@ namespace Betto.Model.ViewModels
         public int UserId { get; set; }
         public string Username { get; set; }
         public string MailAddress { get; set; }
-
+        public double AccountBalance { get; set; }
         public static explicit operator UserViewModel(UserEntity user) => user == null
             ? null
             : new UserViewModel
             {
                 UserId = user.UserId, 
                 Username = user.Username, 
-                MailAddress = user.MailAddress
+                MailAddress = user.MailAddress,
+                AccountBalance = user.AccountBalance
             };
     }
 }

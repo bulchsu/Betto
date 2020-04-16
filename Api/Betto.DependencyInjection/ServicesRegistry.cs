@@ -1,4 +1,5 @@
 ﻿using Betto.Services;
+using Betto.Services.GameService;
 using Betto.Services.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,6 +13,7 @@ namespace Betto.DependencyInjection
                 .AddScoped<ILeagueService, LeagueService>()
                 .AddScoped<ITeamService, TeamService>()
                 .AddScoped<IUserService, UserService>()
+                .AddScoped<IGameService, GameService>()
                 .AddScoped<ITicketService, TicketService>()
                 .AddScoped<IPaymentService, PaymentService>();
         }

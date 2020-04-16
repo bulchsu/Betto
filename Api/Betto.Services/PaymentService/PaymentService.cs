@@ -91,6 +91,7 @@ namespace Betto.Services
         {
             var payment = PreparePaymentEntityToSave(paymentModel);
 
+            await ChargeUserAccountBalanceAsync(paymentModel);
             var paymentEntity = await _paymentRepository.AddPaymentAsync(payment);
             await _paymentRepository.SaveChangesAsync();
 
@@ -140,6 +141,14 @@ namespace Betto.Services
             paymentEntity.PaymentDateTime = DateTime.Now;
 
             return paymentEntity;
+        }
+
+        private async Task ChargeUserAccountBalanceAsync(PaymentWriteModel paymentModel)
+        {
+            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId);
+
+            user.AccountBalance +=
+                paymentModel.Type == PaymentTypeEnum.Deposit ? Math.Round(paymentModel.Amount, 2) : Math.Round(-paymentModel.Amount, 2);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Betto.DataAccessLayer.Repositories;
 using Betto.DataAccessLayer.Repositories.RatesRepository;
 using Betto.Helpers.Extensions;
+using Betto.Model.Constants;
 using Betto.Model.ViewModels;
 using Betto.Model.Entities;
 using Betto.Model.Models;
@@ -144,6 +145,9 @@ namespace Betto.Services.Services
             var errors = new List<ErrorViewModel>();
 
             CheckDoesTicketContainEvents(ticket, errors);
+            SearchForDuplicatedEventsOnATicket(ticket, errors);
+            CheckIsStakeCorrect(ticket, errors);
+
             var doesExist = await CheckDoesUserExistAsync(ticket.UserId);
 
             if (!doesExist)
@@ -155,6 +159,7 @@ namespace Betto.Services.Services
                 return errors;
             }
 
+            await CheckDoTicketGamesExistAsync(ticket, errors);
             await CheckIsTicketAffordableByUserAsync(ticket, errors);
             await CheckHasUserPlayedAnyOfGamesBeforeAsync(ticket, errors);
 
@@ -189,14 +194,63 @@ namespace Betto.Services.Services
             }
         }
 
+        private void SearchForDuplicatedEventsOnATicket(TicketWriteModel ticket,
+            ICollection<ErrorViewModel> errors)
+        {
+            var duplicatedGameIds = ticket.Events
+                .GroupBy(g => g.GameId)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList()
+                .GetEmptyIfNull();
+
+            if (duplicatedGameIds.Any())
+            {
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["TicketContainsDuplicatesErrorMessage",
+                    string.Join(';', duplicatedGameIds)]
+                    .Value));
+            }
+        }
+
+        private void CheckIsStakeCorrect(TicketWriteModel ticket,
+            ICollection<ErrorViewModel> errors)
+        {
+            if (ticket.Stake < TicketConstants.MinimumStake || ticket.Stake > TicketConstants.MaximumStake)
+            {
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectStakeErrorMessage"]
+                    .Value));
+            }
+        }
+
         private async Task<bool> CheckDoesUserExistAsync(int userId) =>
             await _userRepository.GetUserByIdAsync(userId) != null;
+
+        private async Task CheckDoTicketGamesExistAsync(TicketWriteModel ticketModel,
+            ICollection<ErrorViewModel> errors)
+        {
+            var gameIds = ticketModel.Events.Select(e => e.GameId)
+                .ToList();
+            var storedGamesIds = (await _gameRepository.GetGamesByBunchOfIdsAsync(gameIds))
+                .Select(g => g.GameId);
+
+            var incorrectGameIds = gameIds
+                .Where(g => !storedGamesIds
+                    .Contains(g))
+                .ToList();
+
+            if (incorrectGameIds.Any())
+            {
+                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["TicketContainingIncorrectGamesErrorMessage",
+                    string.Join(';', incorrectGameIds)]
+                    .Value));
+            }
+        }
 
         private async Task CheckIsTicketAffordableByUserAsync(TicketWriteModel ticketModel,
             ICollection<ErrorViewModel> errors)
         {
             var user = await _userRepository.GetUserByIdAsync(ticketModel.UserId);
-
+            
             if (ticketModel.Stake > user.AccountBalance)
             {
                 errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["TicketNotAffordableErrorMessage", 
@@ -256,7 +310,19 @@ namespace Betto.Services.Services
             var isWon = VerifyTicketEvents(ticket.Events);
             SetTicketResults(isWon, ticket);
 
+            if (isWon)
+            {
+                var price = ticket.Stake * ticket.TotalConfirmedRate;
+                await ModifyUserAccountBalanceAsync(ticket.UserId, price);
+            }
+
             await _ticketRepository.SaveChangesAsync();
+        }
+
+        private async Task ModifyUserAccountBalanceAsync(int userId, double amountToAdd)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            user.AccountBalance += Math.Round(amountToAdd, 2);
         }
 
         private static TicketViewModel PrepareResponseTicket(TicketEntity ticket)

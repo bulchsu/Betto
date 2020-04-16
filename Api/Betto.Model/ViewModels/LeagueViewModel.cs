@@ -1,5 +1,7 @@
 ﻿using Betto.Model.Entities;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Betto.Model.ViewModels
 {
@@ -15,6 +17,8 @@ namespace Betto.Model.ViewModels
         public string Logo { get; set; }
         public string Flag { get; set; }
         public bool Standings { get; set; }
+        public ICollection<TeamViewModel> Teams { get; set; }
+        public ICollection<GameViewModel> Games { get; set; }
 
         public static explicit operator LeagueViewModel(LeagueEntity league)
             => league == null ? null : new LeagueViewModel
@@ -28,7 +32,13 @@ namespace Betto.Model.ViewModels
                 SeasonEnd = league.SeasonEnd,
                 Logo = league.Logo,
                 Flag = league.Flag,
-                Standings = league.Standings
+                Standings = league.Standings,
+                Teams = league.Teams
+                    ?.Select(t =>  (TeamViewModel) t)
+                    .ToList(),
+                Games = league.Games
+                    ?.Select(g => (GameViewModel) g)
+                    .ToList()
             };
     }
 }
