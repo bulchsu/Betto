@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Betto.Model.Entities;
 
 namespace Betto.DataAccessLayer.Repositories
@@ -9,5 +10,6 @@ namespace Betto.DataAccessLayer.Repositories
         Task<UserEntity> GetUserByUsernameAsync(string username);
         Task<UserEntity> GetUserByMailAsync(string mailAddress);
         Task<UserEntity> GetUserByIdAsync(int userId);
+        Task<ICollection<UserEntity>> GetUsersAsync();
     }
 }

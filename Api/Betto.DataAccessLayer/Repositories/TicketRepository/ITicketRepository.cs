@@ -9,5 +9,6 @@ namespace Betto.DataAccessLayer.Repositories
         Task<IEnumerable<TicketEntity>> GetUserTicketsAsync(int userId);
         Task<TicketEntity> AddTicketAsync(TicketEntity ticket);
         Task<TicketEntity> GetTicketByIdAsync(int ticketId);
+        Task<ICollection<TicketEntity>> GetTicketsAsync();
     }
 }

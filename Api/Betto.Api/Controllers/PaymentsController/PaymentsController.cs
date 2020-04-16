@@ -22,7 +22,7 @@ namespace Betto.Api.Controllers.PaymentsController
 
         [HttpPost]
         public async Task<ActionResult<PaymentViewModel>> CreatePaymentAsync([FromBody] PaymentWriteModel paymentModel)
-        {
+        { 
             try
             {
                 var response = await _paymentService.CreatePaymentAsync(paymentModel);

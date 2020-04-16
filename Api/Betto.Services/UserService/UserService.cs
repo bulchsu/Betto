@@ -10,24 +10,28 @@ using Betto.Resources.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System.Linq;
+using Betto.Helpers.Extensions;
 
 namespace Betto.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ITicketRepository _ticketRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IRegistrationValidator _registrationValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public UserService(IUserRepository userRepository,
+            ITicketRepository ticketRepository,
             IPasswordHasher passwordHasher,
             ITokenGenerator tokenGenerator,
             IRegistrationValidator registrationValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _userRepository = userRepository;
+            _ticketRepository = ticketRepository;
             _passwordHasher = passwordHasher;
             _tokenGenerator = tokenGenerator;
             _registrationValidator = registrationValidator;
@@ -93,6 +97,15 @@ namespace Betto.Services
             return new RequestResponseModel<UserViewModel>(StatusCodes.Status200OK, 
                 Enumerable.Empty<ErrorViewModel>(), 
                 result);
+        }
+
+        public async Task<RequestResponseModel<ICollection<UserRankingPositionViewModel>>> GetUsersRankingAsync()
+        {
+            var rankingPositions = await GetUsersRanking();
+
+            return new RequestResponseModel<ICollection<UserRankingPositionViewModel>>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
+                rankingPositions);
         }
 
         public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
@@ -174,6 +187,36 @@ namespace Betto.Services
                 errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectPasswordErrorMessage"]
                     .Value));
             }
+        }
+
+        private async Task<ICollection<UserRankingPositionViewModel>> GetUsersRanking()
+        {
+            var users = await _userRepository.GetUsersAsync();
+            var tickets = await _ticketRepository.GetTicketsAsync();
+
+            var rankingPositions = (from user in users
+                    let userTickets = tickets.Where(t => t.UserId == user.UserId)
+                    let wonTickets = userTickets.Where(t => t.Status == StatusEnum.Won)
+                    let wonAmount = wonTickets
+                        .Sum(t => t.Stake * t.TotalConfirmedRate)
+                    let lostAmount = userTickets
+                        .Where(t => t.Status == StatusEnum.Lost)
+                        .Sum(t => t.Stake)
+                    select new UserRankingPositionViewModel
+                    {
+                        UserId = user.UserId,
+                        Username = user.Username,
+                        HighestPrice = wonTickets.Any() 
+                            ? wonTickets.Max(t => t.Stake)
+                            : 0,
+                        TotalWonAmount = wonAmount - lostAmount
+                    }).OrderByDescending(t => t.TotalWonAmount)
+                .ThenByDescending(t => t.HighestPrice)
+                .ToList()
+                .GetEmptyIfNull()
+                .FillPositions();
+
+            return rankingPositions;
         }
 
         private async Task<bool> CheckIsMailAlreadyTakenAsync(string mailAddress) =>

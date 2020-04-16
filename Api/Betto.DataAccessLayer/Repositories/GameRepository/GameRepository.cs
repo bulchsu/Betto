@@ -16,6 +16,7 @@ namespace Betto.DataAccessLayer.Repositories
 
         public async Task<ICollection<GameEntity>> GetLeagueGamesAsync(int leagueId) =>
             await DbContext.Games
+                .Include(g => g.Rates)
                 .Where(g => g.LeagueId == leagueId)
                 .ToListAsync();
 

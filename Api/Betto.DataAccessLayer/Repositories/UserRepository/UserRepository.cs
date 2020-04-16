@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Betto.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,5 +24,8 @@ namespace Betto.DataAccessLayer.Repositories
 
         public async Task<UserEntity> GetUserByIdAsync(int userId) =>
             await DbContext.Users.SingleOrDefaultAsync(u => u.UserId == userId);
+
+        public async Task<ICollection<UserEntity>> GetUsersAsync() =>
+            await DbContext.Users.ToListAsync();
     }
 }

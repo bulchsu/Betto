@@ -65,7 +65,7 @@ namespace Betto.Api.Controllers.UsersController
         }
 
         [HttpGet("{userId:int}/tickets"), Authorize]
-        public async Task<ActionResult<ICollection<TicketViewModel>>> GetUserTicketsAsync(int userId)
+        public async Task<ActionResult<ICollection<TicketViewModel>>> GetUserTicketsAsync([FromRoute] int userId)
         {
             try
             {
@@ -82,11 +82,30 @@ namespace Betto.Api.Controllers.UsersController
             }
         }
 
-        public async Task<ActionResult<ICollection<PaymentViewModel>>> GetUserPaymentsAsync(int userId)
+        [HttpGet("{userId:int}/payments"), Authorize]
+        public async Task<ActionResult<ICollection<PaymentViewModel>>> GetUserPaymentsAsync([FromRoute] int userId)
         {
             try
             {
                 var response = await _paymentService.GetUserPaymentsAsync(userId);
+
+                return response.StatusCode == StatusCodes.Status200OK
+                    ? Ok(response.Result)
+                    : StatusCode(response.StatusCode, response.Errors);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    ErrorViewModel.Factory.NewErrorFromException(e));
+            }
+        }
+
+        [HttpGet("ranking")]
+        public async Task<ActionResult<ICollection<PaymentViewModel>>> GetUsersRankingAsync()
+        {
+            try
+            {
+                var response = await _userService.GetUsersRankingAsync();
 
                 return response.StatusCode == StatusCodes.Status200OK
                     ? Ok(response.Result)

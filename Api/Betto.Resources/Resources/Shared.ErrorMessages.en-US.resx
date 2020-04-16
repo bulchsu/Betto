@@ -135,6 +135,9 @@
   <data name="IncorrectPasswordErrorMessage" xml:space="preserve">
     <value>Incorrect password</value>
   </data>
+  <data name="IncorrectStakeErrorMessage" xml:space="preserve">
+    <value>Incorrect stake</value>
+  </data>
   <data name="IncorrectUsernameLengthErrorMessage" xml:space="preserve">
     <value>Username must be longer than 2 characters, and shorter than 100.</value>
   </data>
@@ -159,6 +162,15 @@
   <data name="TicketAlreadyRevealedErrorMessage" xml:space="preserve">
     <value>Ticket {0} has been already revealed.</value>
   </data>
+  <data name="TicketContainingIncorrectGamesErrorMessage" xml:space="preserve">
+    <value>Following games are not exist {0}:</value>
+  </data>
+  <data name="TicketContainsDuplicatesErrorMessage" xml:space="preserve">
+    <value>Following game ids are duplicated: {0}</value>
+  </data>
+  <data name="TicketNotAffordableErrorMessage" xml:space="preserve">
+    <value>You have no enough money to create a ticket</value>
+  </data>
   <data name="TicketNotCreatedErrorMessage" xml:space="preserve">
     <value>Could not create a ticket. Try again later</value>
   </data>
@@ -176,5 +188,8 @@
   </data>
   <data name="WeakPasswordErrorMessage" xml:space="preserve">
     <value>Password must match the following pattern {0}</value>
+  </data>
+  <data name="WithdrawalNotAffordableErrorMessage" xml:space="preserve">
+    <value>You have no enough money to withdraw such an amount</value>
   </data>
 </root>
