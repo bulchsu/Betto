@@ -2,7 +2,7 @@
   <v-app>
     <vue-snotify></vue-snotify>
     <HeaderBar />
-    <div>
+    <div style="height: 100%;">
       <SideBar style="float :left;" />
       <MainContainer v-if="selectedLeague" style="float :left;" />
     </div>
