@@ -14,6 +14,7 @@ namespace Betto.DependencyInjection
                 .RegisterRepositories()
                 .RegisterAuthentication(configuration)
                 .RegisterApiCommunication()
+                .RegisterValidators()
                 .RegisterServices()
                 .RegisterLocalization();
         }

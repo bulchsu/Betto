@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Betto.Configuration;
-using Betto.Helpers;
 using Betto.Model.Entities;
 using Betto.RapidApiCommunication.Parsers;
 using Microsoft.Extensions.Options;
@@ -14,10 +13,9 @@ namespace Betto.RapidApiCommunication.Managers
         private readonly IParser<TeamEntity> _teamParser;
 
         public TeamManager(IOptions<RapidApiConfiguration> configuration, 
-            ILogger logger, 
             IParser<TeamEntity> teamParser, 
             ApiClient apiClient)
-            : base(configuration, logger, apiClient)
+            : base(configuration, apiClient)
         {
             _teamParser = teamParser;
         }
@@ -32,12 +30,10 @@ namespace Betto.RapidApiCommunication.Managers
 
         private async Task<IEnumerable<TeamEntity>> GetLeagueTeamsAsync(int leagueId)
         {
-            var url = GetTeamsUrl(leagueId);
+            var url = GetLeagueTeamsUrl(leagueId);
             var headers = GetRapidApiAuthenticationHeaders();
             
             var rawJson = await ApiClient.GetAsync(url, string.Empty, headers);
-            
-            Logger.LogToFile($"league_{leagueId}_teams", rawJson);
 
             var teams = _teamParser.Parse(rawJson);
             ConnectTeamsToCorrectLeague(leagueId, teams);
@@ -45,8 +41,8 @@ namespace Betto.RapidApiCommunication.Managers
             return teams;
         }
 
-        private string GetTeamsUrl(int leagueId)
-            => string.Concat(Configuration.RapidApiUrl, Configuration.TeamsRoute, leagueId);
+        private string GetLeagueTeamsUrl(int leagueId)
+            => string.Concat(Configuration.TeamsUrl, leagueId);
 
         private static void ConnectTeamsToCorrectLeague(int leagueId, IEnumerable<TeamEntity> teams)
         {

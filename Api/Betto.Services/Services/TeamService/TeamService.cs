@@ -6,6 +6,7 @@ using Betto.DataAccessLayer.Repositories;
 using Betto.Helpers.Extensions;
 using Betto.Model.Models;
 using Betto.Resources.Shared;
+using Betto.Services.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 
@@ -14,21 +15,21 @@ namespace Betto.Services
     public class TeamService : ITeamService
     {
         private readonly ITeamRepository _teamRepository;
-        private readonly ILeagueRepository _leagueRepository;
+        private readonly ILeagueValidator _leagueValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public TeamService(ITeamRepository teamRepository,
-            ILeagueRepository leagueRepository,
+            ILeagueValidator leagueValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _teamRepository = teamRepository;
-            _leagueRepository = leagueRepository;
+            _leagueValidator = leagueValidator;
             _localizer = localizer;
         }
 
         public async Task<RequestResponseModel<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId)
         {
-            var doesLeagueExist = await CheckDoesLeagueExistAsync(leagueId);
+            var doesLeagueExist = await _leagueValidator.CheckDoesTheLeagueExistAsync(leagueId);
 
             if (!doesLeagueExist)
             {
@@ -50,8 +51,5 @@ namespace Betto.Services
                 Enumerable.Empty<ErrorViewModel>(), 
                 leagueTeams);
         }
-
-        private async Task<bool> CheckDoesLeagueExistAsync(int leagueId) =>
-            await _leagueRepository.GetLeagueByIdAsync(leagueId, false, false) != null;
     }
 }

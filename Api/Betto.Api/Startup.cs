@@ -61,7 +61,7 @@ namespace Betto.Api
             });
         }
 
-        private void SetUpRequestLocalization(IApplicationBuilder app) =>
+        private static void SetUpRequestLocalization(IApplicationBuilder app) =>
             app.UseRequestLocalization(new RequestLocalizationOptions
             {
                 DefaultRequestCulture = new RequestCulture("en-US"),

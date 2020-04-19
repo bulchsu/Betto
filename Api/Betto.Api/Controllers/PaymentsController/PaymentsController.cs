@@ -7,6 +7,7 @@ using Betto.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers.PaymentsController
 {
@@ -14,10 +15,13 @@ namespace Betto.Api.Controllers.PaymentsController
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
+        private readonly ILogger<PaymentsController> _logger;
 
-        public PaymentsController(IPaymentService paymentService)
+        public PaymentsController(IPaymentService paymentService,
+            ILogger<PaymentsController> logger)
         {
             _paymentService = paymentService;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -33,6 +37,8 @@ namespace Betto.Api.Controllers.PaymentsController
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }

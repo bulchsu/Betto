@@ -7,10 +7,9 @@ namespace Betto.DependencyInjection
     {
         internal static IServiceCollection RegisterHelpers(this IServiceCollection services)
         {
-            return services.AddSingleton<ILogger, Logger>()
+            return services
                 .AddScoped<IPasswordHasher, PasswordHasher>()
                 .AddScoped<ITokenGenerator, TokenGenerator>()
-                .AddScoped<IRegistrationValidator, RegistrationValidator>()
                 .AddScoped<IRelationCreator, RelationCreator>()
                 .AddScoped<IRateCalculator, RateCalculator>();
         }

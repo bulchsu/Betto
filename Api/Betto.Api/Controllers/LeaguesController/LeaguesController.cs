@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Betto.Model.Models;
 using Betto.Services.GameService;
+using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers
 {
@@ -16,14 +17,17 @@ namespace Betto.Api.Controllers
         private readonly ILeagueService _leagueService;
         private readonly ITeamService _teamService;
         private readonly IGameService _gameService;
+        private readonly ILogger<LeaguesController> _logger;
 
         public LeaguesController(ILeagueService leagueService, 
             ITeamService teamService,
-            IGameService gameService)
+            IGameService gameService,
+            ILogger<LeaguesController> logger)
         {
             _leagueService = leagueService;
             _teamService = teamService;
             _gameService = gameService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -39,6 +43,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -58,6 +64,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -76,6 +84,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -94,6 +104,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }

@@ -8,7 +8,7 @@ namespace Betto.Model.ViewModels
         public int EventId { get; set; }
         public int TicketId { get; set; }
         public int GameId { get; set; }
-        public BetType BetType { get; set; }
+        public BetTypeEnum BetType { get; set; }
         public float ConfirmedRate { get; set; }
         public StatusEnum EventStatus { get; set; }
 

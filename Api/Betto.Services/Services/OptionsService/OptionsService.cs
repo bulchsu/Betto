@@ -55,7 +55,7 @@ namespace Betto.Services
         {   
             _leagueRepository.Clear();
 
-            var leagueIds = CalculateLeaguesIds(_configuration.LeaguesAmount)
+            var leagueIds = CalculateLeaguesIds(_configuration.InitialLeaguesAmount)
                 .ToList()
                 .GetEmptyIfNull();
 

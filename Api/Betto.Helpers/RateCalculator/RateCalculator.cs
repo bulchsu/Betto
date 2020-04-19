@@ -14,7 +14,7 @@ namespace Betto.Helpers
     {
         public ICollection<BetRatesEntity> GetLeagueGamesRates(LeagueEntity league)
         {
-            var leagueTable = LeagueTable.Factory.NewLeagueTable(league);
+            var leagueTable = LeagueTableModel.Factory.NewLeagueTable(league);
             var betRates = new ConcurrentBag<BetRatesEntity>();
 
             Parallel.ForEach(league.Games.GetEmptyIfNull(), game =>
@@ -31,7 +31,7 @@ namespace Betto.Helpers
             return betRates.ToList();
         }
 
-        private static BetRatesEntity GetGameRates(TeamStatistics homeTeam, TeamStatistics awayTeam, int leagueSize)
+        private static BetRatesEntity GetGameRates(TeamStatisticsModel homeTeam, TeamStatisticsModel awayTeam, int leagueSize)
         {
             var positionDifference = GetPositionDifference(homeTeam, awayTeam);
             var probabilityInitialFactor = CalculateInitialProbabilityFactor(positionDifference);
@@ -62,13 +62,13 @@ namespace Betto.Helpers
             };
         }
 
-        private static ProbabilityFactors GetInitialProbability(TeamStatistics homeTeam, TeamStatistics awayTeam, float probabilityInitialFactor)
+        private static ProbabilityFactorsModel GetInitialProbability(TeamStatisticsModel homeTeam, TeamStatisticsModel awayTeam, float probabilityInitialFactor)
         {
             var homeTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position < awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
             var awayTeamWinInitialProbability = RatesConstants.WinInitialProbability + (homeTeam.Position > awayTeam.Position ? probabilityInitialFactor : -probabilityInitialFactor);
             var tieInitialProbability = RatesConstants.CertainEventProbability - (homeTeamWinInitialProbability + awayTeamWinInitialProbability);
 
-            return new ProbabilityFactors
+            return new ProbabilityFactorsModel
             {
                 HomeTeamWinFactor = homeTeamWinInitialProbability,
                 AwayTeamWinFactor = awayTeamWinInitialProbability,
@@ -76,7 +76,7 @@ namespace Betto.Helpers
             };
         }
 
-        private static ProbabilityFactors GetRandomExtraProbability(int positionDifference, int leagueSize)
+        private static ProbabilityFactorsModel GetRandomExtraProbability(int positionDifference, int leagueSize)
         {
             var randomGenerator = new Random();
             var pointsToAllocate = leagueSize - positionDifference;
@@ -98,7 +98,7 @@ namespace Betto.Helpers
             awayTeamExtraProbability += winExtraProbability;
             tieExtraProbability -= (2.0f * winExtraProbability);
 
-            return new ProbabilityFactors
+            return new ProbabilityFactorsModel
             {
                 HomeTeamWinFactor = homeTeamExtraProbability,
                 AwayTeamWinFactor = awayTeamExtraProbability,
@@ -109,7 +109,7 @@ namespace Betto.Helpers
         private static float CalculateInitialProbabilityFactor(int positionDifference) =>
             RatesConstants.PositionDifferenceProbabilityFactor * positionDifference;
 
-        private static int GetPositionDifference(TeamStatistics homeTeamStatistics, TeamStatistics awayTeamStatistics) =>
+        private static int GetPositionDifference(TeamStatisticsModel homeTeamStatistics, TeamStatisticsModel awayTeamStatistics) =>
             Math.Abs(homeTeamStatistics.Position - awayTeamStatistics.Position);
 
         private static float SubtractGamblingCompanyFactor(float value) =>

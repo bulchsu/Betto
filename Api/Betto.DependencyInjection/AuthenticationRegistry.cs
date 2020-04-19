@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Betto.Configuration;
-using Betto.Services;
+using Betto.Services.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,9 +39,9 @@ namespace Betto.DependencyInjection
 
         private static async Task OnTokenValidatedAsync(TokenValidatedContext context)
         {
-            var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+            var userValidator = context.HttpContext.RequestServices.GetRequiredService<IUserValidator>();
             var username = context.Principal.Identity.Name;
-            var doesUserExist = await userService.CheckIsUsernameAlreadyTakenAsync(username);
+            var doesUserExist = await userValidator.CheckIsUsernameAlreadyTakenAsync(username);
 
             if (!doesUserExist)
             {

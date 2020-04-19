@@ -11,6 +11,5 @@ namespace Betto.Services
         Task<RequestResponseModel<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginData);
         Task<RequestResponseModel<UserViewModel>> SignUpAsync(RegistrationWriteModel signUpData);
         Task<RequestResponseModel<ICollection<UserRankingPositionViewModel>>> GetUsersRankingAsync();
-        Task<bool> CheckIsUsernameAlreadyTakenAsync(string username);
     }
 }

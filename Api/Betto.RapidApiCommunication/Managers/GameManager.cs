@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Betto.Configuration;
-using Betto.Helpers;
 using Betto.Model.Entities;
 using Betto.RapidApiCommunication.Parsers;
 using Microsoft.Extensions.Options;
@@ -15,9 +14,8 @@ namespace Betto.RapidApiCommunication.Managers
 
         public GameManager(IParser<GameEntity> gameParser,
             IOptions<RapidApiConfiguration> configuration,
-            ILogger logger,
             ApiClient apiClient)
-            : base(configuration, logger, apiClient)
+            : base(configuration, apiClient)
         {
             _gameParser = gameParser;
         }
@@ -37,15 +35,13 @@ namespace Betto.RapidApiCommunication.Managers
 
             var jsonResponse = await ApiClient.GetAsync(url, string.Empty, headers);
 
-            Logger.LogToFile($"league_{leagueId}_games", jsonResponse);
-
             var leagueGames = _gameParser.Parse(jsonResponse);
 
             return leagueGames;
         }
 
         private string GetLeagueMatchesUrl(int leagueId) =>
-            string.Concat(Configuration.RapidApiUrl, Configuration.LeagueFixturesRoute, leagueId, 
+            string.Concat(Configuration.FixturesUrl, leagueId, 
                 "?timezone=", Configuration.Timezone);
     }
 }

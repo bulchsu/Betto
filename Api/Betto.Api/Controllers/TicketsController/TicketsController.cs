@@ -7,6 +7,7 @@ using Betto.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers.TicketsController
 {
@@ -14,10 +15,13 @@ namespace Betto.Api.Controllers.TicketsController
     public class TicketsController : ControllerBase
     {
         private readonly ITicketService _ticketService;
+        private readonly ILogger<TicketsController> _logger;
 
-        public TicketsController(ITicketService ticketService)
+        public TicketsController(ITicketService ticketService,
+            ILogger<TicketsController> logger)
         {
             _ticketService = ticketService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +42,8 @@ namespace Betto.Api.Controllers.TicketsController
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -56,6 +62,8 @@ namespace Betto.Api.Controllers.TicketsController
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -74,6 +82,8 @@ namespace Betto.Api.Controllers.TicketsController
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }

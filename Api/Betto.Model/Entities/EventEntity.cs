@@ -15,7 +15,7 @@ namespace Betto.Model.Entities
         public GameEntity Game { get; set; }
         [ForeignKey(nameof(Game))]
         public int GameId { get; set; }
-        public BetType BetType { get; set; }
+        public BetTypeEnum BetType { get; set; }
         public float ConfirmedRate { get; set; }
         public StatusEnum EventStatus { get; set; }
 

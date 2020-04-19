@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Betto.DataAccessLayer.Repositories;
 using Betto.Helpers;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 using System.Linq;
 using Betto.Helpers.Extensions;
+using Betto.Services.Validators;
 
 namespace Betto.Services
 {
@@ -20,27 +22,27 @@ namespace Betto.Services
         private readonly ITicketRepository _ticketRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenGenerator _tokenGenerator;
-        private readonly IRegistrationValidator _registrationValidator;
+        private readonly IUserValidator _userValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public UserService(IUserRepository userRepository,
             ITicketRepository ticketRepository,
             IPasswordHasher passwordHasher,
             ITokenGenerator tokenGenerator,
-            IRegistrationValidator registrationValidator,
+            IUserValidator userValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _userRepository = userRepository;
             _ticketRepository = ticketRepository;
             _passwordHasher = passwordHasher;
             _tokenGenerator = tokenGenerator;
-            _registrationValidator = registrationValidator;
+            _userValidator = userValidator;
             _localizer = localizer;
         }
 
         public async Task<RequestResponseModel<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginModel)
         {
-            var errors = await CheckLoginCredentials(loginModel);
+            var errors = await _userValidator.CheckLoginCredentials(loginModel);
 
             if (errors.Any())
             {
@@ -62,7 +64,7 @@ namespace Betto.Services
 
         public async Task<RequestResponseModel<UserViewModel>> SignUpAsync(RegistrationWriteModel signUpData)
         {
-            var errors = await CheckSignUpDataBeforeRegisteringAsync(signUpData);
+            var errors = await _userValidator.CheckSignUpDataBeforeRegisteringAsync(signUpData);
 
             if (errors.Any())
             {
@@ -108,87 +110,6 @@ namespace Betto.Services
                 rankingPositions);
         }
 
-        public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
-            await _userRepository.GetUserByUsernameAsync(username) != null;
-
-        private async Task<ICollection<ErrorViewModel>> CheckSignUpDataBeforeRegisteringAsync(
-            RegistrationWriteModel signUpModel)
-        {
-            var errors = _registrationValidator.ValidateRegistrationModel(signUpModel);
-
-            if (!errors.Any())
-            {
-                await CheckUsernameBeforeSignUpAsync(signUpModel.Username, errors);
-                await CheckMailAddressBeforeSignUpAsync(signUpModel.MailAddress, errors);
-            }
-
-            return errors;
-        }
-
-        private async Task<ICollection<ErrorViewModel>> CheckLoginCredentials(LoginWriteModel loginModel)
-        {
-            var errors = new List<ErrorViewModel>();
-
-            var doesUserExist = await CheckDoesTheUserExistAsync(loginModel.Username, errors);
-
-            if (doesUserExist)
-            {
-                await VerifyUserPasswordAsync(loginModel, errors);
-            }
-
-            return errors;
-        }
-
-        private async Task CheckUsernameBeforeSignUpAsync(string username, ICollection<ErrorViewModel> errors)
-        {
-            var doesExist = await CheckIsUsernameAlreadyTakenAsync(username);
-
-            if (doesExist)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UsernameAlreadyTakenErrorMessage",
-                        username]
-                    .Value));
-            }
-        }
-
-        private async Task CheckMailAddressBeforeSignUpAsync(string mailAddress, ICollection<ErrorViewModel> errors)
-        {
-            var isMailTaken = await CheckIsMailAlreadyTakenAsync(mailAddress);
-
-            if (isMailTaken)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["MailAddressAlreadyTakenErrorMessage",
-                        mailAddress]
-                    .Value));
-            }
-        }
-
-        private async Task<bool> CheckDoesTheUserExistAsync(string username, ICollection<ErrorViewModel> errors)
-        {
-            var doesExist = await CheckIsUsernameAlreadyTakenAsync(username);
-
-            if (!doesExist)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage",
-                        username]
-                    .Value));
-            }
-
-            return doesExist;
-        }
-
-        private async Task VerifyUserPasswordAsync(LoginWriteModel loginModel, ICollection<ErrorViewModel> errors)
-        {
-            var user = await _userRepository.GetUserByUsernameAsync(loginModel.Username);
-            var authenticated = _passwordHasher.VerifyPassword(user.PasswordHash, loginModel.Password);
-
-            if (!authenticated)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["IncorrectPasswordErrorMessage"]
-                    .Value));
-            }
-        }
-
         private async Task<ICollection<UserRankingPositionViewModel>> GetUsersRanking()
         {
             var users = await _userRepository.GetUsersAsync();
@@ -198,7 +119,7 @@ namespace Betto.Services
                     let userTickets = tickets.Where(t => t.UserId == user.UserId)
                     let wonTickets = userTickets.Where(t => t.Status == StatusEnum.Won)
                     let wonAmount = wonTickets
-                        .Sum(t => t.Stake * t.TotalConfirmedRate)
+                        .Sum(t => t.Stake * (t.TotalConfirmedRate - 1))
                     let lostAmount = userTickets
                         .Where(t => t.Status == StatusEnum.Lost)
                         .Sum(t => t.Stake)
@@ -207,9 +128,9 @@ namespace Betto.Services
                         UserId = user.UserId,
                         Username = user.Username,
                         HighestPrice = wonTickets.Any() 
-                            ? wonTickets.Max(t => t.Stake)
+                            ? Math.Round(wonTickets.Max(t => t.Stake * t.TotalConfirmedRate), 2)
                             : 0,
-                        TotalWonAmount = wonAmount - lostAmount
+                        TotalWonAmount = Math.Round(wonAmount - lostAmount, 2)
                     }).OrderByDescending(t => t.TotalWonAmount)
                 .ThenByDescending(t => t.HighestPrice)
                 .ToList()
@@ -218,8 +139,5 @@ namespace Betto.Services
 
             return rankingPositions;
         }
-
-        private async Task<bool> CheckIsMailAlreadyTakenAsync(string mailAddress) =>
-            await _userRepository.GetUserByMailAsync(mailAddress) != null;
     }
 }

@@ -10,6 +10,7 @@ using Betto.Model.Models;
 using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 using Betto.Resources.Shared;
+using Betto.Services.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 
@@ -19,20 +20,26 @@ namespace Betto.Services
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserValidator _userValidator;
+        private readonly IPaymentValidator _paymentValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public PaymentService(IPaymentRepository paymentRepository,
             IUserRepository userRepository,
+            IUserValidator userValidator,
+            IPaymentValidator paymentValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _paymentRepository = paymentRepository;
             _userRepository = userRepository;
+            _userValidator = userValidator;
+            _paymentValidator = paymentValidator;
             _localizer = localizer;
         }
 
         public async Task<RequestResponseModel<ICollection<PaymentViewModel>>> GetUserPaymentsAsync(int userId)
         {
-            var doesUserExist = await CheckDoesUserExistAsync(userId);
+            var doesUserExist = await _userValidator.CheckDoesTheUserExistAsync(userId);
 
             if (!doesUserExist)
             {
@@ -58,7 +65,7 @@ namespace Betto.Services
 
         public async Task<RequestResponseModel<PaymentViewModel>> CreatePaymentAsync(PaymentWriteModel paymentModel)
         {
-            var errors = await ValidatePaymentAsync(paymentModel);
+            var errors = await _paymentValidator.ValidatePaymentAsync(paymentModel);
 
             if (errors.Any())
             {
@@ -74,8 +81,7 @@ namespace Betto.Services
                 return new RequestResponseModel<PaymentViewModel>(StatusCodes.Status404NotFound,
                     new List<ErrorViewModel>
                     {
-                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["PaymentNotCreatedErrorMessage",
-                                paymentModel.UserId]
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["PaymentNotCreatedErrorMessage"]
                             .Value)
                     }, null);
             }
@@ -98,43 +104,6 @@ namespace Betto.Services
             return paymentEntity;
         }
 
-        private async Task<ICollection<ErrorViewModel>> ValidatePaymentAsync(PaymentWriteModel paymentModel)
-        {
-            var errors = new List<ErrorViewModel>();
-            var doesUserExist = await CheckDoesUserExistAsync(paymentModel.UserId);
-
-            if (!doesUserExist)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage",
-                        paymentModel.UserId]
-                    .Value));
-
-                return errors;
-            }
-
-            if (paymentModel.Type == PaymentTypeEnum.Withdrawal)
-            {
-                await CheckUserAccountBalanceBeforeWithdrawal(paymentModel, errors);
-            }
-
-            return errors;
-        }
-
-        private async Task<bool> CheckDoesUserExistAsync(int userId) =>
-            await _userRepository.GetUserByIdAsync(userId) != null;
-
-        private async Task CheckUserAccountBalanceBeforeWithdrawal(PaymentWriteModel paymentModel,
-            ICollection<ErrorViewModel> errors)
-        {
-            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId);
-
-            if (paymentModel.Amount > user.AccountBalance)
-            {
-                errors.Add(ErrorViewModel.Factory.NewErrorFromMessage(_localizer["WithdrawalNotAffordableErrorMessage"]
-                    .Value));
-            }
-        }
-
         private static PaymentEntity PreparePaymentEntityToSave(PaymentWriteModel paymentModel)
         {
             var paymentEntity = (PaymentEntity) paymentModel;
@@ -148,7 +117,9 @@ namespace Betto.Services
             var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId);
 
             user.AccountBalance +=
-                paymentModel.Type == PaymentTypeEnum.Deposit ? Math.Round(paymentModel.Amount, 2) : Math.Round(-paymentModel.Amount, 2);
+                paymentModel.Type == PaymentTypeEnum.Deposit 
+                    ? Math.Round(paymentModel.Amount, 2) 
+                    : Math.Round(-paymentModel.Amount, 2);
         }
     }
 }

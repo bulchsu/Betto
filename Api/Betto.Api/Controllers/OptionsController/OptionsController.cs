@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Betto.Model.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers
 {
@@ -12,10 +13,13 @@ namespace Betto.Api.Controllers
     public class OptionsController : ControllerBase
     {
         private readonly IOptionsService _optionsService;
+        private readonly ILogger<OptionsController> _logger;
 
-        public OptionsController(IOptionsService optionsService)
+        public OptionsController(IOptionsService optionsService,
+            ILogger<OptionsController> logger)
         {
             _optionsService = optionsService;
+            _logger = logger;
         }
 
         [HttpOptions("initialize")]
@@ -31,6 +35,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }
@@ -49,6 +55,8 @@ namespace Betto.Api.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(ex));
             }

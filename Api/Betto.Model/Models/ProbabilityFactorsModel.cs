@@ -1,6 +1,6 @@
 ﻿namespace Betto.Model.Models
 {
-    public class ProbabilityFactors
+    public class ProbabilityFactorsModel
     {
         public float HomeTeamWinFactor { get; set; }
         public float AwayTeamWinFactor { get; set; }

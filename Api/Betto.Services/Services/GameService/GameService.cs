@@ -6,6 +6,7 @@ using Betto.Helpers.Extensions;
 using Betto.Model.Models;
 using Betto.Model.ViewModels;
 using Betto.Resources.Shared;
+using Betto.Services.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 
@@ -14,21 +15,21 @@ namespace Betto.Services.GameService
     public class GameService : IGameService
     {
         private readonly IGameRepository _gameRepository;
-        private readonly ILeagueRepository _leagueRepository;
+        private readonly ILeagueValidator _leagueValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public GameService(IGameRepository gameRepository,
-            ILeagueRepository leagueRepository,
+            ILeagueValidator leagueValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _gameRepository = gameRepository;
-            _leagueRepository = leagueRepository;
+            _leagueValidator = leagueValidator;
             _localizer = localizer;
         }
 
         public async Task<RequestResponseModel<ICollection<GameViewModel>>> GetLeagueGamesAsync(int leagueId)
         {
-            var doesLeagueExist = await CheckDoesLeagueExistAsync(leagueId);
+            var doesLeagueExist = await _leagueValidator.CheckDoesTheLeagueExistAsync(leagueId);
 
             if (!doesLeagueExist)
             {
@@ -46,12 +47,9 @@ namespace Betto.Services.GameService
                 .ToList()
                 .GetEmptyIfNull();
 
-            return new RequestResponseModel<ICollection<GameViewModel>>(StatusCodes.Status200OK, 
-                Enumerable.Empty<ErrorViewModel>(), 
+            return new RequestResponseModel<ICollection<GameViewModel>>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
                 leagueGames);
         }
-
-        public async Task<bool> CheckDoesLeagueExistAsync(int leagueId) =>
-            await _leagueRepository.GetLeagueByIdAsync(leagueId, false, false) != null;
     }
 }

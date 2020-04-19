@@ -9,6 +9,7 @@ using Betto.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers.UsersController
 {
@@ -18,14 +19,17 @@ namespace Betto.Api.Controllers.UsersController
         private readonly IUserService _userService;
         private readonly ITicketService _ticketService;
         private readonly IPaymentService _paymentService;
+        private readonly ILogger<UsersController> _logger;
 
         public UsersController(IUserService userService,
             ITicketService ticketService,
-            IPaymentService paymentService)
+            IPaymentService paymentService,
+            ILogger<UsersController> logger)
         {
             _userService = userService;
             _ticketService = ticketService;
             _paymentService = paymentService;
+            _logger = logger;
         }
 
         [HttpPost("authenticate")]
@@ -41,6 +45,8 @@ namespace Betto.Api.Controllers.UsersController
             }
             catch (Exception e)
             {
+                _logger.LogError(e, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(e));
             }
@@ -59,6 +65,8 @@ namespace Betto.Api.Controllers.UsersController
             }
             catch (Exception e)
             {
+                _logger.LogError(e, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(e));
             }
@@ -77,6 +85,8 @@ namespace Betto.Api.Controllers.UsersController
             }
             catch (Exception e)
             {
+                _logger.LogError(e, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(e));
             }
@@ -95,6 +105,8 @@ namespace Betto.Api.Controllers.UsersController
             }
             catch (Exception e)
             {
+                _logger.LogError(e, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(e));
             }
@@ -113,6 +125,8 @@ namespace Betto.Api.Controllers.UsersController
             }
             catch (Exception e)
             {
+                _logger.LogError(e, string.Empty);
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     ErrorViewModel.Factory.NewErrorFromException(e));
             }

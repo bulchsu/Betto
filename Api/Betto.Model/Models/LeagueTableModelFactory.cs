@@ -5,28 +5,28 @@ using Betto.Model.Entities;
 
 namespace Betto.Model.Models
 {
-    public partial class LeagueTable
+    public partial class LeagueTableModel
     {
         public static class Factory
         {
-            public static LeagueTable NewLeagueTable(LeagueEntity league)
+            public static LeagueTableModel NewLeagueTable(LeagueEntity league)
             {
                 var table = SortOutLeagueTeams(league);
-                return new LeagueTable(league.LeagueId, league.Name, table);
+                return new LeagueTableModel(league.LeagueId, league.Name, table);
             }
 
-            private static Queue<TeamStatistics> SortOutLeagueTeams(LeagueEntity league)
+            private static Queue<TeamStatisticsModel> SortOutLeagueTeams(LeagueEntity league)
             {
                 var statistics = GenerateLeagueTeamsStatistics(league);
 
-                var queue = new Queue<TeamStatistics>(statistics);
+                var queue = new Queue<TeamStatisticsModel>(statistics);
 
                 SetTablePositions(queue);
 
                 return queue;
             }
 
-            private static IEnumerable<TeamStatistics> GenerateLeagueTeamsStatistics(LeagueEntity league)
+            private static IEnumerable<TeamStatisticsModel> GenerateLeagueTeamsStatistics(LeagueEntity league)
             {
                 return (from team in league.Teams
                     let teamHomeGames = league.Games.Where(g => g.HomeTeamId == team.TeamId)
@@ -41,7 +41,7 @@ namespace Betto.Model.Models
                     let goalsLost = teamHomeGames.Sum(t => t.GoalsAwayTeam) + teamAwayGames.Sum(t => t.GoalsHomeTeam)
                     let points = (homeGamesWon + awayGamesWon) * GameConstants.WonGamePointsAmount +
                                  (homeGamesTied + awayGamesTied) * GameConstants.TiedGamePointsAmount 
-                    select new TeamStatistics
+                    select new TeamStatisticsModel
                 {
                     TeamId = team.TeamId,
                     TeamName = team.Name,
@@ -56,7 +56,7 @@ namespace Betto.Model.Models
                     .ToList();
             }
 
-            private static void SetTablePositions(IEnumerable<TeamStatistics> ranking)
+            private static void SetTablePositions(IEnumerable<TeamStatisticsModel> ranking)
             {
                 var position = 1;
 

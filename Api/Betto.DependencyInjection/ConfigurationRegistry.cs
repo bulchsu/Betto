@@ -9,7 +9,6 @@ namespace Betto.DependencyInjection
         internal static IServiceCollection RegisterConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             return services.Configure<RapidApiConfiguration>(configuration.GetSection(nameof(RapidApiConfiguration)))
-                .Configure<LoggingConfiguration>(configuration.GetSection(nameof(LoggingConfiguration)))
                 .Configure<ApplicationMainConfiguration>(configuration.GetSection(nameof(ApplicationMainConfiguration)));
         }
     }

@@ -2,9 +2,9 @@
 
 namespace Betto.Model.Models
 {
-    public partial class LeagueTable
+    public partial class LeagueTableModel
     {
-        private LeagueTable(int leagueId, string leagueName, Queue<TeamStatistics> table)
+        private LeagueTableModel(int leagueId, string leagueName, Queue<TeamStatisticsModel> table)
         {
             LeagueId = leagueId;
             LeagueName = leagueName;
@@ -13,6 +13,6 @@ namespace Betto.Model.Models
 
         public int LeagueId { get; set; }
         public string LeagueName { get; set; }
-        public Queue<TeamStatistics> Table { get; set; }
+        public Queue<TeamStatisticsModel> Table { get; set; }
     }
 }
