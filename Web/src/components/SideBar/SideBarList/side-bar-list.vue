@@ -23,13 +23,23 @@ import { mapActions, mapState } from "vuex";
 export default {
   name: "SideBarList",
   methods: {
-    ...mapActions(["getLeaguesAction", "selectLeagueAction"]),
-    selectLeague(league) {
-      this.selectLeagueAction(league);
+    ...mapActions([
+      "getLeaguesAction",
+      "selectLeagueAction",
+      "getLeagueTeamsAction",
+      "getLeagueGamesAction",
+      "selectTabAction"
+    ]),
+    async selectLeague(league) {
+      this.selectTabAction(0);
+      await this.selectLeagueAction(league);
+      await this.getLeagueTeamsAction(league);
+      await this.getLeagueGamesAction(league);
     }
   },
   async created() {
     await this.getLeaguesAction();
+    await this.selectLeague(this.leagues[0]);
   },
   computed: {
     ...mapState(["leagues"])
