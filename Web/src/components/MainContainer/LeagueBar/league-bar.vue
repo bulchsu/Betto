@@ -9,9 +9,11 @@
         <v-icon>mdi-heart</v-icon>
       </v-btn>
       <template v-slot:extension>
-        <v-tabs align-with-title>
+        <v-tabs align-with-title
+          :value="selectedTab">
           <v-tab @click="changeTab(0)">General</v-tab>
           <v-tab @click="changeTab(1)">Teams</v-tab>
+          <v-tab @click="changeTab(2)">Games</v-tab>
         </v-tabs>
       </template>
     </v-app-bar>
@@ -19,19 +21,23 @@
 
 <script>
 
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: "LeagueBar",
   methods: {
+    ...mapActions(["selectTabAction"]),
     changeTab(value) {
-      this.$emit('tabChanged', value);
+      this.selectTabAction(value);
     }
   },
   computed: {
-    ...mapGetters(['getSelectedLeague']),
+    ...mapGetters(['getSelectedLeague', 'getSelectedTab']),
     selectedLeague() {
       return this.getSelectedLeague;
+    },
+    selectedTab() {
+      return this.getSelectedTab;
     }
   }
 };
