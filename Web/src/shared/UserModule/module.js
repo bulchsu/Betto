@@ -5,8 +5,10 @@ import {
     LOGOUT
 } from './mutation-types';
 
+const loggedUser = JSON.parse(localStorage.getItem('user'));
+
 const state = () => ({
-    user: null,
+    user: loggedUser,
 });
 
 const mutations = {
@@ -24,6 +26,7 @@ const actions = {
         commit(LOGIN, user);
     },
     logoutAction({ commit }) {
+        userService.logout();
         commit(LOGOUT);
     }
 };

@@ -11,7 +11,11 @@ import Snotify from 'vue-snotify';
 import 'vue-snotify/styles/material.css';
 
 Vue.config.productionTip = false;
-Vue.use(Snotify);
+Vue.use(Snotify, {
+  toast: {
+    timeout: 3000
+  }
+});
 
 const vm = new Vue({
   store,

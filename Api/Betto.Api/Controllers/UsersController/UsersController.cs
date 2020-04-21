@@ -112,7 +112,7 @@ namespace Betto.Api.Controllers.UsersController
             }
         }
 
-        [HttpGet("ranking")]
+        [HttpGet("ranking"), Authorize]
         public async Task<ActionResult<ICollection<PaymentViewModel>>> GetUsersRankingAsync()
         {
             try
