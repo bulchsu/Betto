@@ -10,7 +10,7 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import LeagueBar from '@/components/MainContainer/LeagueBar/league-bar';
-import GeneralInfo from './GeneralInfo/general-info';
+import GeneralInfo from './LeagueTable/league-table';
 import TeamsTable from './TeamsTable/teams-table';
 import GamesTable from './GamesTable/games-table';
 
@@ -23,13 +23,13 @@ export default {
     GamesTable
   },
   methods: {
-    ...mapActions(["selectTabAction"]),
+    ...mapActions("LeagueModule", ["selectTabAction"]),
     changeTab(value) {
       this.selectTabAction(value);
     }
   },
   computed: {
-    ...mapGetters(["getSelectedTab"]),
+    ...mapGetters("LeagueModule", ["getSelectedTab"]),
     selectedTab() {
       return this.getSelectedTab;
     }

@@ -113,7 +113,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
+    ...mapGetters("LeagueModule", [
       "getSelectedLeague",
       "getSelectedLeagueGames",
       "getSelectedLeagueTeams"

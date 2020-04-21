@@ -51,5 +51,25 @@ namespace Betto.Services.GameService
                 Enumerable.Empty<ErrorViewModel>(),
                 leagueGames);
         }
+
+        public async Task<RequestResponseModel<GameViewModel>> GetGameByIdAsync(int gameId, bool includeRates)
+        {
+            var game = (GameViewModel) await _gameRepository.GetGameByIdAsync(gameId, includeRates);
+
+            if (game == null)
+            {
+                return new RequestResponseModel<GameViewModel>(StatusCodes.Status404NotFound,
+                    new List<ErrorViewModel>
+                    {
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["GameNotFoundErrorMessage"]
+                            .Value)
+                    },
+                    null);
+            }
+
+            return new RequestResponseModel<GameViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
+                game);
+        }
     }
 }

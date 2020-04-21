@@ -18,12 +18,12 @@
 </template>
 
 <script>
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
   name: "SideBarList",
   methods: {
-    ...mapActions([
+    ...mapActions("LeagueModule", [
       "getLeaguesAction",
       "selectLeagueAction",
       "getLeagueTeamsAction",
@@ -42,7 +42,10 @@ export default {
     await this.selectLeague(this.leagues[0]);
   },
   computed: {
-    ...mapState(["leagues"])
+    ...mapGetters("LeagueModule", ["getLeagues"]),
+    leagues() {
+      return this.getLeagues;
+    }
   }
 };
 </script>

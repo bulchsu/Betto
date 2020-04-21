@@ -51,5 +51,26 @@ namespace Betto.Services
                 Enumerable.Empty<ErrorViewModel>(), 
                 leagueTeams);
         }
+
+        public async Task<RequestResponseModel<TeamViewModel>> GetTeamByIdAsync(int teamId,
+            bool includeVenue)
+        {
+            var team = (TeamViewModel) await _teamRepository.GetTeamByIdAsync(teamId, includeVenue);
+
+            if (team == null)
+            {
+                return new RequestResponseModel<TeamViewModel>(StatusCodes.Status404NotFound,
+                    new List<ErrorViewModel>
+                    {
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["TeamNotFoundErrorMessage"]
+                            .Value)
+                    },
+                    null);
+            }
+
+            return new RequestResponseModel<TeamViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
+                team);
+        }
     }
 }
