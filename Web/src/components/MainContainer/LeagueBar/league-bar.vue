@@ -26,13 +26,13 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "LeagueBar",
   methods: {
-    ...mapActions(["selectTabAction"]),
+    ...mapActions("LeagueModule", ["selectTabAction"]),
     changeTab(value) {
       this.selectTabAction(value);
     }
   },
   computed: {
-    ...mapGetters(['getSelectedLeague', 'getSelectedTab']),
+    ...mapGetters("LeagueModule", ['getSelectedLeague', 'getSelectedTab']),
     selectedLeague() {
       return this.getSelectedLeague;
     },

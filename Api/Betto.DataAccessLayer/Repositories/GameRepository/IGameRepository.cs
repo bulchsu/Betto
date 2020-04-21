@@ -8,5 +8,6 @@ namespace Betto.DataAccessLayer.Repositories
     {
         Task<ICollection<GameEntity>> GetLeagueGamesAsync(int leagueId);
         Task<ICollection<GameEntity>> GetGamesByBunchOfIdsAsync(IEnumerable<int> ids);
+        Task<GameEntity> GetGameByIdAsync(int gameId, bool includeRates);
     }
 }

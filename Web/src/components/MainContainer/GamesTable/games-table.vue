@@ -1,8 +1,14 @@
 <template>
   <div>
+    <GameDialog
+      v-if="gameDialogVisibility"
+      @dialogClosed="onGameDialogClosed"
+      :gameId="selectedGameId"
+      :dialogVisibility="gameDialogVisibility"
+    />
     <GamesTableForm @filterGames="filterGames" />
     <v-list class="main-list overflow-y-auto" max-height="607">
-      <v-list-item v-for="game in chosenGames" :key="game.GameId" @click="openGameDialog">
+      <v-list-item v-for="game in chosenGames" :key="game.GameId" @click="openGameDialog(game.gameId)">
         <v-list-item-avatar>
           <v-img :src="getTeamLogoById(game.homeTeamId)"></v-img>
         </v-list-item-avatar>
@@ -28,19 +34,30 @@
 <script>
 import { mapGetters } from "vuex";
 import GamesTableForm from "./GamesTableForm/games-table-form";
+import GameDialog from "./GameDialog/game-dialog";
 
 export default {
   name: "GamesTable",
   components: {
-    GamesTableForm
+    GamesTableForm,
+    GameDialog
   },
   data() {
     return {
-      chosenGames: []
+      chosenGames: [],
+      selectedGameId: null,
+      gameDialogVisibility: false
     };
   },
   methods: {
-    openGameDialog() {},
+    openGameDialog(gameId) {
+      this.selectedGameId = gameId;
+      this.gameDialogVisibility = true;
+    },
+    onGameDialogClosed() {
+      this.selectedGameId = null;
+      this.gameDialogVisibility = false;
+    },
     getTeamNameById(teamId) {
       return this.teams.find(t => t.teamId == teamId).name;
     },
@@ -69,7 +86,10 @@ export default {
     this.chosenGames = this.games;
   },
   computed: {
-    ...mapGetters(["getSelectedLeagueGames", "getSelectedLeagueTeams"]),
+    ...mapGetters("LeagueModule", [
+      "getSelectedLeagueGames",
+      "getSelectedLeagueTeams"
+    ]),
     games() {
       return this.getSelectedLeagueGames;
     },

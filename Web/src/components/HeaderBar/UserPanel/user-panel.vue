@@ -30,7 +30,7 @@
 import RegisterDialog from "./RegisterDialog/register-dialog";
 import LoginDialog from "./LoginDialog/login-dialog";
 import { mapActions, mapGetters } from "vuex";
-import { userService } from "@/shared/UserService/user-service";
+import { userService } from '@/shared/UserModule/user-service';
 import vm from "@/main";
 
 export default {
@@ -43,12 +43,15 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["loginAction", "registerAction", "logoutAction"]),
+    ...mapActions("UserModule", [
+      "loginAction",
+      "logoutAction"
+    ]),
     async login(username, password) {
       await this.loginAction({ username, password });
     },
     async register(username, password, mailAddress) {
-      await userService.register(username, password, mailAddress);
+      await userService.register( username, password, mailAddress );
     },
     logout() {
       this.logoutAction();
@@ -70,7 +73,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["getLoggedUser"]),
+    ...mapGetters("UserModule", ["getLoggedUser"]),
     loggedUser() {
       return this.getLoggedUser;
     }

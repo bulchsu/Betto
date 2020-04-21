@@ -8,5 +8,6 @@ namespace Betto.Services
     public interface ITeamService
     {
         Task<RequestResponseModel<ICollection<TeamViewModel>>> GetLeagueTeamsAsync(int leagueId);
+        Task<RequestResponseModel<TeamViewModel>> GetTeamByIdAsync(int teamId, bool includeVenue);
     }
 }

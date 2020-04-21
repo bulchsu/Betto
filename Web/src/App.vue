@@ -23,7 +23,7 @@ export default {
     MainContainer
   },
   computed: {
-    ...mapGetters(["getSelectedLeague"]),
+    ...mapGetters("LeagueModule", ["getSelectedLeague"]),
     selectedLeague() {
       return this.getSelectedLeague;
     }

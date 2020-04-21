@@ -3,5 +3,3 @@ export const SELECT_LEAGUE = 'selectLeague';
 export const GET_LEAGUE_TEAMS = 'getLeagueTeams';
 export const GET_LEAGUE_GAMES = 'getLeagueGames';
 export const CHANGE_TAB = 'changeTab';
-export const LOGIN = 'login';
-export const LOGOUT = 'logout';
