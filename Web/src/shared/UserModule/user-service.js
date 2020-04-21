@@ -29,6 +29,16 @@ const register = async function (username, password, mailAddress) {
     }
 }
 
+const getUsersRanking = async function () {
+    try {
+        let resourceRoute = `${API_URL}users/ranking/`;
+        var response = await apiClient.get(resourceRoute);
+        return response;
+    } catch (error) {
+        return [];
+    }
+}
+
 const logout = function() {
     localStorage.removeItem('user');
 }
@@ -36,5 +46,6 @@ const logout = function() {
 export const userService = {
     login,
     register,
+    getUsersRanking,
     logout
 }

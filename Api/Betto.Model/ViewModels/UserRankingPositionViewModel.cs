@@ -1,6 +1,4 @@
-﻿using Betto.Model.Models;
-
-namespace Betto.Model.ViewModels
+﻿namespace Betto.Model.ViewModels
 {
     public class UserRankingPositionViewModel
     {

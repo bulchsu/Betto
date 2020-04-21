@@ -4,7 +4,7 @@ import vm from '@/main';
 axios.interceptors.request.use(config => {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user != null) {
-        config.headers.post['Authorization'] = `Bearer ${user.authenticationToken}`;
+        config.headers.Authorization = `Bearer ${user.authenticationToken}`;
     }
     return config;
 });
