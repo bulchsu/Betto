@@ -6,6 +6,7 @@ using Betto.Helpers.Extensions;
 using Betto.Model.Constants;
 using Betto.Model.Entities;
 using Betto.Model.Models;
+using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 using Betto.Resources.Shared;
 using Microsoft.Extensions.Localization;
@@ -83,6 +84,14 @@ namespace Betto.Services.Validators
 
         public bool CheckIsTicketWon(TicketEntity ticket) =>
             ticket.Events.All(e => e.EventStatus == StatusEnum.Won);
+
+        public async Task<TicketViewModel> PrepareResponseTicketAsync(TicketEntity ticket)
+        {
+            var result = (TicketViewModel)ticket;
+            await FilterTicketEventsResultsAsync(result);
+
+            return result;
+        }
 
         private void ValidateTicketEvents(TicketWriteModel ticket, ICollection<ErrorViewModel> errors)
         {
@@ -173,7 +182,7 @@ namespace Betto.Services.Validators
                 .ToList()
                 .GetEmptyIfNull();
         
-        private bool CheckIsStakeCorrect(TicketWriteModel ticket) =>
+        private static bool CheckIsStakeCorrect(TicketWriteModel ticket) =>
             ticket.Stake >= TicketConstants.MinimumStake && ticket.Stake <= TicketConstants.MaximumStake;
         
         private async Task<IEnumerable<int>> SearchForIncorrectGamesAsync(TicketWriteModel ticketModel)
@@ -193,7 +202,7 @@ namespace Betto.Services.Validators
         
         private async Task<bool> CheckIsTicketAffordableByUserAsync(TicketWriteModel ticketModel)
         {
-            var user = await _userRepository.GetUserByIdAsync(ticketModel.UserId);
+            var user = await _userRepository.GetUserByIdAsync(ticketModel.UserId, false, false);
             return user.AccountBalance >= ticketModel.Stake;
         }
         
@@ -220,6 +229,24 @@ namespace Betto.Services.Validators
         }
 
         private async Task<bool> CheckDoesUserExistAsync(int userId) =>
-            await _userRepository.GetUserByIdAsync(userId) != null;
+            await _userRepository.GetUserByIdAsync(userId, false, false) != null;
+
+        private async Task FilterTicketEventsResultsAsync(TicketViewModel ticket)
+        {
+            var isRevealed = await CheckIsTicketAlreadyRevealedAsync(ticket.TicketId);
+
+            if (!isRevealed)
+            {
+                HideEventResult(ticket.Events);
+            }
+        }
+
+        private static void HideEventResult(IEnumerable<TicketEventViewModel> events)
+        {
+            foreach (var eventViewModel in events)
+            {
+                eventViewModel.EventStatus = StatusEnum.Pending;
+            }
+        }
     }
 }

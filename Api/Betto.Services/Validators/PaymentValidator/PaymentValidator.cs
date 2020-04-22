@@ -56,11 +56,11 @@ namespace Betto.Services.Validators
 
         private async Task<bool> CheckIsUserAbleToWithdrawAsync(PaymentWriteModel paymentModel)
         {
-            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId);
+            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId, false, false);
             return user.AccountBalance >= paymentModel.Amount;
         }
 
         private async Task<bool> CheckDoesTheUserExistAsync(int userId) =>
-            await _userRepository.GetUserByIdAsync(userId) != null;
+            await _userRepository.GetUserByIdAsync(userId, false, false) != null;
     }
 }

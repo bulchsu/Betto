@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Betto.Model.Models;
 using Betto.Model.ViewModels;
-using Betto.Services.GameService;
+using Betto.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

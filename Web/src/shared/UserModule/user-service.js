@@ -39,6 +39,26 @@ const getUsersRanking = async function () {
     }
 }
 
+const getUserById = async function(userId, includePayments, includeTickets) {
+    try {
+        let resourcePath = `${API_URL}users/${userId}?includePayments=${includePayments}&includeTickets=${includeTickets}`;
+        var response = await apiClient.get(resourcePath);
+        return response;
+    } catch (error) {
+        return null;
+    }
+}
+
+const createPayment = async function(userId, amount, type) {
+    try {
+        let resourcePath = `${API_URL}payments/`;
+        var response = await apiClient.post(resourcePath, { userId, amount, type });
+        return response;
+    } catch (error) {
+        return null;
+    }
+}
+
 const logout = function() {
     localStorage.removeItem('user');
 }
@@ -47,5 +67,7 @@ export const userService = {
     login,
     register,
     getUsersRanking,
+    getUserById,
+    createPayment,
     logout
 }

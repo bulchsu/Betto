@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Betto.Model.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +23,24 @@ namespace Betto.DataAccessLayer.Repositories
         public async Task<UserEntity> GetUserByMailAsync(string mailAddress) =>
             await DbContext.Users.SingleOrDefaultAsync(u => u.MailAddress == mailAddress);
 
-        public async Task<UserEntity> GetUserByIdAsync(int userId) =>
-            await DbContext.Users.SingleOrDefaultAsync(u => u.UserId == userId);
+        public async Task<UserEntity> GetUserByIdAsync(int userId,
+            bool includePayments, bool includeTickets)
+        {
+            IQueryable<UserEntity> query = DbContext.Users;
+
+            if (includePayments)
+            {
+                query = query.Include(u => u.Payments);
+            }
+
+            if (includeTickets)
+            {
+                query = query.Include(u => u.Tickets);
+            }
+
+            return await query
+                .SingleOrDefaultAsync(u => u.UserId == userId);
+        }
 
         public async Task<ICollection<UserEntity>> GetUsersAsync() =>
             await DbContext.Users.ToListAsync();

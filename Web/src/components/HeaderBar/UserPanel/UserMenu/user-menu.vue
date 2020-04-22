@@ -5,13 +5,18 @@
       @dialogClosed="onRankingDialogClosed"
       :dialogVisibility="rankingDialogVisibility"
     />
-    <v-speed-dial v-model="isOpened" bottom right direction="left" transition="slide-y-transition">
+    <PaymentsDialog
+      v-if="paymentsDialogVisibility"
+      @dialogClosed="onPaymentsDialogClosed"
+      :dialogVisibility="paymentsDialogVisibility"
+    />
+    <v-speed-dial bottom right direction="left" transition="slide-y-transition">
       <template v-slot:activator>
-        <v-btn v-model="isOpened" color="#003304" dark fab>
+        <v-btn color="#003304" dark fab>
           <i class="fas fa-user fa-2x"></i>
         </v-btn>
       </template>
-      <v-btn fab color="primary">
+      <v-btn fab color="primary" @click="openPaymentsDialog">
         <i class="fas fa-dollar-sign fa-2x"></i>
       </v-btn>
       <v-btn fab color="primary">
@@ -31,15 +36,17 @@
 import { mapActions } from "vuex";
 import vm from "@/main";
 import RankingDialog from "./RankingDialog/ranking-dialog";
+import PaymentsDialog from "./PaymentsDialog/payments-dialog";
 
 export default {
   name: "UserMenu",
   components: {
-    RankingDialog
+    RankingDialog,
+    PaymentsDialog
   },
   data: () => ({
-    isOpened: false,
-    rankingDialogVisibility: false
+    rankingDialogVisibility: false,
+    paymentsDialogVisibility: false,
   }),
   methods: {
     ...mapActions("UserModule", ["logoutAction"]),
@@ -48,6 +55,12 @@ export default {
       if (this.loggedUser == null) {
         vm.$snotify.info("You have been signed out!");
       }
+    },
+    openPaymentsDialog() {
+      this.paymentsDialogVisibility = true;
+    },
+    onPaymentsDialogClosed() {
+      this.paymentsDialogVisibility = false;
     },
     openRankingDialog() {
       this.rankingDialogVisibility = true;

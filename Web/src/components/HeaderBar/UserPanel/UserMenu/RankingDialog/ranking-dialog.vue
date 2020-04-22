@@ -5,7 +5,7 @@
         <v-card-title>
           <span class="display-1 my-3 mx-3">Users Ranking</span>
         </v-card-title>
-        <v-card-text style="height: 300px;">
+        <v-card-text style="height: 400px;">
         <v-col class="d-flex justify-center">
         <v-simple-table style="width: 90%;">
           <template v-slot:default>

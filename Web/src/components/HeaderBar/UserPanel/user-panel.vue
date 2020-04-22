@@ -8,8 +8,8 @@
         <p class="my-2">SIGN IN</p>
       </v-btn>
     </div>
-    <div v-if="loggedUser != null" class="mx-5" style="display: inline-block;">
-      <UserMenu class="my-6" style="float: left" />
+    <div v-if="loggedUser != null" class="mx-5 my-6" style="display: inline-block;">
+      <UserMenu style="float: left;" />
     </div>
     <LoginDialog
       @dialogClosed="onLoginDialogClosed"
