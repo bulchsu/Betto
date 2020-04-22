@@ -174,7 +174,7 @@ export default {
       return (
         this.amount.length != 0 &&
         !this.amount.startsWith("0") &&
-        (this.paymentType == 0 || this.amount > this.user.accountBalance)
+        (this.paymentType == 0 || Number(this.amount) <= this.user.accountBalance)
       );
     }
   },
