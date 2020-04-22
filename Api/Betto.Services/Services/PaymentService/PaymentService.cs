@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Betto.DataAccessLayer.Repositories;
 using Betto.DataAccessLayer.Repositories.PaymentRepository;
-using Betto.Helpers.Extensions;
 using Betto.Model.Entities;
 using Betto.Model.Models;
 using Betto.Model.ViewModels;
@@ -20,47 +19,18 @@ namespace Betto.Services
     {
         private readonly IPaymentRepository _paymentRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IUserValidator _userValidator;
         private readonly IPaymentValidator _paymentValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public PaymentService(IPaymentRepository paymentRepository,
             IUserRepository userRepository,
-            IUserValidator userValidator,
             IPaymentValidator paymentValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _paymentRepository = paymentRepository;
             _userRepository = userRepository;
-            _userValidator = userValidator;
             _paymentValidator = paymentValidator;
             _localizer = localizer;
-        }
-
-        public async Task<RequestResponseModel<ICollection<PaymentViewModel>>> GetUserPaymentsAsync(int userId)
-        {
-            var doesUserExist = await _userValidator.CheckDoesTheUserExistAsync(userId);
-
-            if (!doesUserExist)
-            {
-                return new RequestResponseModel<ICollection<PaymentViewModel>>(StatusCodes.Status404NotFound,
-                    new List<ErrorViewModel>
-                    {
-                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage",
-                                userId]
-                            .Value)
-                    },
-                    null);
-            }
-
-            var payments = (await _paymentRepository.GetUserPaymentsAsync(userId))
-                .Select(p => (PaymentViewModel)p)
-                .ToList()
-                .GetEmptyIfNull();
-
-            return new RequestResponseModel<ICollection<PaymentViewModel>>(StatusCodes.Status200OK,
-                Enumerable.Empty<ErrorViewModel>(),
-                payments);
         }
 
         public async Task<RequestResponseModel<PaymentViewModel>> CreatePaymentAsync(PaymentWriteModel paymentModel)
@@ -114,7 +84,7 @@ namespace Betto.Services
 
         private async Task ChargeUserAccountBalanceAsync(PaymentWriteModel paymentModel)
         {
-            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId);
+            var user = await _userRepository.GetUserByIdAsync(paymentModel.UserId, false, false);
 
             user.AccountBalance +=
                 paymentModel.Type == PaymentTypeEnum.Deposit 

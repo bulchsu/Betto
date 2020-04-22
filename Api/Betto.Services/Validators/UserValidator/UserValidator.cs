@@ -28,7 +28,7 @@ namespace Betto.Services.Validators
         }
 
         public async Task<bool> CheckDoesTheUserExistAsync(int userId) =>
-            await _userRepository.GetUserByIdAsync(userId) != null;
+            await _userRepository.GetUserByIdAsync(userId, false, false) != null;
 
         public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
             await _userRepository.GetUserByUsernameAsync(username) != null;

@@ -1,6 +1,6 @@
 <template>
     <div class="d-flex align-self-center">
-        <a href="https://github.com/bulchsu/Betto" target="_blank"> <!-- TODO make configurable -->
+        <a href="https://github.com/bulchsu/Betto" target="_blank">
             <i class="fab fa-github fa-4x" aria-hidden="true"></i>
         </a>
     </div>

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Betto.Model.Entities;
 using Betto.Model.Models;
+using Betto.Model.ViewModels;
 using Betto.Model.WriteModels;
 
 namespace Betto.Services.Validators
@@ -12,5 +13,6 @@ namespace Betto.Services.Validators
         Task<ICollection<ErrorViewModel>> ValidateTicketBeforeSavingAsync(TicketWriteModel ticket);
         Task<ICollection<ErrorViewModel>> ValidateTicketBeforeRevealingAsync(int ticketId);
         bool CheckIsTicketWon(TicketEntity ticket);
+        Task<TicketViewModel> PrepareResponseTicketAsync(TicketEntity ticket);
     }
 }

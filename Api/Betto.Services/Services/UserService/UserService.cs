@@ -23,6 +23,7 @@ namespace Betto.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IUserValidator _userValidator;
+        private readonly ITicketValidator _ticketValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public UserService(IUserRepository userRepository,
@@ -30,6 +31,7 @@ namespace Betto.Services
             IPasswordHasher passwordHasher,
             ITokenGenerator tokenGenerator,
             IUserValidator userValidator,
+            ITicketValidator ticketValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _userRepository = userRepository;
@@ -37,28 +39,31 @@ namespace Betto.Services
             _passwordHasher = passwordHasher;
             _tokenGenerator = tokenGenerator;
             _userValidator = userValidator;
+            _ticketValidator = ticketValidator;
             _localizer = localizer;
         }
 
-        public async Task<RequestResponseModel<WebTokenViewModel>> AuthenticateUserAsync(LoginWriteModel loginModel)
+        public async Task<RequestResponseModel<AuthenticationViewModel>> AuthenticateUserAsync(LoginWriteModel loginModel)
         {
             var errors = await _userValidator.CheckLoginCredentials(loginModel);
 
             if (errors.Any())
             {
-                return new RequestResponseModel<WebTokenViewModel>(StatusCodes.Status400BadRequest, 
+                return new RequestResponseModel<AuthenticationViewModel>(StatusCodes.Status400BadRequest, 
                     errors, 
                     null);
             }
 
             var authenticationToken = _tokenGenerator.GenerateToken(loginModel.Username);
+            var user = await _userRepository.GetUserByUsernameAsync(loginModel.Username);
 
-            return new RequestResponseModel<WebTokenViewModel>(StatusCodes.Status200OK,
+            return new RequestResponseModel<AuthenticationViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
-                new WebTokenViewModel
+                new AuthenticationViewModel
                 {
                     AuthenticationToken = authenticationToken,
-                    Username = loginModel.Username
+                    Username = loginModel.Username,
+                    UserId = user.UserId
                 });
         }
 
@@ -108,6 +113,36 @@ namespace Betto.Services
             return new RequestResponseModel<ICollection<UserRankingPositionViewModel>>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                 rankingPositions);
+        }
+
+        public async Task<RequestResponseModel<UserViewModel>> GetUserByIdAsync(int userId, 
+            bool includePayments, bool includeTickets)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId, includePayments, includeTickets);
+
+            if (user == null)
+            {
+                return new RequestResponseModel<UserViewModel>(StatusCodes.Status404NotFound,
+                    new List<ErrorViewModel>
+                    {
+                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage",
+                                userId]
+                            .Value)
+                    },
+                    null);
+            }
+
+            var jointTask = user.Tickets
+                .GetEmptyIfNull()
+                .Select(_ticketValidator.PrepareResponseTicketAsync);
+            
+            var userViewModel = (UserViewModel) user;
+            userViewModel.Tickets = (await Task.WhenAll(jointTask))
+                .ToList();
+
+            return new RequestResponseModel<UserViewModel>(StatusCodes.Status200OK,
+                Enumerable.Empty<ErrorViewModel>(),
+                userViewModel);
         }
 
         private async Task<ICollection<UserRankingPositionViewModel>> GetUsersRanking()

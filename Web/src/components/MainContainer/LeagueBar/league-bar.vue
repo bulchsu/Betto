@@ -5,9 +5,6 @@
         prominent>
       <p id="title">{{ selectedLeague.name }}</p>
       <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
-      </v-btn>
       <template v-slot:extension>
         <v-tabs align-with-title
           :value="selectedTab">

@@ -23,7 +23,6 @@ namespace Betto.Services.Services
         private readonly IGameRepository _gameRepository;
         private readonly IRatesRepository _ratesRepository;
         private readonly ITicketValidator _ticketValidator;
-        private readonly IUserValidator _userValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public TicketService(ITicketRepository ticketRepository,
@@ -31,7 +30,6 @@ namespace Betto.Services.Services
             IGameRepository gameRepository,
             IRatesRepository ratesRepository,
             ITicketValidator ticketValidator,
-            IUserValidator userValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _ticketRepository = ticketRepository;
@@ -39,7 +37,6 @@ namespace Betto.Services.Services
             _gameRepository = gameRepository;
             _ratesRepository = ratesRepository;
             _ticketValidator = ticketValidator;
-            _userValidator = userValidator;
             _localizer = localizer;
         }
 
@@ -59,40 +56,11 @@ namespace Betto.Services.Services
                     null);
             }
 
-            var result = await PrepareResponseTicketAsync(ticket);
+            var result = await _ticketValidator.PrepareResponseTicketAsync(ticket);
 
             return new RequestResponseModel<TicketViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(), 
                 result);
-        }
-
-        public async Task<RequestResponseModel<IEnumerable<TicketViewModel>>> GetUserTicketsAsync(int userId)
-        {
-            var doesUserExist = await _userValidator.CheckDoesTheUserExistAsync(userId);
-
-            if (!doesUserExist)
-            {
-                return new RequestResponseModel<IEnumerable<TicketViewModel>>(StatusCodes.Status404NotFound,
-                    new List<ErrorViewModel>
-                    { 
-                        ErrorViewModel.Factory.NewErrorFromMessage(_localizer["UserNotFoundErrorMessage", 
-                            userId]
-                            .Value)
-                    }, 
-                    null);
-            }
-
-            var userTickets = (await _ticketRepository.GetUserTicketsAsync(userId))
-                .ToList()
-                .GetEmptyIfNull();
-
-            var jointTask = userTickets.Select(PrepareResponseTicketAsync);
-            var results = (await Task.WhenAll(jointTask))
-                .AsEnumerable();
-
-            return new RequestResponseModel<IEnumerable<TicketViewModel>>(StatusCodes.Status200OK,
-                Enumerable.Empty<ErrorViewModel>(),
-                    results);
         }
 
         public async Task<RequestResponseModel<TicketViewModel>> AddTicketAsync(TicketWriteModel ticket)
@@ -119,7 +87,7 @@ namespace Betto.Services.Services
                     null);
             }
 
-            var result = await PrepareResponseTicketAsync(createdTicket);
+            var result = await _ticketValidator.PrepareResponseTicketAsync(createdTicket);
 
             return new RequestResponseModel<TicketViewModel>(StatusCodes.Status201Created, 
                 Enumerable.Empty<ErrorViewModel>(), 
@@ -140,7 +108,7 @@ namespace Betto.Services.Services
             var ticket = await _ticketRepository.GetTicketByIdAsync(ticketId);
             await DetermineTicketResultAsync(ticket);
 
-            var result = await PrepareResponseTicketAsync(ticket);
+            var result = await _ticketValidator.PrepareResponseTicketAsync(ticket);
 
             return new RequestResponseModel<TicketViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
@@ -178,33 +146,8 @@ namespace Betto.Services.Services
 
         private async Task ModifyUserAccountBalanceAsync(int userId, double amountToAdd)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByIdAsync(userId, false, false);
             user.AccountBalance += Math.Round(amountToAdd, 2);
-        }
-
-        private async Task<TicketViewModel> PrepareResponseTicketAsync(TicketEntity ticket)
-        {
-            var result = (TicketViewModel) ticket;
-            await FilterTicketEventsResultsAsync(result);
-
-            return result;
-        }
-        private async Task FilterTicketEventsResultsAsync(TicketViewModel ticket)
-        {
-            var isRevealed = await _ticketValidator.CheckIsTicketAlreadyRevealedAsync(ticket.TicketId);
-
-            if (!isRevealed)
-            {
-                HideEventResult(ticket.Events);
-            }
-        }
-
-        private static void HideEventResult(IEnumerable<TicketEventViewModel> events)
-        {
-            foreach (var eventViewModel in events)
-            {
-                eventViewModel.EventStatus = StatusEnum.Pending;
-            }
         }
 
         private static void SetTicketResults(bool isWon, TicketEntity ticket)
@@ -229,7 +172,7 @@ namespace Betto.Services.Services
 
         private async Task ReduceUserAccountBalanceAsync(int userId, double charge)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByIdAsync(userId, false, false);
             user.AccountBalance -= charge;
         }
 

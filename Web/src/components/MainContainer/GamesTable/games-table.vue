@@ -7,7 +7,7 @@
       :dialogVisibility="gameDialogVisibility"
     />
     <GamesTableForm @filterGames="filterGames" />
-    <v-list class="main-list overflow-y-auto" max-height="607">
+    <v-list class="main-list overflow-y-auto" max-height="600">
       <v-list-item v-for="game in chosenGames" :key="game.GameId" @click="openGameDialog(game.gameId)">
         <v-list-item-avatar>
           <v-img :src="getTeamLogoById(game.homeTeamId)"></v-img>

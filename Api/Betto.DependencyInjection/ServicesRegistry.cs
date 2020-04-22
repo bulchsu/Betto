@@ -1,5 +1,5 @@
 ﻿using Betto.Services;
-using Betto.Services.GameService;
+using Betto.Services;
 using Betto.Services.Services;
 using Microsoft.Extensions.DependencyInjection;
 

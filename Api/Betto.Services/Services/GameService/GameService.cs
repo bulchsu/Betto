@@ -10,7 +10,7 @@ using Betto.Services.Validators;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Localization;
 
-namespace Betto.Services.GameService
+namespace Betto.Services
 {
     public class GameService : IGameService
     {

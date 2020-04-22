@@ -8,11 +8,8 @@
         <p class="my-2">SIGN IN</p>
       </v-btn>
     </div>
-    <div v-if="loggedUser != null" class="mx-10" style="display: inline-block;">
-      <p class="my-6 mx-5" style="float: left">Welcome {{ loggedUser.username }}!</p>
-      <v-btn class="my-4" color="#004a04" @click="logout" style="float: left">
-        <p class="my-2">SIGN OUT</p>
-      </v-btn>
+    <div v-if="loggedUser != null" class="mx-5 my-6" style="display: inline-block;">
+      <UserMenu style="float: left;" />
     </div>
     <LoginDialog
       @dialogClosed="onLoginDialogClosed"
@@ -30,12 +27,12 @@
 import RegisterDialog from "./RegisterDialog/register-dialog";
 import LoginDialog from "./LoginDialog/login-dialog";
 import { mapActions, mapGetters } from "vuex";
-import { userService } from '@/shared/UserModule/user-service';
-import vm from "@/main";
+import { userService } from "@/shared/UserModule/user-service";
+import UserMenu from "./UserMenu/user-menu";
 
 export default {
   name: "UserPanel",
-  components: { LoginDialog, RegisterDialog },
+  components: { LoginDialog, RegisterDialog, UserMenu },
   data() {
     return {
       loginDialogVisibility: false,
@@ -43,21 +40,12 @@ export default {
     };
   },
   methods: {
-    ...mapActions("UserModule", [
-      "loginAction",
-      "logoutAction"
-    ]),
+    ...mapActions("UserModule", ["loginAction", "logoutAction"]),
     async login(username, password) {
       await this.loginAction({ username, password });
     },
     async register(username, password, mailAddress) {
-      await userService.register( username, password, mailAddress );
-    },
-    logout() {
-      this.logoutAction();
-      if (this.loggedUser == null) {
-        vm.$snotify.info("You have been signed out!");
-      }
+      await userService.register(username, password, mailAddress);
     },
     showLoginDialog() {
       this.loginDialogVisibility = true;
