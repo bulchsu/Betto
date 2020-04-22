@@ -12,11 +12,11 @@
         </tr>
         <tr class="general-table-row">
           <td class="general-table-cell">Season start:</td>
-          <td class="general-table-cell">{{ selectedLeague.seasonStart }}</td>
+          <td class="general-table-cell">{{ selectedLeague.seasonStart | formatDate }}</td>
         </tr>
         <tr class="general-table-row">
           <td class="general-table-cell">Season end:</td>
-          <td class="general-table-cell">{{ selectedLeague.seasonEnd }}</td>
+          <td class="general-table-cell">{{ selectedLeague.seasonEnd | formatDate }}</td>
         </tr>
         <tr class="general-table-row">
           <td class="general-table-cell">Teams:</td>
@@ -50,6 +50,11 @@ export default {
     },
     gamesCount() {
       return this.getGamesCount;
+    }
+  },
+  filters: {
+    formatDate : function (date) {
+      return date.slice(0, 10);
     }
   }
 };

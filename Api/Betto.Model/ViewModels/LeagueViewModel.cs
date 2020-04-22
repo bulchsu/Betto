@@ -1,7 +1,7 @@
-﻿using Betto.Model.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Betto.Model.Entities;
 
 namespace Betto.Model.ViewModels
 {

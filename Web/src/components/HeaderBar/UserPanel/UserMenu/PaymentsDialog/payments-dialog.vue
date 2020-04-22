@@ -52,7 +52,7 @@
                   <tr v-for="payment in selectedPayments" :key="payment.paymentId">
                     <td class="text-center">{{ payment.amount }}</td>
                     <td class="text-center">{{ paymentTypeLabel(payment.type) }}</td>
-                    <td class="text-center">{{ payment.paymentDateTime }}</td>
+                    <td class="text-center">{{ payment.paymentDateTime | formatDate }}</td>
                   </tr>
                 </tbody>
               </template>
@@ -136,8 +136,8 @@ export default {
       );
       this.user.payments = this.user.payments.slice().reverse();
       this.pageAmount = this.getPageAmount(this.user.payments.length);
-      this.choosePayments();
       this.selectedPage = 1;
+      this.choosePayments();
     },
     getPageAmount(length) {
       return Math.floor(length / 4) + 1;
@@ -174,12 +174,18 @@ export default {
       return (
         this.amount.length != 0 &&
         !this.amount.startsWith("0") &&
-        (this.paymentType == 0 || Number(this.amount) <= this.user.accountBalance)
+        (this.paymentType == 0 ||
+          Number(this.amount) <= this.user.accountBalance)
       );
     }
   },
   created: async function() {
     await this.refresh();
+  },
+  filters: {
+    formatDate: function(date) {
+      return date.replace("T", " ").slice(0, 19);
+    }
   }
 };
 </script>
@@ -195,5 +201,4 @@ export default {
   font-size: 20px;
   font-weight: bold;
 }
-
 </style>

@@ -15,7 +15,7 @@
             <v-card-text>
               <div class="my-2">
                 <small class="label-header">Game date</small>
-                <div class="label-content">{{ game.eventDate }}</div>
+                <div class="label-content">{{ game.eventDate | formatDate }}</div>
               </div>
               <div class="my-2">
                 <small class="label-header">Round</small>
@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     addToTicket() {
-      console.log(this.betType);
+
     },
     closeDialog() {
       this.$emit("dialogClosed");
@@ -106,6 +106,11 @@ export default {
     },
     awayTeamLabel() {
       return `${this.awayTeam.name} wins`;
+    }
+  },
+  filters: {
+    formatDate: function (date) {
+      return date.replace('T', ' ');
     }
   }
 };
