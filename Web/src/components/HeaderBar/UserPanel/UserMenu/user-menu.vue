@@ -50,9 +50,11 @@ export default {
   }),
   methods: {
     ...mapActions("UserModule", ["logoutAction"]),
+    ...mapActions("TicketModule", ["clearTicketAction"]),
     logout() {
       this.logoutAction();
       if (this.loggedUser == null) {
+        this.clearTicketAction();
         vm.$snotify.info("You have been signed out!");
       }
     },

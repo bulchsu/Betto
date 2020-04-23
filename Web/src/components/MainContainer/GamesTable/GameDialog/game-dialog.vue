@@ -52,7 +52,7 @@
               <v-radio :label="homeTeamLabel" :value="1"></v-radio>
               <v-radio label="Tie" :value="0"></v-radio>
               <v-radio :label="awayTeamLabel" :value="2"></v-radio>
-              <v-btn @click="addToTicket" class="my-7" color="primary">Add to ticket</v-btn>
+              <v-btn :disabled="!canAddToTicket" @click="addToTicket" class="my-7" color="primary">Add to ticket</v-btn>
             </v-radio-group>
           </v-col>
         </v-row>
@@ -63,6 +63,8 @@
 
 <script>
 import { leagueService } from "@/shared/LeagueModule/league-service";
+import { mapActions, mapGetters } from "vuex";
+import vm from "@/main";
 
 export default {
   name: "GameDialog",
@@ -84,8 +86,24 @@ export default {
     }
   },
   methods: {
+    ...mapActions("TicketModule", ["addTicketEventAction"]),
     addToTicket() {
-
+      var ticketEventsGameIds = this.ticketEvents.map(t => t.game.gameId);
+      var doesContainSelectedGameId = ticketEventsGameIds.includes(
+        this.game.gameId
+      );
+      if (!doesContainSelectedGameId) {
+        this.addTicketEventAction({
+          game: this.game,
+          betType: this.betType
+        });
+        this.closeDialog();
+        vm.$snotify.success("Added event to your ticket");
+      } else {
+        vm.$snotify.error(
+          "You already have an event relating to this game on your ticket!"
+        );
+      }
     },
     closeDialog() {
       this.$emit("dialogClosed");
@@ -98,6 +116,8 @@ export default {
     this.game = game;
   },
   computed: {
+    ...mapGetters("TicketModule", ["getTicketEvents"]),
+    ...mapGetters("UserModule", ["getLoggedUser"]),
     gameLabel() {
       return `${this.homeTeam.name} - ${this.awayTeam.name}`;
     },
@@ -106,11 +126,17 @@ export default {
     },
     awayTeamLabel() {
       return `${this.awayTeam.name} wins`;
+    },
+    ticketEvents() {
+      return this.getTicketEvents;
+    },
+    canAddToTicket() {
+      return this.betType != null && this.getLoggedUser != null;
     }
   },
   filters: {
-    formatDate: function (date) {
-      return date.replace('T', ' ');
+    formatDate: function(date) {
+      return date.replace("T", " ");
     }
   }
 };
@@ -120,12 +146,11 @@ export default {
 @import "@/assets/styles/_colors.scss";
 
 .label-header {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .label-content {
-    font-size: 15px;
-    font-weight: bold;
+  font-size: 15px;
+  font-weight: bold;
 }
-
 </style>
