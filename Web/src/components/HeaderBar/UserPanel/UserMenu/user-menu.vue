@@ -10,6 +10,11 @@
       @dialogClosed="onPaymentsDialogClosed"
       :dialogVisibility="paymentsDialogVisibility"
     />
+    <UserTicketsDialog
+      v-if="userTicketsDialogVisibility"
+      @dialogClosed="onUserTicketsDialogClosed"
+      :dialogVisibility="userTicketsDialogVisibility"
+    />
     <v-speed-dial bottom right direction="left" transition="slide-y-transition">
       <template v-slot:activator>
         <v-btn color="#003304" dark fab>
@@ -19,7 +24,7 @@
       <v-btn fab color="primary" @click="openPaymentsDialog">
         <i class="fas fa-dollar-sign fa-2x"></i>
       </v-btn>
-      <v-btn fab color="primary">
+      <v-btn fab color="primary" @click="openUserTicketsDialog">
         <i class="fas fa-ticket-alt fa-2x"></i>
       </v-btn>
       <v-btn fab color="primary" @click="openRankingDialog">
@@ -37,16 +42,19 @@ import { mapActions } from "vuex";
 import vm from "@/main";
 import RankingDialog from "./RankingDialog/ranking-dialog";
 import PaymentsDialog from "./PaymentsDialog/payments-dialog";
+import UserTicketsDialog from "./UserTicketsDialog/user-tickets-dialog";
 
 export default {
   name: "UserMenu",
   components: {
     RankingDialog,
-    PaymentsDialog
+    PaymentsDialog,
+    UserTicketsDialog
   },
   data: () => ({
     rankingDialogVisibility: false,
     paymentsDialogVisibility: false,
+    userTicketsDialogVisibility: false
   }),
   methods: {
     ...mapActions("UserModule", ["logoutAction"]),
@@ -69,6 +77,12 @@ export default {
     },
     onRankingDialogClosed() {
       this.rankingDialogVisibility = false;
+    },
+    openUserTicketsDialog() {
+      this.userTicketsDialogVisibility = true;
+    },
+    onUserTicketsDialogClosed() {
+      this.userTicketsDialogVisibility = false;
     }
   }
 };

@@ -11,6 +11,28 @@ const pushTicket = async function (ticket) {
     }
 }
 
+const revealTicket = async function (ticketId) {
+    try {
+        let resourcePath = `${API_URL}tickets/${ticketId}/reveal`;
+        var response = await apiClient.post(resourcePath);
+        return response;
+    } catch (error) {
+        return null;
+    }
+}
+
+const getTicketById = async function (ticketId) {
+    try {
+        let resourcePath = `${API_URL}tickets/${ticketId}`;
+        var response = await apiClient.get(resourcePath);
+        return response;
+    } catch (error) {
+        return null;
+    }
+}
+
 export const ticketService = {
-    pushTicket
+    pushTicket,
+    revealTicket,
+    getTicketById
 }
