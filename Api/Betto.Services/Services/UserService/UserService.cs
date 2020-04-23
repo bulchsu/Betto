@@ -132,14 +132,8 @@ namespace Betto.Services
                     null);
             }
 
-            var jointTask = user.Tickets
-                .GetEmptyIfNull()
-                .Select(_ticketValidator.PrepareResponseTicketAsync);
-            
             var userViewModel = (UserViewModel) user;
-            userViewModel.Tickets = (await Task.WhenAll(jointTask))
-                .ToList();
-
+            
             return new RequestResponseModel<UserViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
                 userViewModel);

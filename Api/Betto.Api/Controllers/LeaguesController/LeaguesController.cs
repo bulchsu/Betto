@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Betto.Model.Models;
-using Betto.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers

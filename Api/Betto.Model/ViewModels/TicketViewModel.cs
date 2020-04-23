@@ -23,7 +23,7 @@ namespace Betto.Model.ViewModels
             {
                 TicketId = ticket.TicketId,
                 UserId = ticket.UserId,
-                Events = ticket.Events.Select(t => (TicketEventViewModel)t).ToList(),
+                Events = ticket.Events?.Select(t => (TicketEventViewModel)t).ToList(),
                 CreationDateTime = ticket.CreationDateTime,
                 Stake = ticket.Stake,
                 TotalConfirmedRate = ticket.TotalConfirmedRate,

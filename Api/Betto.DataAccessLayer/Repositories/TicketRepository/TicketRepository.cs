@@ -26,6 +26,7 @@ namespace Betto.DataAccessLayer.Repositories
         public async Task<TicketEntity> GetTicketByIdAsync(int ticketId) =>
             await DbContext.Tickets
                 .Include(t => t.Events)
+                .ThenInclude(e => e.Game)
                 .SingleOrDefaultAsync(t => t.TicketId == ticketId);
 
         public async Task<ICollection<TicketEntity>> GetTicketsAsync() =>
