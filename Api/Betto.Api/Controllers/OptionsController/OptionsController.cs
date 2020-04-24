@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Betto.Api.Controllers
 {
-    [ApiController, Route("api/[controller]"), Authorize]
+    [ApiController, Route("api/[controller]"), Authorize(Roles = Role.Admin)]
     public class OptionsController : ControllerBase
     {
         private readonly IOptionsService _optionsService;

@@ -23,7 +23,6 @@ namespace Betto.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenGenerator _tokenGenerator;
         private readonly IUserValidator _userValidator;
-        private readonly ITicketValidator _ticketValidator;
         private readonly IStringLocalizer<ErrorMessages> _localizer;
 
         public UserService(IUserRepository userRepository,
@@ -31,7 +30,6 @@ namespace Betto.Services
             IPasswordHasher passwordHasher,
             ITokenGenerator tokenGenerator,
             IUserValidator userValidator,
-            ITicketValidator ticketValidator,
             IStringLocalizer<ErrorMessages> localizer)
         {
             _userRepository = userRepository;
@@ -39,7 +37,6 @@ namespace Betto.Services
             _passwordHasher = passwordHasher;
             _tokenGenerator = tokenGenerator;
             _userValidator = userValidator;
-            _ticketValidator = ticketValidator;
             _localizer = localizer;
         }
 
@@ -54,8 +51,8 @@ namespace Betto.Services
                     null);
             }
 
-            var authenticationToken = _tokenGenerator.GenerateToken(loginModel.Username);
             var user = await _userRepository.GetUserByUsernameAsync(loginModel.Username);
+            var authenticationToken = _tokenGenerator.GenerateToken(user.Username, user.Role);
 
             return new RequestResponseModel<AuthenticationViewModel>(StatusCodes.Status200OK,
                 Enumerable.Empty<ErrorViewModel>(),
@@ -79,12 +76,14 @@ namespace Betto.Services
             }
 
             var passwordHash = _passwordHasher.EncodePassword(signUpData.Password);
+            var role = await _userValidator.GetUserRoleBeforeRegisterAsync();
 
             var registeredUser = await _userRepository.SignUpAsync(new UserEntity
             {
                 MailAddress = signUpData.MailAddress,
                 Username = signUpData.Username,
-                PasswordHash = passwordHash
+                PasswordHash = passwordHash,
+                Role = role
             });
 
             if (registeredUser == null)

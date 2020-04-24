@@ -19,6 +19,8 @@
     <Compile Remove="Migrations\20200409190746_AddRapidApiExternalIViewModelSomeEntities.Designer.cs" />
     <Compile Remove="Migrations\20200412084414_AddRatesEntity.cs" />
     <Compile Remove="Migrations\20200412084414_AddRatesEntity.Designer.cs" />
+    <Compile Remove="Migrations\20200424071939_Add role to user entity.cs" />
+    <Compile Remove="Migrations\20200424071939_Add role to user entity.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,9 +7,9 @@ namespace Betto.Services.Validators
 {
     public interface IUserValidator
     {
-        Task<bool> CheckDoesTheUserExistAsync(int userId);
         Task<bool> CheckIsUsernameAlreadyTakenAsync(string username);
         Task<ICollection<ErrorViewModel>> CheckLoginCredentials(LoginWriteModel loginModel);
         Task<ICollection<ErrorViewModel>> CheckSignUpDataBeforeRegisteringAsync(RegistrationWriteModel signUpModel);
+        Task<string> GetUserRoleBeforeRegisterAsync();
     }
 }

@@ -27,9 +27,6 @@ namespace Betto.Services.Validators
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<bool> CheckDoesTheUserExistAsync(int userId) =>
-            await _userRepository.GetUserByIdAsync(userId, false, false) != null;
-
         public async Task<bool> CheckIsUsernameAlreadyTakenAsync(string username) =>
             await _userRepository.GetUserByUsernameAsync(username) != null;
 
@@ -58,6 +55,9 @@ namespace Betto.Services.Validators
 
             return errors;
         }
+
+        public async Task<string> GetUserRoleBeforeRegisterAsync() =>
+            (await _userRepository.GetUsersAsync()).Count == 0 ? Role.Admin : Role.User;
 
         private async Task<ICollection<ErrorViewModel>> CheckDoesTheUserExistAsync(string username)
         {
