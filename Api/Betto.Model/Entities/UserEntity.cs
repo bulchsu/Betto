@@ -15,6 +15,7 @@ namespace Betto.Model.Entities
         [Required, MaxLength(64)]
         public byte[] PasswordHash { get; set; }
         public double AccountBalance { get; set; }
+        public string Role { get; set; }
         public ICollection<TicketEntity> Tickets { get; set; }
         public ICollection<PaymentEntity> Payments { get; set; }
     }

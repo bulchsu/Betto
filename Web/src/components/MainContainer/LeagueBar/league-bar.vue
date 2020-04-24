@@ -1,5 +1,7 @@
 <template>
   <v-app-bar color="#7cb378" dark prominent>
+    <template>
+      </template>
     <TicketDialog v-if="ticketDialogVisibility" :dialogVisibility="ticketDialogVisibility" @dialogClosed="onTicketDialogClosed" />
     <p id="title">{{ selectedLeague.name }}</p>
     <v-spacer></v-spacer>

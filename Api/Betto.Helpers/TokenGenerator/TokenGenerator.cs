@@ -17,7 +17,7 @@ namespace Betto.Helpers
             _appConfiguration = appConfiguration.Value;
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(string username, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var secretKey = Encoding.ASCII.GetBytes(_appConfiguration.AuthenticationSecretKey);
@@ -26,7 +26,8 @@ namespace Betto.Helpers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Name, username)
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, role) 
                 }),
                 Expires = DateTime.Now.AddHours(_appConfiguration.AuthenticationTokenValidityTime),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)

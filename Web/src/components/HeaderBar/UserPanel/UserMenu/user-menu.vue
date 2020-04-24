@@ -15,12 +15,23 @@
       @dialogClosed="onUserTicketsDialogClosed"
       :dialogVisibility="userTicketsDialogVisibility"
     />
+    <ImportLeaguesDialog
+      v-if="importLeaguesDialogVisibility"
+      @dialogClosed="onImportLeaguesDialogClosed"
+      :dialogVisibility="importLeaguesDialogVisibility"
+    />
     <v-speed-dial bottom right direction="left" transition="slide-y-transition">
       <template v-slot:activator>
         <v-btn color="#003304" dark fab>
           <i class="fas fa-user fa-2x"></i>
         </v-btn>
       </template>
+      <v-btn v-if="this.role == 'Admin'" fab color="primary" @click="importInitialData">
+        <i class="fas fa-sync-alt fa-2x"></i>
+      </v-btn>
+      <v-btn v-if="this.role == 'Admin'" fab color="primary" @click="addLeagues">
+        <i class="fas fa-plus fa-2x"></i>
+      </v-btn>
       <v-btn fab color="primary" @click="openPaymentsDialog">
         <i class="fas fa-dollar-sign fa-2x"></i>
       </v-btn>
@@ -38,23 +49,29 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 import vm from "@/main";
 import RankingDialog from "./RankingDialog/ranking-dialog";
 import PaymentsDialog from "./PaymentsDialog/payments-dialog";
 import UserTicketsDialog from "./UserTicketsDialog/user-tickets-dialog";
+import ImportLeaguesDialog from "./ImportLeaguesDialog/import-leagues-dialog";
+import { userService } from "@/shared/UserModule/user-service";
+import { optionsService } from "@/shared/OptionsModule/options-service";
 
 export default {
   name: "UserMenu",
   components: {
     RankingDialog,
     PaymentsDialog,
-    UserTicketsDialog
+    UserTicketsDialog,
+    ImportLeaguesDialog
   },
   data: () => ({
     rankingDialogVisibility: false,
     paymentsDialogVisibility: false,
-    userTicketsDialogVisibility: false
+    userTicketsDialogVisibility: false,
+    importLeaguesDialogVisibility: false,
+    role: "User"
   }),
   methods: {
     ...mapActions("UserModule", ["logoutAction"]),
@@ -83,7 +100,29 @@ export default {
     },
     onUserTicketsDialogClosed() {
       this.userTicketsDialogVisibility = false;
+    },
+    async importInitialData() {
+      var response = await optionsService.initialImport();
+      if (response != null) {
+        vm.$snotify.success('Successfully initialized database! Refresh the page!');
+      } else {
+        vm.$snotify.error('Something went wrong! Check logs!');
+      }
+    },
+    addLeagues() {
+      this.importLeaguesDialogVisibility = true;
+    },
+    onImportLeaguesDialogClosed() {
+      this.importLeaguesDialogVisibility = false;
     }
+  },
+  computed: {
+    ...mapGetters("UserModule", ["getLoggedUser"])
+  },
+  created: async function() {
+    this.role = (
+      await userService.getUserById(this.getLoggedUser.userId, false, false)
+    ).role;
   }
 };
 </script>

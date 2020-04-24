@@ -33,6 +33,18 @@ const apiClient = {
                 throw error;
             });
         return response;
+    },
+    async options(resource) {
+        var response = null;
+        await axios.options(resource)
+            .then(r => {
+                response = r.data;
+            })
+            .catch(error => {
+                informAboutAnError(error.response);
+                throw error;
+            });
+        return response;
     }
 }
 
