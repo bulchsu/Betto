@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using Betto.DataAccessLayer;
 using Betto.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,6 +44,8 @@ namespace Betto.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.EnsureMigrationOfContext<BettoDbContext>();
 
             app.UseCors("CorsPolicy");
 
